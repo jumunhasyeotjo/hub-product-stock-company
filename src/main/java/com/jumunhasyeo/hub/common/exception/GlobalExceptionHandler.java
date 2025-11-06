@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.jumunhasyeo.hub.common.exception.ErrorCode.INVALID_JSON;
+import static com.jumunhasyeo.hub.common.exception.ErrorCode.VALIDATION_FAILED;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -26,7 +29,7 @@ public class GlobalExceptionHandler {
         log.error("JSON parsing error: {}", ex.getMessage());
         return ResponseEntity
                 .badRequest()
-                .body(ApiRes.error("INVALID_JSON", "잘못된 JSON 형식입니다."));
+                .body(ApiRes.error(INVALID_JSON.name(), INVALID_JSON.getMessage()));
     }
 
     /**
@@ -47,7 +50,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .badRequest()
-                .body(ApiRes.error("VALIDATION_FAILED", "입력값 검증에 실패했습니다. "+ errors));
+                .body(ApiRes.error(VALIDATION_FAILED.name(), VALIDATION_FAILED.getMessage()+" "+ errors));
     }
 
     /**
