@@ -29,8 +29,7 @@ public class Hub extends BaseEntity {
     @Embedded
     private Address address;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "hub_id")
+    @OneToMany(mappedBy = "hub", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Stock> stockList = new ArrayList<>();
 
     private Hub(String name, Address address) {
@@ -61,20 +60,24 @@ public class Hub extends BaseEntity {
         markDeleted(userId);
     }
 
-    public void addProductStock(Stock stock) {
-        if (stock == null)
-            throw new BusinessException(ErrorCode.MUST_NOT_NULL, "stock");
+    public Stock addStock(UUID productId, Integer quantity) {
+        if (productId == null || quantity == null) {
+            throw new BusinessException(ErrorCode.MUST_NOT_NULL, "productId or quantity");
+        }
+
+        Stock stock = Stock.of(this, productId, quantity);
         this.stockList.add(stock);
+        return stock;
     }
 
-    public void stockDecrease(Long productId, int amount) {
+    public void stockDecrease(UUID productId, int amount) {
         Stock targetStock = getStock(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "해당 상품의 재고를 찾을 수 없습니다."));
 
         targetStock.decrease(amount);
     }
 
-    public void stockIncrease(Long productId, int amount) {
+    public void stockIncrease(UUID productId, int amount) {
         Stock targetStock = getStock(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "해당 상품의 재고를 찾을 수 없습니다."));
         targetStock.increase(amount);
@@ -84,7 +87,7 @@ public class Hub extends BaseEntity {
         return Collections.unmodifiableList(stockList);
     }
 
-    public Optional<Stock> getStock(Long productId) {
+    public Optional<Stock> getStock(UUID productId) {
         return stockList.stream().filter(stock -> stock.isSameProduct(productId)).findFirst();
     }
 }

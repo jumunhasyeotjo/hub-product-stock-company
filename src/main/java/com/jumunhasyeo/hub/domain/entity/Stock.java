@@ -19,23 +19,28 @@ public class Stock extends BaseEntity {
     @Id
     private UUID stockId;
 
-    private Long productId;
+    private UUID productId;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    private Stock(Long productId, Integer quantity) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hub_id", nullable = false)
+    private Hub hub;
+
+    private Stock(Hub hub, UUID productId, Integer quantity) {
+        this.hub = hub;
         this.productId = productId;
         this.quantity = quantity;
     }
 
-    public static Stock of(Long productId, Integer quantity) {
-        if (productId == null || quantity == null || quantity < 0)
+     static Stock of(Hub hub, UUID productId, Integer quantity) {
+        if (hub == null || productId == null || quantity == null || quantity < 0)
             throw new BusinessException(ErrorCode.CREATE_VALIDATE_EXCEPTION);
-        return new Stock(productId, quantity);
+        return new Stock(hub, productId, quantity);
     }
 
-    public void decrease(int amount) {
+    void decrease(int amount) {
         if (amount <= 0)
             throw new BusinessException(ErrorCode.STOCK_VALID, "감소 수량은 0보다 커야 합니다.");
 
@@ -45,14 +50,14 @@ public class Stock extends BaseEntity {
         this.quantity -= amount;
     }
 
-    public boolean isSameProduct(Long productId) {
-        return this.productId.equals(productId);
-    }
-
-    public void increase(int amount) {
+    void increase(int amount) {
         if (amount <= 0)
             throw new BusinessException(ErrorCode.STOCK_VALID, "증가 수량은 0보다 커야 합니다.");
 
         this.quantity += amount;
+    }
+
+    public boolean isSameProduct(UUID productId) {
+        return this.productId.equals(productId);
     }
 }
