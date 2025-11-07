@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class StockTest{
 
     @Test
-    @DisplayName("Hub를 통해 Stock을 생성할 수 있다.")
+    @DisplayName("quantity >=0 인 경우 생성할 수 있다.")
     public void of_stock_success() {
         Hub hub = createHub();
         Stock stock = hub.registerNewStock(UUID.randomUUID(), 100);
