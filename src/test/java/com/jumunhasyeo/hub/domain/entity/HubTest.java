@@ -98,7 +98,7 @@ public class HubTest {
         UUID productId = UUID.randomUUID();
         int quantity = 100;
 
-        hub.addStock(productId, quantity);
+        hub.registerNewStock(productId, quantity);
 
         assertThat(hub.getStockList().size()).isEqualTo(1);
     }
@@ -110,7 +110,7 @@ public class HubTest {
         Hub hub = createHub();;
         UUID productId = UUID.randomUUID();
         int quantity = 100;
-        hub.addStock(productId, quantity);
+        hub.registerNewStock(productId, quantity);
 
         hub.stockDecrease(productId, 10);
 
@@ -124,7 +124,7 @@ public class HubTest {
         Hub hub = createHub();
         UUID productId = UUID.randomUUID();
         int quantity = 100;
-        hub.addStock(productId, quantity);
+        hub.registerNewStock(productId, quantity);
 
         hub.stockIncrease(productId, 10);
 
@@ -138,7 +138,7 @@ public class HubTest {
         Hub hub = createHub();
         UUID productId = UUID.randomUUID();
         int quantity = 100;
-        hub.addStock(productId, quantity);
+        hub.registerNewStock(productId, quantity);
 
         Optional<Stock> stockOpt = hub.getStock(productId);
 
@@ -149,12 +149,12 @@ public class HubTest {
 
     @Test
     @DisplayName("동일 상품 재고 중복 등록 시 예외 반환")
-    public void addStock_DuplicateProduct_ShouldThrowException() {
+    public void registerNewStock_DuplicateProduct_ShouldThrowException() {
         Hub hub = createHub();
         UUID productId = UUID.randomUUID();
-        hub.addStock(productId, 100);
+        hub.registerNewStock(productId, 100);
 
-        assertThrows(BusinessException.class, () -> hub.addStock(productId, 50));
+        assertThrows(BusinessException.class, () -> hub.registerNewStock(productId, 50));
     }
 
     private static Hub createHub() {

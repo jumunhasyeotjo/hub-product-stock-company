@@ -2,7 +2,6 @@ package com.jumunhasyeo.hub.domain.entity;
 
 import com.jumunhasyeo.hub.exception.BusinessException;
 import com.jumunhasyeo.hub.exception.ErrorCode;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,8 +16,8 @@ class StockTest{
     @Test
     @DisplayName("Hub를 통해 Stock을 생성할 수 있다.")
     public void of_stock_success() {
-        Hub hub = Hub.builder().stockList(new ArrayList<>()).build();
-        Stock stock = hub.addStock(UUID.randomUUID(), 100);
+        Hub hub = createHub();
+        Stock stock = hub.registerNewStock(UUID.randomUUID(), 100);
         assertThat(stock.getQuantity()).isEqualTo(100);
     }
 
@@ -117,7 +116,28 @@ class StockTest{
         assertThat(businessException.getMessage()).contains("증가 수량은 0보다 커야 합니다.");
     }
 
+    @Test
+    @DisplayName("재고를 정확히 0까지 감소시킬 수 있다")
+    public void decrease_ToZero_success() {
+        Stock stock = createStock(100);
+        stock.decrease(100);
+        assertThat(stock.getQuantity()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("재고 0으로 생성 가능")
+    public void of_quantityIsZero_success() {
+        Hub hub = createHub();
+        Stock stock = hub.registerNewStock(UUID.randomUUID(), 0);
+        assertThat(stock.getQuantity()).isEqualTo(0);
+    }
+
     private static Stock createStock(int quantity) {
-        return Stock.of(Hub.builder().build(), UUID.randomUUID(), quantity);
+        Hub hub = createHub();
+        return hub.registerNewStock(UUID.randomUUID(), quantity);
+    }
+
+    private static Hub createHub() {
+        return Hub.builder().stockList(new ArrayList<>()).build();
     }
 }

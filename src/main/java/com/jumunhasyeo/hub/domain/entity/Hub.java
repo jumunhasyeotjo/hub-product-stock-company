@@ -60,11 +60,7 @@ public class Hub extends BaseEntity {
         markDeleted(userId);
     }
 
-    public Stock addStock(UUID productId, Integer quantity) {
-        if (productId == null || quantity == null) {
-            throw new BusinessException(ErrorCode.MUST_NOT_NULL, "productId or quantity");
-        }
-
+    public Stock registerNewStock(UUID productId, Integer quantity) {
         // 기존 재고 확인
         Optional<Stock> existingStock = getStock(productId);
         if (existingStock.isPresent()) {
