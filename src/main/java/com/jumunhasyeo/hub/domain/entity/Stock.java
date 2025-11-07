@@ -17,6 +17,8 @@ import java.util.UUID;
 public class Stock extends BaseEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "stock_id", columnDefinition = "UUID")
     private UUID stockId;
 
     private UUID productId;
@@ -58,6 +60,7 @@ public class Stock extends BaseEntity {
     }
 
     public boolean isSameProduct(UUID productId) {
+        if (productId == null) return false;
         return this.productId.equals(productId);
     }
 }

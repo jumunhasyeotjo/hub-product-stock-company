@@ -16,7 +16,8 @@ public enum ErrorCode {
     INVALID_JSON(HttpStatus.BAD_REQUEST, "E007", "잘못된 JSON 형식입니다."),
     MUST_NOT_NULL(HttpStatus.BAD_REQUEST, "E008", "는(은) null일 수 없습니다."),
     NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, "EN001", "조회에 실패했습니다."),
-    STOCK_VALID(HttpStatus.BAD_REQUEST, "ES", "Stock 유효성 검사에 실패했습니다.");
+    STOCK_VALID(HttpStatus.BAD_REQUEST, "ES", "Stock 유효성 검사에 실패했습니다."),
+    ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "E009", "이미 존재합니다.");
 
     private final HttpStatus status;
     private final String code;

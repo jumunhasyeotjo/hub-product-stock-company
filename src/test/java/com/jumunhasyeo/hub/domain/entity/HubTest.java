@@ -147,6 +147,15 @@ public class HubTest {
         assertThat(stockOpt.get().getQuantity()).isEqualTo(100);
     }
 
+    @Test
+    @DisplayName("동일 상품 재고 중복 등록 시 예외 반환")
+    public void addStock_DuplicateProduct_ShouldThrowException() {
+        Hub hub = createHub();
+        UUID productId = UUID.randomUUID();
+        hub.addStock(productId, 100);
+
+        assertThrows(BusinessException.class, () -> hub.addStock(productId, 50));
+    }
 
     private static Hub createHub() {
         return Hub.builder()

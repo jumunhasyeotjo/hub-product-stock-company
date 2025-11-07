@@ -65,6 +65,12 @@ public class Hub extends BaseEntity {
             throw new BusinessException(ErrorCode.MUST_NOT_NULL, "productId or quantity");
         }
 
+        // 기존 재고 확인
+        Optional<Stock> existingStock = getStock(productId);
+        if (existingStock.isPresent()) {
+            throw new BusinessException(ErrorCode.ALREADY_EXISTS, "해당 상품은 이미 존재합니다.");
+        }
+
         Stock stock = Stock.of(this, productId, quantity);
         this.stockList.add(stock);
         return stock;
