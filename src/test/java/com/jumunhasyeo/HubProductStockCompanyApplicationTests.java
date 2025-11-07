@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class HubProductStockCompanyApplicationTests {
+class HubProductStockCompanyApplicationTests extends CommonTestContainer {
 
     @Test
     void contextLoads() {

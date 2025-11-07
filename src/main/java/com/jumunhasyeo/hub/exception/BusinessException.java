@@ -1,4 +1,4 @@
-package com.jumunhasyeo.hub.common.exception;
+package com.jumunhasyeo.hub.exception;
 
 import lombok.Getter;
 
@@ -9,6 +9,11 @@ public class BusinessException extends RuntimeException {
 
     public BusinessException(ErrorCode errorCode) {
         super(errorCode.getMessage());
+        this.errorCode = errorCode;
+    }
+
+    public BusinessException(ErrorCode errorCode, String variable) {
+        super(variable + errorCode.getMessage());
         this.errorCode = errorCode;
     }
 }
