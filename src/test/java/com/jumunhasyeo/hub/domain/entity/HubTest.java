@@ -178,7 +178,7 @@ public class HubTest {
 
     private Stock createStock(Long productId, Integer quantity) {
         return Stock.builder()
-                .id(UUID.randomUUID())
+                .stockId(UUID.randomUUID())
                 .productId(productId)
                 .quantity(quantity)
                 .build();

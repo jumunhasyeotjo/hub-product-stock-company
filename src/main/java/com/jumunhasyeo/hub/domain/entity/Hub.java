@@ -30,7 +30,7 @@ public class Hub extends BaseEntity {
     private Address address;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "stock_id")
+    @JoinColumn(name = "hub_id")
     private List<Stock> stockList = new ArrayList<>();
 
     private Hub(String name, Address address) {

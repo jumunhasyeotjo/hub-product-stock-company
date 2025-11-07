@@ -3,10 +3,7 @@ package com.jumunhasyeo.hub.domain.entity;
 import com.jumunhasyeo.common.BaseEntity;
 import com.jumunhasyeo.hub.exception.BusinessException;
 import com.jumunhasyeo.hub.exception.ErrorCode;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
@@ -20,7 +17,7 @@ import java.util.UUID;
 public class Stock extends BaseEntity {
 
     @Id
-    private UUID id;
+    private UUID stockId;
 
     private Long productId;
 
