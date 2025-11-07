@@ -36,7 +36,7 @@ public class Stock extends BaseEntity {
         this.quantity = quantity;
     }
 
-     static Stock of(Hub hub, UUID productId, Integer quantity) {
+    static Stock of(Hub hub, UUID productId, Integer quantity) {
         if (hub == null || productId == null || quantity == null || quantity < 0)
             throw new BusinessException(ErrorCode.CREATE_VALIDATE_EXCEPTION);
         return new Stock(hub, productId, quantity);
