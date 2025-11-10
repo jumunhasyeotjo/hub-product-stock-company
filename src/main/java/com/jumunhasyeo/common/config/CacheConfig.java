@@ -11,6 +11,10 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 @EnableCaching
 public class CacheConfig {
@@ -34,6 +38,11 @@ public class CacheConfig {
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer())
                 );
+
+        // 캐시별로 다른 TTL
+        Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
+
+        cacheConfigs.put("hub", cacheConfig.entryTtl(Duration.ofDays(1)));  // hub 캐시는 24시간
 
         return RedisCacheManager.builder(factory)
                 .cacheDefaults(cacheConfig)
