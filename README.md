@@ -1,4 +1,6 @@
 # README.md
+<img width="1139" height="374" alt="스크린샷 2025-11-10 오후 4 05 45" src="https://github.com/user-attachments/assets/37f8838e-eee2-4593-8c02-810c442acee3" />
+
 ## TDD 학습 과정
 TDD 세션에서 튜터님께서 제공해주신 강의와 강의 자료를 통해 기본적인 지식을 습득했습니다. <br/>
 그리고 TDD에 대한 다양한 관점에서의 토론을 통해 시각과 TDD의 필요성에 대해 깨닫는 시간을 가졌습니다. <br/>
