@@ -38,3 +38,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.orm.jpa: DEBUG
     org.springframework.transaction: DEBUG
+
+cache:
+  config:
+    hubService: {HUB_SERVICE_CACHEABLE}  # true면 캐시 Proxy 주입, false면 원본 Service 주입

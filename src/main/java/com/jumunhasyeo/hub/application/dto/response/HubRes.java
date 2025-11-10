@@ -6,6 +6,7 @@ import com.jumunhasyeo.hub.domain.vo.Coordinate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Schema(description = "허브 응답")
@@ -26,7 +27,7 @@ public record HubRes(
 
         @Schema(description = "경도", example = "127.1230678")
         Double longitude
-) {
+) implements Serializable {
 
     public static HubRes from(Hub hub) {
         Address addressVo = hub.getAddress();
