@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
-public class HubServiceImpl{
+public class HubServiceImpl implements HubService{
     private final HubRepository hubRepository;
     private final HubRepositoryCustom hubRepositoryCustom;
     private final ApplicationEventPublisher eventPublisher;
