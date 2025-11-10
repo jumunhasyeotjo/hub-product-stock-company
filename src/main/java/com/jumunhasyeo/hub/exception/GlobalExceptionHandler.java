@@ -3,6 +3,8 @@ package com.jumunhasyeo.hub.exception;
 
 import com.jumunhasyeo.common.ApiRes;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -19,6 +21,26 @@ import static com.jumunhasyeo.hub.exception.ErrorCode.VALIDATION_FAILED;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiRes<Void>> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex
+    ) {
+        log.error("DataIntegrityViolationException error: {}", ex.getMessage());
+        String message = ex.getMessage();
+
+        if (message != null && message.contains("p_hub_name_key")) {
+            // 허브 이름 중복
+            return ResponseEntity
+                    .status(ErrorCode.ALREADY_EXISTS.getStatus())
+                    .body(ApiRes.error(ErrorCode.ALREADY_EXISTS.name(), "이미 존재하는 허브 이름입니다."));
+        }
+
+        // 기타 데이터 무결성 위반
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiRes.error(ErrorCode.INVALID_INPUT.name(), "데이터 무결성 제약조건 위반입니다."));
+    }
 
     /**
      * JSON 파싱 에러 처리
