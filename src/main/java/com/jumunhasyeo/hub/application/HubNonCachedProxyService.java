@@ -35,7 +35,6 @@ public class HubNonCachedProxyService implements HubService {
     }
 
     public HubRes getById(UUID hubId) {
-        System.out.println("non");
         return hubServiceImpl.getById(hubId);
     }
 
