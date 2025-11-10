@@ -1,7 +1,6 @@
 package com.jumunhasyeo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jumunhasyeo.hub.application.HubNonCachedProxyService;
 import com.jumunhasyeo.hub.application.HubService;
 import com.jumunhasyeo.hub.application.HubServiceImpl;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -17,6 +16,6 @@ public class TestConfig {
 
     @Bean
     public HubService hubService(HubServiceImpl hubServiceImpl) {
-        return new HubNonCachedProxyService(hubServiceImpl);
+        return hubServiceImpl;
     }
 }

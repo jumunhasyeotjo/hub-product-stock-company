@@ -7,6 +7,9 @@ import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
-public class HubNonCachedProxyService implements HubService {
+public class HubCachedDecoratorService implements HubService {
     private final HubServiceImpl hubServiceImpl;
 
     @Transactional
@@ -25,17 +28,26 @@ public class HubNonCachedProxyService implements HubService {
     }
 
     @Transactional
+    @CachePut(value = "hub", key = "#command.hubId()")
     public HubRes update(UpdateHubCommand command) {
-        return hubServiceImpl.update(command);
+        HubRes update = hubServiceImpl.update(command);
+        log.info("Cache Write-Through - hubId: {}", update.id());
+        return update;
     }
 
     @Transactional
+    @CacheEvict(value = "hub", key = "#command.hubId()")
     public UUID delete(DeleteHubCommand command) {
-        return hubServiceImpl.delete(command);
+        UUID deleteId = hubServiceImpl.delete(command);
+        log.info("Cache delete - hubId: {}", deleteId);
+        return deleteId;
     }
 
+    @Cacheable(value = "hub", key = "#hubId", unless = "#result == null")
     public HubRes getById(UUID hubId) {
-        return hubServiceImpl.getById(hubId);
+        HubRes hubRes = hubServiceImpl.getById(hubId);
+        log.info("Cache get - hubId: {}", hubRes.id());
+        return hubRes;
     }
 
     public Page<HubRes> search(HubSearchCondition condition, Pageable pageable) {
