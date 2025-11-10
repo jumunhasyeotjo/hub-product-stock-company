@@ -90,25 +90,7 @@ class HubServiceTest {
         assertThat(result.id()).isEqualTo(hub.getHubId());
     }
 }
-```
 
-### 2. BDDMockito 패턴 (권장)
-```java
-import static org.mockito.BDDMockito.*;
-
-@Test
-void test() {
-    // given
-    Hub hub = createHub();
-    given(hubRepository.findById(any())).willReturn(Optional.of(hub));
-    
-    // when
-    HubRes result = hubService.getById(hub.getHubId());
-    
-    // then
-    assertThat(result).isNotNull();
-    then(hubRepository).should().findById(any());
-}
 ```
 
 ### 3. ArgumentCaptor 사용
@@ -162,8 +144,8 @@ class RepositoryTest extends CommonTestContainer {
     
     @BeforeEach
     void setUp() {
-        // 테스트 데이터 준비
         cleanUp.truncateAll();
+        // 테스트 데이터 준비
     }
 }
 ```
@@ -185,40 +167,16 @@ class ControllerTest {
 ### 3. @SpringBootTest - E2E 테스트
 ```java
 @SpringBootTest
-@Transactional
-class E2ETest extends CommonTestContainer {
+class HubIntegrationTest extends CommonTestContainer {
     
     @Autowired
     private HubService hubService;
     
     @Autowired
     private HubRepository hubRepository;
+
+    //cleanUp
 }
 ```
 
 ---
-
-## ✅ AssertJ 사용 패턴
-```java
-// 기본 검증
-assertThat(hub.getName()).isEqualTo("송파 허브");
-assertThat(hub.getAddress()).isNotNull();
-
-// 컬렉션 검증
-assertThat(hub.getStockList())
-    .hasSize(1)
-    .extracting(Stock::getProductId)
-    .contains(productId);
-
-// 예외 검증
-assertThatThrownBy(() -> hub.delete(null))
-    .isInstanceOf(BusinessException.class)
-    .hasMessageContaining("null일 수 없습니다");
-
-// Optional 검증
-assertThat(hub.getStock(productId))
-    .isPresent()
-    .get()
-    .extracting(Stock::getQuantity)
-    .isEqualTo(100);
-```
