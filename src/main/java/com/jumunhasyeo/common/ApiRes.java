@@ -27,4 +27,3 @@ public class ApiRes<T> {
         return new ApiRes<>(code, message, null);
     }
 }
-
