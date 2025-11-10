@@ -4,6 +4,8 @@ import com.jumunhasyeo.hub.exception.BusinessException;
 import com.jumunhasyeo.hub.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -13,7 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StockTest {
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2, 10})
     @DisplayName("quantity >=0 인 경우 생성할 수 있다.")
     public void of_stock_success() {
         // given
@@ -55,11 +58,11 @@ class StockTest {
         assertThat(businessException.getMessage()).contains("객체 생성에 실패했습니다");
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(ints = {-10, -5, -1})
     @DisplayName("Stock을 Of로 생성할 때 quantity < 0일 경우 예외 반환")
-    public void of_quantityLessThanZero_ShouldThrowException() {
+    public void of_quantityLessThanZero_ShouldThrowException(int quantity) {
         // given
-        Integer quantity = -1;
         UUID productId = UUID.randomUUID();
         Hub hub = Hub.builder().build();
         // when
@@ -82,28 +85,30 @@ class StockTest {
         assertThat(stock.getQuantity()).isEqualTo(50);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1, -10})
     @DisplayName("재고 감소할 때 '감소 값 <= 0'일 경우 예외 반환")
-    public void decrease_LessThanZero_ShouldThrowException() {
+    public void decrease_LessThanZero_ShouldThrowException(int decrease) {
         // given
         Stock stock = createStock(100);
         // when
         BusinessException businessException = assertThrows(
-                BusinessException.class, () -> stock.decrease(-1)
+                BusinessException.class, () -> stock.decrease(decrease)
         );
         // then
         assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.STOCK_VALID);
         assertThat(businessException.getMessage()).contains("감소 수량은 0보다 커야 합니다.");
     }
 
-    @Test
-    @DisplayName("재고 감소할 때 '감소 값 >= 재고 값' 일 경우 예외 반환")
-    public void decrease_LessThanQuantity_ShouldThrowException() {
+    @ParameterizedTest
+    @ValueSource(ints = {101, 1000, 5000})
+    @DisplayName("재고 감소할 때 '감소 값 > 재고 값' 일 경우 예외 반환")
+    public void decrease_LessThanQuantity_ShouldThrowException(int decrease) {
         // given
         Stock stock = createStock(100);
         // when
         BusinessException businessException = assertThrows(
-                BusinessException.class, () -> stock.decrease(5000)
+                BusinessException.class, () -> stock.decrease(decrease)
         );
         // then
         assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.STOCK_VALID);
@@ -133,13 +138,28 @@ class StockTest {
     }
 
     @Test
-    @DisplayName("재고 증가할 때 '증가 값 <= 0'일 경우 예외 반환")
-    public void increase_LessThanZero_ShouldThrowException() {
+    @DisplayName("재고가 최대치 초과시 예외 발생")
+    public void increase_MaxStock_shouldThrowException() {
         // given
         Stock stock = createStock(100);
         // when
         BusinessException businessException = assertThrows(
-                BusinessException.class, () -> stock.increase(-1)
+                BusinessException.class, () -> stock.increase(Integer.MAX_VALUE)
+        );
+        // then
+        assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.STOCK_VALID);
+        assertThat(businessException.getMessage()).contains("재고 최대값을 초과했습니다.");
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0,-1,-50})
+    @DisplayName("재고 증가할 때 '증가 값 <= 0'일 경우 예외 반환")
+    public void increase_LessThanZero_ShouldThrowException(int increase) {
+        // given
+        Stock stock = createStock(100);
+        // when
+        BusinessException businessException = assertThrows(
+                BusinessException.class, () -> stock.increase(increase)
         );
         // then
         assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.STOCK_VALID);

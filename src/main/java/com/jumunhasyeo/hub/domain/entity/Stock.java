@@ -56,6 +56,10 @@ public class Stock extends BaseEntity {
         if (amount <= 0)
             throw new BusinessException(ErrorCode.STOCK_VALID, "증가 수량은 0보다 커야 합니다.");
 
+        if(this.quantity > Integer.MAX_VALUE - amount){
+            throw new BusinessException(ErrorCode.STOCK_VALID, "재고 최대값을 초과했습니다.");
+        }
+
         this.quantity += amount;
     }
 
