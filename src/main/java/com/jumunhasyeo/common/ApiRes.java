@@ -1,4 +1,5 @@
-package com.jumunhasyeo.hub.common;
+package com.jumunhasyeo.common;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 

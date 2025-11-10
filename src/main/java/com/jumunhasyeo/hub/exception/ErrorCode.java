@@ -1,4 +1,4 @@
-package com.jumunhasyeo.hub.common.exception;
+package com.jumunhasyeo.hub.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -11,10 +11,13 @@ public enum ErrorCode {
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "E002", "잘못된 요청입니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "E003", "인증이 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "E004", "접근이 거부되었습니다."),
-    CREATE_VALIDATE_EXCEPTION(HttpStatus.BAD_REQUEST,"E005", "객체 생성에 실패했습니다."),
+    CREATE_VALIDATE_EXCEPTION(HttpStatus.BAD_REQUEST, "E005", "객체 생성에 실패했습니다."),
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "E006", "입력값 검증에 실패했습니다."),
-    INVALID_JSON(HttpStatus.BAD_REQUEST, "E007",  "잘못된 JSON 형식입니다."),
-    ;
+    INVALID_JSON(HttpStatus.BAD_REQUEST, "E007", "잘못된 JSON 형식입니다."),
+    MUST_NOT_NULL(HttpStatus.BAD_REQUEST, "E008", "는(은) null일 수 없습니다."),
+    NOT_FOUND_EXCEPTION(HttpStatus.BAD_REQUEST, "EN001", "조회에 실패했습니다."),
+    STOCK_VALID(HttpStatus.BAD_REQUEST, "ES", "Stock 유효성 검사에 실패했습니다."),
+    ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "E009", "이미 존재합니다.");
 
     private final HttpStatus status;
     private final String code;
