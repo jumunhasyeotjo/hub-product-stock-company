@@ -46,6 +46,7 @@ public class CacheConfig {
 
         return RedisCacheManager.builder(factory)
                 .cacheDefaults(cacheConfig)
+                .withInitialCacheConfigurations(cacheConfigs) // 캐시별 설정 적용
                 .build();
     }
 }
