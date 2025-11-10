@@ -18,8 +18,7 @@ public interface HubService {
     //허브 삭제
     UUID delete(DeleteHubCommand command);
     //허브 단건 조회
-    HubRes
-    getById(UUID hubId);
+    HubRes getById(UUID hubId);
     //허브 검색 조회
     Page<HubRes> search(HubSearchCondition condition, Pageable pageable);
 }
