@@ -1,0 +1,34 @@
+package com.jumunhasyeo.hub.presentation.dto.request;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.UUID;
+
+
+@Schema(description = "허브 수정 요청")
+public record UpdateHubReq(
+
+        @Schema(description = "변경할 허브 id", example = "77777777-7777-7777-7777-777777777777", required = true)
+        @NotNull(message = "허브 id는 필수입니다")
+        UUID hubId,
+
+        @Schema(description = "허브 이름", example = "서울특별시 센터", required = true)
+        @NotBlank(message = "허브 이름은 필수입니다")
+        String name,
+
+        @Schema(description = "허브 주소", example = "서울특별시 송파구 송파대로 55", required = true)
+        @NotBlank(message = "허브 주소는 필수입니다")
+        String address,
+
+        @Schema(description = "위도", example = "37.4783091", required = true)
+        @NotNull(message = "위도는 필수입니다")
+        Double latitude,
+
+        @Schema(description = "경도", example = "127.1230678", required = true)
+        @NotNull(message = "경도는 필수입니다")
+        Double longitude
+) {
+}
+
