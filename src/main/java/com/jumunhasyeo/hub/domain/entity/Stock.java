@@ -21,6 +21,7 @@ public class Stock extends BaseEntity {
     @Column(name = "stock_id", columnDefinition = "UUID")
     private UUID stockId;
 
+    @Column(name = "product_id", columnDefinition = "UUID")
     private UUID productId;
 
     @Column(name = "quantity", nullable = false)
