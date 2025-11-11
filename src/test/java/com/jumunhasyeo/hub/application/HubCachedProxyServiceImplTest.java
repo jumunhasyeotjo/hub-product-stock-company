@@ -31,8 +31,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
-@Import(HubCachedProxyServiceIntegrationTest.HubCachedTestConfig.class)
-class HubCachedProxyServiceIntegrationTest extends CommonTestContainer {
+@Import(HubCachedDecoratorServiceIntegrationTest.HubCachedTestConfig.class)
+class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
 
     @Autowired
     private HubService hubService;
@@ -206,7 +206,7 @@ class HubCachedProxyServiceIntegrationTest extends CommonTestContainer {
 
         @Bean
         public HubService hubService(HubServiceImpl hubServiceImpl) {
-            return new HubCachedProxyService(hubServiceImpl);
+            return new HubCachedDecoratorService(hubServiceImpl);
         }
     }
 }
