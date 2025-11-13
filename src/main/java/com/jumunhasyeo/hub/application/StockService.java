@@ -24,7 +24,11 @@ class StockService { //package-private
         return isSuccess;
     }
 
+    @Transactional
     public boolean tryIncreaseStock(UUID stockId, int amount){
-        return hubRepository.increaseStock(stockId, amount) == 1;
+        boolean isSuccess = hubRepository.increaseStock(stockId, amount) == 1;
+        if (!isSuccess)
+            throw new BusinessException(ErrorCode.STOCK_VALID, "최대 재고값을 넘었습니다.");
+        return isSuccess;
     }
 }
