@@ -1,0 +1,19 @@
+package com.jumunhasyeo.hub.presentation.dto.request;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.UUID;
+
+@Schema(description = "재고 감소 요청")
+public record DecreaseStockReq(
+
+        @Schema(description = "상품 ID", example = "77777777-7777-7777-7777-777777777777", required = true)
+        @NotNull(message = "상품 ID(productId) 는 필수 입니다.")
+        UUID productId,
+
+        @Schema(description = "감소량", example = "10", required = true)
+        @NotNull(message = "감소량(amount) 는 필수입니다")
+        Integer amount
+) {
+}

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -177,7 +177,7 @@ public class HubTest {
         return Hub.builder()
                 .name("송파 허브")
                 .address(Address.of("street", Coordinate.of(12.6, 12.6)))
-                .stockList(new ArrayList<>())
+                .stockList(new HashSet<>())
                 .build();
     }
 

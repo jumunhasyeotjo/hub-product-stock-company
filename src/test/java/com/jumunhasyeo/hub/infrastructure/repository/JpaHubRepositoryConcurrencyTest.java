@@ -1,0 +1,128 @@
+package com.jumunhasyeo.hub.infrastructure.repository;
+
+import com.jumunhasyeo.CleanUp;
+import com.jumunhasyeo.CommonTestContainer;
+import com.jumunhasyeo.TestConfig;
+import com.jumunhasyeo.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.domain.entity.Stock;
+import com.jumunhasyeo.hub.domain.vo.Address;
+import com.jumunhasyeo.hub.domain.vo.Coordinate;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import java.util.HashSet;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+@Import(TestConfig.class)
+public class JpaHubRepositoryConcurrencyTest extends CommonTestContainer {
+
+    @Autowired
+    private JpaHubRepository hubRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
+    @Autowired
+    private CleanUp cleanUp;
+
+    @BeforeEach
+    void setUp() {
+        cleanUp.truncateAll();
+    }
+
+    @Test
+    @DisplayName("재고 감소 동시성(원자성) 확인")
+    public void decreaseStock_hub_success() throws InterruptedException {
+        //given
+        UUID productId = UUID.randomUUID();
+        int willSuccessCount = 5;
+        int initQuantity = willSuccessCount;
+        int decreaseRequestCount = 10;
+        UUID stockId = transactionTemplate.execute(status -> {
+            Hub hub = createHub("송파허브", "송파대로", 12.6, 15.4);
+            Stock stock = hub.registerNewStock(productId, initQuantity);
+            entityManager.persist(hub);
+            entityManager.flush();
+            return stock.getStockId();
+        });
+        //when
+
+        int successCount = executeConcurrently(stockId, decreaseRequestCount, () -> (hubRepository.decreaseStock(stockId, 1) == 1));
+
+        //then
+        Stock stock = hubRepository.findStockByProductId(productId).orElse(null);
+        assertThat(successCount).isEqualTo(willSuccessCount);
+        assertThat(stock.getQuantity()).isEqualTo(initQuantity - successCount);
+    }
+
+    @Test
+    @DisplayName("재고 증가 동시성(원자성) 확인")
+    public void inCreaseStock_hub_success() throws InterruptedException {
+        //given
+        UUID productId = UUID.randomUUID();
+        int stockMax = 2147483647;
+        int willSuccessCount = 5;
+        int initQuantity = stockMax - willSuccessCount;
+        int increaseRequestCount = 10;
+        UUID stockId = transactionTemplate.execute(status -> {
+            Hub hub = createHub("송파허브", "송파대로", 12.6, 15.4);
+            Stock stock = hub.registerNewStock(productId, initQuantity);
+            entityManager.persist(hub);
+            entityManager.flush();
+            return stock.getStockId();
+        });
+        //when
+        int successCount = executeConcurrently(stockId, increaseRequestCount, () -> (hubRepository.increaseStock(stockId, 1) == 1));
+
+        //then
+        Stock stock = hubRepository.findStockByProductId(productId).orElse(null);
+        assertThat(successCount).isEqualTo(willSuccessCount);
+        assertThat(stock.getQuantity()).isEqualTo(initQuantity + successCount);
+    }
+
+    private int executeConcurrently(UUID stockId, int threadCount, Supplier<Boolean> supplier) throws InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        AtomicInteger successCount = new AtomicInteger(0);
+
+        for (int i = 0; i < threadCount; i++) {
+            executorService.submit(() -> {
+                try {
+                    if( supplier.get() ){
+                        successCount.incrementAndGet();
+                    }
+                }finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        executorService.shutdown();
+        return successCount.get();
+    }
+
+    private static Hub createHub(String name, String street, Double lat, Double lon) {
+        return Hub.builder()
+                .name(name)
+                .address(Address.of(street, Coordinate.of(lat, lon)))
+                .stockList(new HashSet<>())
+                .build();
+    }
+}

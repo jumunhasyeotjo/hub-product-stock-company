@@ -18,6 +18,7 @@ public abstract class CommonTestContainer {
                 .withDatabaseName("testdb")
                 .withUsername("testuser")
                 .withPassword("testpass")
+                .withCommand("postgres", "-c", "max_connections=500")
                 .withReuse(true);
 
         REDIS_CONTAINER = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))

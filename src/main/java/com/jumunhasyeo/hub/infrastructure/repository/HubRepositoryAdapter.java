@@ -1,6 +1,7 @@
 package com.jumunhasyeo.hub.infrastructure.repository;
 
 import com.jumunhasyeo.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.domain.entity.Stock;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,5 +22,20 @@ public class HubRepositoryAdapter implements HubRepository {
     @Override
     public Optional<Hub> findById(UUID id) {
         return jpaHubRepository.findById(id);
+    }
+
+    @Override
+    public Optional<Stock> findStockByProductId(UUID productId) {
+        return jpaHubRepository.findStockByProductId(productId);
+    }
+
+    @Override
+    public int decreaseStock(UUID stockId, int amount) {
+        return jpaHubRepository.decreaseStock(stockId, amount);
+    }
+
+    @Override
+    public int increaseStock(UUID stockId, int amount) {
+        return jpaHubRepository.increaseStock(stockId, amount);
     }
 }

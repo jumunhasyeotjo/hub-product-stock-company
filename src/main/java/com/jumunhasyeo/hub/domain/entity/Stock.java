@@ -24,7 +24,7 @@ public class Stock extends BaseEntity {
     @Column(name = "product_id", columnDefinition = "UUID")
     private UUID productId;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "amount", nullable = false)
     private Integer quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -67,5 +67,9 @@ public class Stock extends BaseEntity {
     public boolean isSameProduct(UUID productId) {
         if (productId == null) return false;
         return this.productId.equals(productId);
+    }
+
+    void setHub(Hub hub) {
+        this.hub = hub;
     }
 }

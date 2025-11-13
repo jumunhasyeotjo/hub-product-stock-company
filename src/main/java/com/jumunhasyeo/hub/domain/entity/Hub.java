@@ -30,7 +30,7 @@ public class Hub extends BaseEntity {
     private Address address;
 
     @OneToMany(mappedBy = "hub", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Stock> stockList = new ArrayList<>();
+    private Set<Stock> stockList = new HashSet<>();
 
     private Hub(String name, Address address) {
         this.name = name;
@@ -72,21 +72,27 @@ public class Hub extends BaseEntity {
         return stock;
     }
 
-    public void stockDecrease(UUID productId, int amount) {
-        Stock targetStock = getStock(productId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "해당 상품의 재고를 찾을 수 없습니다."));
-
-        targetStock.decrease(amount);
+    public void addStock(Stock stock) {
+        this.stockList.add(stock);
+        stock.setHub(this);
     }
 
-    public void stockIncrease(UUID productId, int amount) {
+    public Stock stockDecrease(UUID productId, int amount) {
+        Stock targetStock = getStock(productId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "해당 상품의 재고를 찾을 수 없습니다."));
+        targetStock.decrease(amount);
+        return targetStock;
+    }
+
+    public Stock stockIncrease(UUID productId, int amount) {
         Stock targetStock = getStock(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "해당 상품의 재고를 찾을 수 없습니다."));
         targetStock.increase(amount);
+        return targetStock;
     }
 
-    public List<Stock> getStockList() {
-        return Collections.unmodifiableList(stockList);
+    public Set<Stock> getStockList() {
+        return Collections.unmodifiableSet(stockList);
     }
 
     public Optional<Stock> getStock(UUID productId) {

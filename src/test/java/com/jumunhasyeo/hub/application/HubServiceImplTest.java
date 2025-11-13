@@ -1,11 +1,11 @@
 package com.jumunhasyeo.hub.application;
 
 
-import com.jumunhasyeo.hub.application.command.CreateHubCommand;
-import com.jumunhasyeo.hub.application.command.DeleteHubCommand;
-import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
+import com.jumunhasyeo.hub.application.command.*;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
+import com.jumunhasyeo.hub.application.dto.response.StockRes;
 import com.jumunhasyeo.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.domain.entity.Stock;
 import com.jumunhasyeo.hub.domain.event.HubCreatedEvent;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
@@ -27,13 +27,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +44,8 @@ public class HubServiceImplTest {
     @Mock
     private HubRepositoryCustom hubRepositoryCustom;
     @Mock
+    private StockService stockService;
+    @Mock
     private ApplicationEventPublisher eventPublisher;
     @InjectMocks
     private HubServiceImpl hubService;
@@ -52,6 +53,7 @@ public class HubServiceImplTest {
     private static Hub createHub(UUID hubId) {
         return Hub.builder()
                 .hubId(hubId)
+                .stockList(new HashSet<>())
                 .name("송파 허브")
                 .address(Address.of("street", Coordinate.of(12.6, 12.6)))
                 .build();
@@ -175,5 +177,48 @@ public class HubServiceImplTest {
 
         //then
         assertThat(deletedId).isEqualTo(hub.getHubId());
+    }
+
+    @Test
+    @DisplayName("hub에 상품재고를 감소시킬 수 있다.")
+    public void decreaseStock_Hub_Success() {
+        //given
+        UUID productId = UUID.randomUUID();
+        Stock stock = createStock(productId, 500);
+        DecreaseStockCommand command = new DecreaseStockCommand(productId, 100);
+        when(hubRepository.findStockByProductId(any())).thenReturn(Optional.of(stock));
+        when(stockService.tryDecreaseStockAtomically(any(UUID.class), anyInt())).thenReturn(true);
+        //when
+        StockRes stockRes = hubService.decreaseStock(command);
+        //then
+        assertThat(stockRes.stockId()).isEqualTo(stock.getStockId());
+        assertThat(stockRes.quantity()).isEqualTo(400);
+    }
+
+    @Test
+    @DisplayName("hub에 상품재고를 증가시킬 수 있다.")
+    public void increaseStock_Hub_Success() {
+        //given
+        UUID productId = UUID.randomUUID();
+        Stock stock = createStock(productId, 500);
+        IncreaseStockCommand command = new IncreaseStockCommand(productId, 100);
+        when(hubRepository.findStockByProductId(any())).thenReturn(Optional.of(stock));
+        when(stockService.tryIncreaseStock(any(UUID.class), anyInt())).thenReturn(true);
+        //when
+        StockRes stockRes = hubService.increaseStock(command);
+        //then
+        assertThat(stockRes.stockId()).isEqualTo(stock.getHub().getStock(productId).get().getStockId());
+        assertThat(stockRes.quantity()).isEqualTo(600);
+    }
+
+    private Stock createStock(UUID productId, int quantity) {
+        Hub hub = createHub(UUID.randomUUID());
+        Stock stock = Stock.builder()
+                .stockId(UUID.randomUUID())
+                .productId(productId)
+                .quantity(quantity)
+                .build();
+        hub.addStock(stock);
+        return stock;
     }
 }

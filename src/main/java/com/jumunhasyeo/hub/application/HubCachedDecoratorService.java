@@ -1,9 +1,8 @@
 package com.jumunhasyeo.hub.application;
 
-import com.jumunhasyeo.hub.application.command.CreateHubCommand;
-import com.jumunhasyeo.hub.application.command.DeleteHubCommand;
-import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
+import com.jumunhasyeo.hub.application.command.*;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
+import com.jumunhasyeo.hub.application.dto.response.StockRes;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,5 +51,16 @@ public class HubCachedDecoratorService implements HubService {
 
     public Page<HubRes> search(HubSearchCondition condition, Pageable pageable) {
         return hubServiceImpl.search(condition, pageable);
+    }
+
+    @Override
+    @Transactional
+    public StockRes decreaseStock(DecreaseStockCommand command) {
+        return hubServiceImpl.decreaseStock(command);
+    }
+
+    @Override
+    public StockRes increaseStock(IncreaseStockCommand command) {
+        return hubServiceImpl.increaseStock(command);
     }
 }

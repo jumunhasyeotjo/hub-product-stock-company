@@ -1,10 +1,10 @@
 package com.jumunhasyeo.hub.application;
 
-import com.jumunhasyeo.hub.application.command.CreateHubCommand;
-import com.jumunhasyeo.hub.application.command.DeleteHubCommand;
-import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
+import com.jumunhasyeo.hub.application.command.*;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
+import com.jumunhasyeo.hub.application.dto.response.StockRes;
 import com.jumunhasyeo.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.domain.entity.Stock;
 import com.jumunhasyeo.hub.domain.event.HubCreatedEvent;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
@@ -30,6 +30,7 @@ import java.util.UUID;
 public class HubServiceImpl implements HubService{
     private final HubRepository hubRepository;
     private final HubRepositoryCustom hubRepositoryCustom;
+    private final StockService stockService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -65,6 +66,37 @@ public class HubServiceImpl implements HubService{
 
     public Page<HubRes> search(HubSearchCondition condition, Pageable pageable) {
         return hubRepositoryCustom.searchHubsByCondition(condition, pageable);
+    }
+
+    @Transactional
+    public StockRes decreaseStock(DecreaseStockCommand command) {
+        UUID productId = command.productId();
+        int amount = command.amount();
+        Stock stock = getStock(productId, amount);
+        stockService.tryDecreaseStockAtomically(stock.getStockId(), amount);
+        return StockRes.from(stock);
+    }
+
+    private Stock getStock(UUID productId, int amount) {
+        Hub hub = getHubWithStockByProductId(productId);
+        Stock stock = hub.stockDecrease(productId, amount);
+        return stock;
+    }
+
+    @Transactional
+    public StockRes increaseStock(IncreaseStockCommand command) {
+        UUID productId = command.productId();
+        int amount = command.amount();
+        Hub hub = getHubWithStockByProductId(productId);
+        Stock stock = hub.stockIncrease(productId, amount);
+        stockService.tryIncreaseStock(stock.getStockId(), amount);
+        return StockRes.from(stock);
+    }
+
+    private Hub getHubWithStockByProductId(UUID productId) {
+        Stock stock = hubRepository.findStockByProductId(productId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
+        return stock.getHub();
     }
 
     private Hub getHub(UUID hubId) {

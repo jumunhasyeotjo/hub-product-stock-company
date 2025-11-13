@@ -3,8 +3,11 @@ package com.jumunhasyeo.hub.domain.repository;
 import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
 import com.jumunhasyeo.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.domain.entity.Stock;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import com.jumunhasyeo.hub.domain.vo.Coordinate;
+import com.jumunhasyeo.hub.exception.BusinessException;
+import com.jumunhasyeo.hub.exception.ErrorCode;
 import com.jumunhasyeo.hub.infrastructure.repository.HubRepositoryAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +18,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -75,9 +80,32 @@ class HubRepositoryTest extends CommonTestContainer {
         assertThat(findHub.isEmpty()).isTrue();
     }
 
+    @Test
+    @DisplayName("Stock을 productID로 조회할 수 있다.")
+    public void findStockByProductId_Hub_success() {
+        //given
+        UUID productId = UUID.randomUUID();
+        Hub hub = createHub();
+        Stock stock = hub.registerNewStock(productId, 100);
+        for (int i = 0; i < 100; i++) {
+            hub.registerNewStock(UUID.randomUUID(), 100);
+        }
+        UUID productId2 = UUID.randomUUID();
+        hub.registerNewStock(productId2, 100);
+        testEntityManager.persistAndFlush(hub);
+        testEntityManager.clear();
+
+        //when
+        Stock findStock = hubRepository.findStockByProductId(productId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
+        //then
+        assertThat(findStock.getStockId()).isEqualTo(stock.getStockId());
+    }
+
     private static Hub createHub() {
         return Hub.builder()
                 .name("송파 허브")
+                .stockList(new HashSet<>())
                 .address(Address.of("street", Coordinate.of(12.6, 12.6)))
                 .build();
     }
