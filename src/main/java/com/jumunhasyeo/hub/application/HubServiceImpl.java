@@ -32,7 +32,7 @@ public class HubServiceImpl implements HubService{
     private final HubRepository hubRepository;
     private final HubRepositoryCustom hubRepositoryCustom;
     private final StockService stockService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher eventPublisher; //TODO OCP
     private final EntityManager entityManager;
 
     @Transactional
