@@ -14,6 +14,7 @@ import com.jumunhasyeo.hub.domain.vo.Coordinate;
 import com.jumunhasyeo.hub.exception.BusinessException;
 import com.jumunhasyeo.hub.exception.ErrorCode;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,6 +50,8 @@ public class HubServiceImplTest {
     private ApplicationEventPublisher eventPublisher;
     @InjectMocks
     private HubServiceImpl hubService;
+    @Mock
+    private EntityManager entityManager;
 
     private static Hub createHub(UUID hubId) {
         return Hub.builder()

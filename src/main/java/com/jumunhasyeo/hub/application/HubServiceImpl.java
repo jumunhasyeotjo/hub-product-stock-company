@@ -13,6 +13,7 @@ import com.jumunhasyeo.hub.domain.vo.Coordinate;
 import com.jumunhasyeo.hub.exception.BusinessException;
 import com.jumunhasyeo.hub.exception.ErrorCode;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,6 +33,7 @@ public class HubServiceImpl implements HubService{
     private final HubRepositoryCustom hubRepositoryCustom;
     private final StockService stockService;
     private final ApplicationEventPublisher eventPublisher;
+    private final EntityManager entityManager;
 
     @Transactional
     public HubRes create(CreateHubCommand command) {
@@ -69,18 +71,15 @@ public class HubServiceImpl implements HubService{
     }
 
     @Transactional
-    public StockRes decreaseStock(DecreaseStockCommand command) {
+    public StockRes decreaseStock(DecreaseStockCommand command) {;
         UUID productId = command.productId();
         int amount = command.amount();
-        Stock stock = getStock(productId, amount);
+        Hub hub = getHubWithStockByProductId(productId);
+
+        entityManager.detach(hub);
+        Stock stock = hub.stockDecrease(productId, amount);
         stockService.tryDecreaseStockAtomically(stock.getStockId(), amount);
         return StockRes.from(stock);
-    }
-
-    private Stock getStock(UUID productId, int amount) {
-        Hub hub = getHubWithStockByProductId(productId);
-        Stock stock = hub.stockDecrease(productId, amount);
-        return stock;
     }
 
     @Transactional
@@ -89,6 +88,8 @@ public class HubServiceImpl implements HubService{
         int amount = command.amount();
         Hub hub = getHubWithStockByProductId(productId);
         Stock stock = hub.stockIncrease(productId, amount);
+
+        entityManager.detach(hub);
         stockService.tryIncreaseStock(stock.getStockId(), amount);
         return StockRes.from(stock);
     }
