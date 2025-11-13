@@ -60,6 +60,7 @@ public class HubCachedDecoratorService implements HubService {
     }
 
     @Override
+    @Transactional
     public StockRes increaseStock(IncreaseStockCommand command) {
         return hubServiceImpl.increaseStock(command);
     }
