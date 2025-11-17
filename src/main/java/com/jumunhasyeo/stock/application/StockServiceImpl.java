@@ -22,21 +22,21 @@ public class StockServiceImpl implements StockService{
     private final StockRepository stockRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public StockRes decrement(DecreaseStockCommand command) {
         Stock stock = getStock(command.stockId());
-        stockRepository.decreaseStock(stock.getStockId(), command.amount());
         stock.decrease(command.amount());
-        return StockRes.from(stock);
+        StockRes res = StockRes.from(stock);
+        stockRepository.decreaseStock(stock.getStockId(), command.amount());
+        return res;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public StockRes increment(IncreaseStockCommand command) {
         Stock stock = getStock(command.stockId());
-        stockRepository.increaseStock(stock.getStockId(), command.amount());
         stock.increase(command.amount());
-        return StockRes.from(stock);
+        StockRes res = StockRes.from(stock);
+        stockRepository.increaseStock(stock.getStockId(), command.amount());
+        return res;
     }
 
     @Override
