@@ -7,6 +7,7 @@ import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
+import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import com.jumunhasyeo.hub.domain.vo.Coordinate;
 import jakarta.persistence.EntityManager;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -204,8 +204,16 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
     @RequiredArgsConstructor
     public static class HubCachedTestConfig {
 
-        @Bean
-        public HubService hubService(HubServiceImpl hubServiceImpl) {
+        public HubService hubServiceNonCached(
+                HubRepository hubRepository,
+                HubRepositoryCustom hubRepositoryCustom,
+                HubEventPublisher hubEventPublisher
+        ) {
+            HubServiceImpl hubServiceImpl = new HubServiceImpl(
+                    hubRepository,
+                    hubRepositoryCustom,
+                    hubEventPublisher
+            );
             return new HubCachedDecoratorService(hubServiceImpl);
         }
     }

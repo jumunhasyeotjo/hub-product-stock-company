@@ -2,16 +2,15 @@ package com.jumunhasyeo.hub.presentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jumunhasyeo.ControllerTestConfig;
+import com.jumunhasyeo.common.exception.ErrorCode;
+import com.jumunhasyeo.common.exception.GlobalExceptionHandler;
 import com.jumunhasyeo.hub.application.HubService;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
-import com.jumunhasyeo.hub.exception.ErrorCode;
-import com.jumunhasyeo.hub.exception.GlobalExceptionHandler;
 import com.jumunhasyeo.hub.presentation.dto.request.CreateHubReq;
 import com.jumunhasyeo.hub.presentation.dto.request.DeleteHubReq;
 import com.jumunhasyeo.hub.presentation.dto.request.UpdateHubReq;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;

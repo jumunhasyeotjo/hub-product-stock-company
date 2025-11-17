@@ -1,8 +1,8 @@
 package com.jumunhasyeo.hub.domain.vo;
 
 
-import com.jumunhasyeo.hub.exception.BusinessException;
-import com.jumunhasyeo.hub.exception.ErrorCode;
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;

@@ -1,4 +1,4 @@
-package com.jumunhasyeo.hub.exception;
+package com.jumunhasyeo.common.exception;
 
 
 import com.jumunhasyeo.common.ApiRes;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jumunhasyeo.hub.exception.ErrorCode.INVALID_JSON;
-import static com.jumunhasyeo.hub.exception.ErrorCode.VALIDATION_FAILED;
+import static com.jumunhasyeo.common.exception.ErrorCode.INVALID_JSON;
+import static com.jumunhasyeo.common.exception.ErrorCode.VALIDATION_FAILED;
 
 @RestControllerAdvice
 @Slf4j

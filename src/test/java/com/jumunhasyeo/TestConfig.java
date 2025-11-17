@@ -1,21 +1,33 @@
 package com.jumunhasyeo;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jumunhasyeo.hub.application.HubEventPublisher;
 import com.jumunhasyeo.hub.application.HubService;
 import com.jumunhasyeo.hub.application.HubServiceImpl;
+import com.jumunhasyeo.hub.domain.repository.HubRepository;
+import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
+import com.jumunhasyeo.stock.application.StockService;
+import com.jumunhasyeo.stock.application.StockServiceImpl;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class TestConfig {
 
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+    public HubService hubServiceNonCached(
+            HubRepository hubRepository,
+            HubRepositoryCustom hubRepositoryCustom,
+            HubEventPublisher hubEventPublisher
+    ) {
+
+        return new HubServiceImpl(
+                hubRepository,
+                hubRepositoryCustom,
+                hubEventPublisher
+        );
     }
 
     @Bean
-    public HubService hubService(HubServiceImpl hubServiceImpl) {
-        return hubServiceImpl;
+    public StockService StockService(StockServiceImpl stockService) {
+        return stockService;
     }
 }

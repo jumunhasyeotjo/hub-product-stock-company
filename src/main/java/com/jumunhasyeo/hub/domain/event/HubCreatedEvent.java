@@ -4,7 +4,6 @@ import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
