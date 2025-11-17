@@ -6,7 +6,7 @@ const errorRate = new Rate('errors');
 // k6 run script/stock.js
 export let options = {
     scenarios: {
-        // 시나리오 1: 점진적 증가로 한계점 찾기
+        // 재고 차감 성능테스트
         ramping_test: {
             executor: 'ramping-vus',
             startVUs: 0,
