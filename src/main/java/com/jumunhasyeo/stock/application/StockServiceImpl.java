@@ -10,6 +10,7 @@ import com.jumunhasyeo.stock.domain.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ public class StockServiceImpl implements StockService{
     private final StockRepository stockRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public StockRes decrement(DecreaseStockCommand command) {
         Stock stock = getStock(command.stockId());
         stockRepository.decreaseStock(stock.getStockId(), command.amount());
@@ -29,6 +31,7 @@ public class StockServiceImpl implements StockService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public StockRes increment(IncreaseStockCommand command) {
         Stock stock = getStock(command.stockId());
         stockRepository.increaseStock(stock.getStockId(), command.amount());
