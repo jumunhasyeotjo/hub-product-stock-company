@@ -92,4 +92,14 @@ public class HubWebController {
         UUID deletedHubId = hubService.delete(command);
         return ResponseEntity.ok(ApiRes.success(Map.of("id", deletedHubId)));
     }
+
+    @ApiDocExistHub
+    @GetMapping("/{hubId}/exist")
+    public ResponseEntity<ApiRes<Map<String, Boolean>>> exist(
+            @Parameter(description = "조회할 허브의 ID", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable(name = "hubId") UUID hubId
+    ) {
+        boolean result = hubService.existById(hubId);
+        return ResponseEntity.ok(ApiRes.success(Map.of("exist", result)));
+    }
 }

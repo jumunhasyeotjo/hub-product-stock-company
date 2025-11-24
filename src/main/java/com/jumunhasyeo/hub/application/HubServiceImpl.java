@@ -55,6 +55,11 @@ public class HubServiceImpl implements HubService{
         return hub.getHubId();
     }
 
+    @Override
+    public Boolean existById(UUID uuid) {
+        return hubRepository.existById(uuid);
+    }
+
     public HubRes getById(UUID hubId) {
         return HubRes.from(getHub(hubId));
     }
