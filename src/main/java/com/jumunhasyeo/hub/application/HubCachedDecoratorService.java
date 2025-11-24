@@ -84,7 +84,11 @@ public class HubCachedDecoratorService implements HubService {
      * - 페이징 결과는 자주 변경됨
      */
     public Page<HubRes> search(HubSearchCondition condition, Pageable pageable) {
-        log.debug("Hub search - no cache (condition: {}, page: {})", condition, pageable);
         return hubService.search(condition, pageable);
+    }
+
+    @Override
+    public Boolean existById(UUID hubId) {
+        return hubService.existById(hubId);
     }
 }
