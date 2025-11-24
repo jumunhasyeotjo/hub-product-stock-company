@@ -26,9 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class StockServiceImplIntegrationTest extends CommonTestContainer {
+public class StockVariationServiceImplIntegrationTest extends CommonTestContainer {
     @Autowired
-    private StockServiceImpl stockService;
+    private StockVariationServiceImpl stockService;
 
     @Autowired
     private EntityManager entityManager;

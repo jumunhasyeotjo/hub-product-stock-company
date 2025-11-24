@@ -24,12 +24,12 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class StockServiceImplTest {
+class StockVariationServiceImplTest {
 
     @Mock
     private StockRepository stockRepository;
     @InjectMocks
-    private StockServiceImpl stockService;
+    private StockVariationServiceImpl stockService;
 
     @Test
     @DisplayName("hub에 상품재고를 감소시킬 수 있다.")

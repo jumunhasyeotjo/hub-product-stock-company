@@ -2,6 +2,7 @@ package com.jumunhasyeo.stock.application;
 
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
+import com.jumunhasyeo.stock.application.command.CreateStockCommand;
 import com.jumunhasyeo.stock.application.command.DecreaseStockCommand;
 import com.jumunhasyeo.stock.application.command.IncreaseStockCommand;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;
@@ -15,7 +16,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class StockServicePessimisticLock implements StockService{
+public class StockVariationServicePessimisticLock implements StockVariationService {
 
     private final StockRepository stockRepository;
 
@@ -33,12 +34,6 @@ public class StockServicePessimisticLock implements StockService{
         Stock stock = getStockByPessimisticLock(command.stockId());
         stock.increase(command.amount());
         return StockRes.from(stock);
-    }
-
-    @Override
-    public Stock getStock(UUID stockId) {
-        return stockRepository.findById(stockId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
     }
 
     private Stock getStockByPessimisticLock(UUID productId) {
