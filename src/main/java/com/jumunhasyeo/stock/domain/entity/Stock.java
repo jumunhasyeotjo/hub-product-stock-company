@@ -1,8 +1,9 @@
-package com.jumunhasyeo.hub.domain.entity;
+package com.jumunhasyeo.stock.domain.entity;
 
 import com.jumunhasyeo.common.BaseEntity;
-import com.jumunhasyeo.hub.exception.BusinessException;
-import com.jumunhasyeo.hub.exception.ErrorCode;
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
+import com.jumunhasyeo.hub.domain.entity.Hub;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,29 +22,28 @@ public class Stock extends BaseEntity {
     @Column(name = "stock_id", columnDefinition = "UUID")
     private UUID stockId;
 
-    @Column(name = "product_id", columnDefinition = "UUID")
+    @Column(name = "product_id", columnDefinition = "UUID", unique = true)
     private UUID productId;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hub_id", nullable = false)
-    private Hub hub;
+    @Column(name = "hub_id", nullable = false)
+    private UUID hubId;
 
-    private Stock(Hub hub, UUID productId, Integer quantity) {
-        this.hub = hub;
+    private Stock(UUID hubId, UUID productId, Integer quantity) {
+        this.hubId = hubId;
         this.productId = productId;
         this.quantity = quantity;
     }
 
-    static Stock of(Hub hub, UUID productId, Integer quantity) {
-        if (hub == null || productId == null || quantity == null || quantity < 0)
+    public static Stock of(UUID hubId, UUID productId, Integer quantity) {
+        if (hubId == null || productId == null || quantity == null || quantity < 0)
             throw new BusinessException(ErrorCode.CREATE_VALIDATE_EXCEPTION);
-        return new Stock(hub, productId, quantity);
+        return new Stock(hubId, productId, quantity);
     }
 
-    void decrease(int amount) {
+    public void decrease(int amount) {
         if (amount <= 0)
             throw new BusinessException(ErrorCode.STOCK_VALID, "감소 수량은 0보다 커야 합니다.");
 
@@ -53,7 +53,7 @@ public class Stock extends BaseEntity {
         this.quantity -= amount;
     }
 
-    void increase(int amount) {
+    public void increase(int amount) {
         if (amount <= 0)
             throw new BusinessException(ErrorCode.STOCK_VALID, "증가 수량은 0보다 커야 합니다.");
 
