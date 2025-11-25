@@ -1,5 +1,6 @@
 package com.jumunhasyeo.stock.application;
 
+import com.jumunhasyeo.common.Idempotency.DbIdempotent;
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.stock.application.command.CreateStockCommand;

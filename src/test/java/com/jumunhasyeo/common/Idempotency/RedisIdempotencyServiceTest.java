@@ -1,7 +1,7 @@
 package com.jumunhasyeo.common.Idempotency;
 
 import com.jumunhasyeo.CommonTestContainer;
-import com.jumunhasyeo.TestConfig;
+import com.jumunhasyeo.InternalIntegrationTestConfig;
 import com.jumunhasyeo.common.RedisKey;
 import com.jumunhasyeo.common.config.CacheConfig;
 import org.junit.jupiter.api.AfterEach;
@@ -15,7 +15,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({TestConfig.class, CacheConfig.class})
+@Import({InternalIntegrationTestConfig.class, CacheConfig.class})
 class RedisIdempotencyServiceTest extends CommonTestContainer {
 
     @Autowired

@@ -21,7 +21,7 @@ public enum ErrorCode {
     PROCESSING_CONFLICT_EXCEPTION(HttpStatus.CONFLICT, "C001", "요청이 진행중입니다."),
     SUCCESS_CONFLICT_EXCEPTION(HttpStatus.CONFLICT, "C002", "요청이 이미 완료되었습니다."),
     //product
-    PRODUCT_VALID(HttpStatus.BAD_REQUEST, "EP", "Product 유효성 검사에 실패했습니다"),
+    PRODUCT_VALID(HttpStatus.BAD_REQUEST, "EP", "Product 유효성 검사에 실패했습니다");
 
     private final HttpStatus status;
     private final String code;

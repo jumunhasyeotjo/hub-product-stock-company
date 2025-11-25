@@ -2,6 +2,7 @@ package com.jumunhasyeo.stock.application;
 
 import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
+import com.jumunhasyeo.InternalIntegrationTestConfig;
 import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import com.jumunhasyeo.hub.domain.vo.Coordinate;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.UUID;
@@ -26,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(InternalIntegrationTestConfig.class)
 public class StockVariationServiceImplIntegrationTest extends CommonTestContainer {
     @Autowired
     private StockVariationServiceImpl stockService;
