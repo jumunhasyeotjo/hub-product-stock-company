@@ -23,12 +23,12 @@ public interface JpaStockRepository extends JpaRepository<Stock, UUID> {
     Optional<Stock> findByProductId(UUID productId);
 
     @Modifying
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @Query("UPDATE Stock s SET s.quantity = s.quantity - :amount WHERE s.quantity - :amount >= 0 AND s.stockId = :stockId")
     int decreaseStock(@Param(value = "stockId") UUID stockId, @Param(value = "amount") int amount);
 
     @Modifying
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @Query("UPDATE Stock s SET s.quantity = s.quantity + :amount WHERE s.stockId = :stockId AND s.quantity + :amount <= 2147483647")
     int increaseStock(UUID stockId, int amount);
 

@@ -16,4 +16,6 @@ public interface StockRepository {
     boolean increaseStock(UUID stockId, int amount);
 
     Optional<Stock> findById(UUID stockId);
+
+    Stock save(Stock stock);
 }

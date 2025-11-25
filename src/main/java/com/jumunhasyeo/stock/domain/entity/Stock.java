@@ -3,7 +3,6 @@ package com.jumunhasyeo.stock.domain.entity;
 import com.jumunhasyeo.common.BaseEntity;
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
-import com.jumunhasyeo.hub.domain.entity.Hub;
 import jakarta.persistence.*;
 import lombok.*;
 
