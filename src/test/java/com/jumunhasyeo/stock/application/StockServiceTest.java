@@ -1,0 +1,190 @@
+package com.jumunhasyeo.stock.application;
+
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
+import com.jumunhasyeo.stock.application.command.CreateStockCommand;
+import com.jumunhasyeo.stock.application.command.DeleteStockCommand;
+import com.jumunhasyeo.stock.application.dto.response.StockRes;
+import com.jumunhasyeo.stock.application.service.HubClient;
+import com.jumunhasyeo.stock.application.service.ProductClient;
+import com.jumunhasyeo.stock.domain.entity.Stock;
+import com.jumunhasyeo.stock.domain.repository.StockRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("StockService 단위 테스트")
+class StockServiceTest {
+
+    @Mock
+    private StockVariationService stockVariationService;
+    @Mock
+    private StockRepository stockRepository;
+    @Mock
+    private HubClient hubClient;
+    @Mock
+    private ProductClient productClient;
+
+    @InjectMocks
+    private StockService stockService;
+
+    @Test
+    @DisplayName("재고를 생성할 수 있다.")
+    void create_stock_success() {
+        // given
+        UUID hubId = UUID.randomUUID();
+        UUID productId = UUID.randomUUID();
+        Integer quantity = 100;
+        CreateStockCommand command = new CreateStockCommand(hubId, productId, quantity);
+
+        Stock stock = Stock.builder()
+                .stockId(UUID.randomUUID())
+                .hubId(hubId)
+                .productId(productId)
+                .quantity(quantity)
+                .build();
+
+        given(hubClient.existHub(hubId)).willReturn(true);
+        given(productClient.existProduct(productId)).willReturn(true);
+        given(stockRepository.save(any(Stock.class))).willReturn(stock);
+
+        // when
+        StockRes result = stockService.create(command);
+
+        // then
+        assertThat(result.stockId()).isEqualTo(stock.getStockId());
+        assertThat(result.hubId()).isEqualTo(hubId);
+        assertThat(result.productId()).isEqualTo(productId);
+        assertThat(result.quantity()).isEqualTo(quantity);
+    }
+
+    @Test
+    @DisplayName("허브가 존재하지 않으면 재고 생성에 실패한다.")
+    void create_stock_fail_when_hub_not_exist() {
+        // given
+        UUID hubId = UUID.randomUUID();
+        UUID productId = UUID.randomUUID();
+        CreateStockCommand command = new CreateStockCommand(hubId, productId, 100);
+
+        given(hubClient.existHub(hubId)).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> stockService.create(command))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("허브 또는 상품이 존재하지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("상품이 존재하지 않으면 재고 생성에 실패한다.")
+    void create_stock_fail_when_product_not_exist() {
+        // given
+        UUID hubId = UUID.randomUUID();
+        UUID productId = UUID.randomUUID();
+        CreateStockCommand command = new CreateStockCommand(hubId, productId, 100);
+
+        given(hubClient.existHub(hubId)).willReturn(true);
+        given(productClient.existProduct(productId)).willReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> stockService.create(command))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("허브 또는 상품이 존재하지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("재고 ID로 재고를 조회할 수 있다.")
+    void get_stock_success() {
+        // given
+        UUID stockId = UUID.randomUUID();
+        UUID hubId = UUID.randomUUID();
+        UUID productId = UUID.randomUUID();
+        Stock stock = Stock.builder()
+                .stockId(stockId)
+                .hubId(hubId)
+                .productId(productId)
+                .quantity(100)
+                .build();
+
+        given(stockRepository.findById(stockId)).willReturn(Optional.of(stock));
+
+        // when
+        StockRes result = stockService.get(stockId);
+
+        // then
+        assertThat(result.stockId()).isEqualTo(stockId);
+        assertThat(result.hubId()).isEqualTo(hubId);
+        assertThat(result.productId()).isEqualTo(productId);
+        assertThat(result.quantity()).isEqualTo(100);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 재고 ID로 조회 시 예외가 발생한다.")
+    void get_stock_fail_when_not_found() {
+        // given
+        UUID stockId = UUID.randomUUID();
+        given(stockRepository.findById(stockId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> stockService.get(stockId))
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_EXCEPTION);
+    }
+
+    @Test
+    @DisplayName("재고를 논리적으로 삭제할 수 있다.")
+    void delete_stock_success() {
+        // given
+        UUID stockId = UUID.randomUUID();
+        UUID hubId = UUID.randomUUID();
+        UUID productId = UUID.randomUUID();
+        Long userId = 123L;
+        DeleteStockCommand command = new DeleteStockCommand(stockId, userId);
+
+        Stock stock = Stock.builder()
+                .stockId(stockId)
+                .hubId(hubId)
+                .productId(productId)
+                .quantity(100)
+                .build();
+
+        given(stockRepository.findById(stockId)).willReturn(Optional.of(stock));
+
+        // when
+        StockRes result = stockService.delete(command);
+
+        // then
+        assertThat(result.stockId()).isEqualTo(stockId);
+        assertThat(result.deletedBy()).isEqualTo(userId);
+        assertThat(result.deletedAt()).isNotNull();
+        verify(stockRepository).findById(stockId);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 재고를 삭제하려고 하면 예외가 발생한다.")
+    void delete_stock_fail_when_not_found() {
+        // given
+        UUID stockId = UUID.randomUUID();
+        Long userId = 123L;
+        DeleteStockCommand command = new DeleteStockCommand(stockId, userId);
+
+        given(stockRepository.findById(stockId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> stockService.delete(command))
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.NOT_FOUND_EXCEPTION);
+    }
+}

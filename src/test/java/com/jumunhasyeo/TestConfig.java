@@ -5,8 +5,8 @@ import com.jumunhasyeo.hub.application.HubService;
 import com.jumunhasyeo.hub.application.HubServiceImpl;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
-import com.jumunhasyeo.stock.application.StockService;
-import com.jumunhasyeo.stock.application.StockServiceImpl;
+import com.jumunhasyeo.stock.application.StockVariationService;
+import com.jumunhasyeo.stock.application.StockVariationServiceImpl;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -27,7 +27,7 @@ public class TestConfig {
     }
 
     @Bean
-    public StockService StockService(StockServiceImpl stockService) {
+    public StockVariationService StockService(StockVariationServiceImpl stockService) {
         return stockService;
     }
 }

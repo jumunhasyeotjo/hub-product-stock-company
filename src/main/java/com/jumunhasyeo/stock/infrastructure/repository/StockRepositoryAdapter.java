@@ -45,4 +45,9 @@ public class StockRepositoryAdapter implements StockRepository {
     public Optional<Stock> findById(UUID stockId) {
         return jpaStockRepository.findById(stockId);
     }
+
+    @Override
+    public Stock save(Stock stock) {
+        return jpaStockRepository.save(stock);
+    }
 }

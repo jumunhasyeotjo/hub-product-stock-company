@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public record DecreaseStockCommand(
         UUID stockId,
-        int amount
+        Integer amount
 ) {
 }
