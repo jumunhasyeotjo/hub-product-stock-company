@@ -23,14 +23,14 @@ public record StockRes(
         @Schema(description = "삭제자 ID", example = "2L")
         Long deletedBy
 ) {
-        public static StockRes from(Stock stock) {
-                return new StockRes(
-                        stock.getStockId(),
-                        stock.getProductId(),
-                        stock.getHubId(),
-                        stock.getQuantity(),
-                        stock.getDeletedAt(),
-                        stock.getDeletedBy()
-                );
-        }
+    public static StockRes from(Stock stock) {
+        return new StockRes(
+                stock.getStockId(),
+                stock.getProductId(),
+                stock.getHubId(),
+                stock.getQuantity(),
+                stock.getDeletedAt(),
+                stock.getDeletedBy()
+        );
+    }
 }
