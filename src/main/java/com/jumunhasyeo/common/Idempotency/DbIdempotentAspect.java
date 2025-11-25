@@ -1,5 +1,7 @@
 package com.jumunhasyeo.common.Idempotency;
 
+import com.jumunhasyeo.common.Idempotency.db.application.IdempotentService;
+import com.jumunhasyeo.common.Idempotency.db.domain.IdempotentStatus;
 import com.jumunhasyeo.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,23 +17,23 @@ import static com.jumunhasyeo.common.exception.ErrorCode.SUCCESS_CONFLICT_EXCEPT
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class IdempotencyAspect {
-    private final IdempotencyService idempotencyService;
+public class DbIdempotentAspect {
+    private final IdempotentService idempotentService;
 
-    @Around("@annotation(idempotent)")
+    @Around("@annotation(dbIdempotent)")
     public Object handleIdempotency(
             ProceedingJoinPoint joinPoint,
-            Idempotent idempotent
+            DbIdempotent dbIdempotent
     ) throws Throwable {
 
         Object[] args = joinPoint.getArgs();
         // 첫 번째 파라미터 = 멱등키
         String statusKey = (String) args[0];
-        long ttlSeconds = getTtlSeconds(idempotent);
-        log.info("Idempotent request - key: {}, ttl: {} days", statusKey, idempotent.ttlDays());
+        long ttlSeconds = getTtlSeconds(dbIdempotent);
+        log.info("DbIdempotent request - key: {}, ttl: {} days", statusKey, dbIdempotent.ttlDays());
 
         // 1. 상태 확인
-        IdempotentStatus idempotentStatus = idempotencyService.getCurrentStatus(statusKey);
+        IdempotentStatus idempotentStatus = idempotentService.getCurrentStatus(statusKey);
 
         // 2-1. COMPLETED:
         if (isSuccess(idempotentStatus)) {
@@ -39,7 +41,7 @@ public class IdempotencyAspect {
         }
 
         // 2-2. PROCESSING: SET NX (없을 때만 PROCESSING 설정)
-        Boolean acquired = idempotencyService.setIfAbsent(statusKey, IdempotentStatus.PROCESSING, ttlSeconds);
+        Boolean acquired = idempotentService.setIfAbsent(statusKey, IdempotentStatus.PROCESSING, ttlSeconds);
         if (isProcessing(acquired)){
             throw new BusinessException(PROCESSING_CONFLICT_EXCEPTION);
         }
@@ -65,22 +67,22 @@ public class IdempotencyAspect {
     private Object proceed(ProceedingJoinPoint joinPoint, String statusKey, long ttlSeconds) throws Throwable {
         log.info("Executing business logic for key: {}", statusKey);
         Object result = joinPoint.proceed();
-        idempotencyService.saveStatus(statusKey, IdempotentStatus.SUCCESS, ttlSeconds);
+        idempotentService.saveStatus(statusKey, IdempotentStatus.SUCCESS, ttlSeconds);
         log.info("Successfully completed and cached result for key: {}", statusKey);
         return result;
     }
 
     private void fail(Exception e, String statusKey, long ttlSeconds) {
         log.error("Business logic failed for key: {}", statusKey, e);
-        idempotencyService.saveStatus(statusKey, IdempotentStatus.FAIL, ttlSeconds);
-        idempotencyService.saveError(statusKey, getErrorMsg(e), ttlSeconds);
+        idempotentService.saveStatus(statusKey, IdempotentStatus.FAIL, ttlSeconds);
+        idempotentService.saveError(statusKey, getErrorMsg(e), ttlSeconds);
     }
 
     private String getErrorMsg(Exception e) {
         return e.getMessage() != null ? e.getMessage() : "Unknown error";
     }
 
-    private long getTtlSeconds(Idempotent idempotent) {
-        return idempotent.ttlDays() * 24 * 3600L;
+    private long getTtlSeconds(DbIdempotent dbIdempotent) {
+        return dbIdempotent.ttlDays() * 24 * 3600L;
     }
 }

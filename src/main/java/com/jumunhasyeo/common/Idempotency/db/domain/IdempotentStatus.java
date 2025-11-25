@@ -1,4 +1,4 @@
-package com.jumunhasyeo.common.Idempotency;
+package com.jumunhasyeo.common.Idempotency.db.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

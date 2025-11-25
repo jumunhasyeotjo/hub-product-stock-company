@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Idempotent {
+public @interface DbIdempotent {
 
     /**
      * TTL (일 단위)
