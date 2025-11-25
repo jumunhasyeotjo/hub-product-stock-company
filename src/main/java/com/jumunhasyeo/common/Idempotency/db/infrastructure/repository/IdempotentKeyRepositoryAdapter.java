@@ -1,6 +1,7 @@
 package com.jumunhasyeo.common.Idempotency.db.infrastructure.repository;
 
 import com.jumunhasyeo.common.Idempotency.db.domain.DbIdempotentKey;
+import com.jumunhasyeo.common.Idempotency.db.domain.IdempotentStatus;
 import com.jumunhasyeo.common.Idempotency.db.domain.repository.IdempotencyKeyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ public class IdempotentKeyRepositoryAdapter implements IdempotencyKeyRepository 
 
     @Override
     public List<DbIdempotentKey> findStaleProcessingKeys(LocalDateTime threshold) {
-        return repository.findStaleProcessingKeys(threshold);
+        return repository.findStaleProcessingKeys(IdempotentStatus.PROCESSING, threshold);
     }
 
     @Override

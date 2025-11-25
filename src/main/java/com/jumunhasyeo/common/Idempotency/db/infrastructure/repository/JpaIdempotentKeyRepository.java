@@ -1,6 +1,7 @@
 package com.jumunhasyeo.common.Idempotency.db.infrastructure.repository;
 
 import com.jumunhasyeo.common.Idempotency.db.domain.DbIdempotentKey;
+import com.jumunhasyeo.common.Idempotency.db.domain.IdempotentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,8 +19,8 @@ public interface JpaIdempotentKeyRepository extends JpaRepository<DbIdempotentKe
             @Param("now") LocalDateTime now
     );
 
-    @Query("SELECT i FROM DbIdempotentKey i WHERE i.status = 'PROCESSING' AND i.createdAt < :threshold")
-    List<DbIdempotentKey> findStaleProcessingKeys(@Param("threshold") LocalDateTime threshold);
+    @Query("SELECT i FROM DbIdempotentKey i WHERE i.status = :status AND i.createdAt < :threshold")
+    List<DbIdempotentKey> findStaleProcessingKeys(@Param("status") IdempotentStatus status, @Param("threshold") LocalDateTime threshold);
 
     @Query("SELECT i FROM DbIdempotentKey i WHERE i.expiresAt < :now")
     List<DbIdempotentKey> findExpiredKeys(@Param("now") LocalDateTime now);
