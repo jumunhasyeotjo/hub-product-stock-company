@@ -1,4 +1,4 @@
-package com.jumunhasyeo.hub.infrastructure.repository;
+package com.jumunhasyeo.stock.infrastructure.repository;
 
 import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
@@ -7,6 +7,9 @@ import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import com.jumunhasyeo.hub.domain.vo.Coordinate;
+import com.jumunhasyeo.hub.infrastructure.repository.JpaHubRepository;
+import com.jumunhasyeo.hub.infrastructure.repository.JpaHubRepositoryCustom;
+import com.jumunhasyeo.hub.infrastructure.repository.JpaHubRepositoryCustomImpl;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({JpaHubRepositoryCustomImpl.class, RepositoryTestConfig.class, CleanUp.class})
-class JpaHubRepositoryCustomImplTest extends CommonTestContainer {
+class JpaStockRepositoryCustomImplTest extends CommonTestContainer {
 
     @Autowired
     private JpaHubRepository hubRepository;
@@ -43,26 +45,20 @@ class JpaHubRepositoryCustomImplTest extends CommonTestContainer {
     private CleanUp cleanUp;
 
     private UUID product1;
-    private UUID product2;
 
     @BeforeEach
     void setUp() {
         cleanUp.truncateAll();
         product1 = UUID.randomUUID();
-        product2 = UUID.randomUUID();
 
         // 테스트 데이터 생성
         Hub hub1 = createHub("서울 허브", "서울시 강남구", 37.5, 127.0);
-        hub1.registerNewStock(product1, 100);
-        hub1.registerNewStock(product2, 50);
         hubRepository.save(hub1);
 
         Hub hub2 = createHub("부산 허브", "부산시 해운대구", 35.1, 129.1);
-        hub2.registerNewStock(product1, 200);
         hubRepository.save(hub2);
 
         Hub hub3 = createHub("대구 허브", "대구시 중구", 35.8, 128.6);
-        hub3.registerNewStock(product2, 30);
         hubRepository.save(hub3);
 
         Hub hub4 = createHub("인천 허브", "인천시 연수구", 37.4, 126.7);
@@ -97,48 +93,20 @@ class JpaHubRepositoryCustomImplTest extends CommonTestContainer {
         assertThat(result.getContent().get(0).address()).contains("강남");
     }
 
-    @Test
-    @DisplayName("특정 상품 재고가 있는 Hub를 검색할 수 있다.")
-    public void search_ByProductId_success() {
-        HubSearchCondition condition = HubSearchCondition.builder()
-                .productId(product1)
-                .build();
-        Pageable pageable = PageRequest.of(0, 10);
-
-        Page<HubRes> result = hubRepositoryCustom.searchHubsByCondition(condition, pageable);
-
-        assertThat(result.getContent()).hasSize(2);
-        assertThat(result.getContent())
-                .extracting(HubRes::name)
-                .containsExactlyInAnyOrder("서울 허브", "부산 허브");
-    }
-
-    @Test
-    @DisplayName("최소 재고 수량 이상인 Hub를 검색할 수 있다.")
-    public void search_ByMinStockQuantity_success() {
-        HubSearchCondition condition = HubSearchCondition.builder()
-                .minStockQuantity(100)
-                .build();
-        Pageable pageable = PageRequest.of(0, 10);
-
-        Page<HubRes> result = hubRepositoryCustom.searchHubsByCondition(condition, pageable);
-
-        assertThat(result.getContent()).hasSize(2);
-    }
 
     @Test
     @DisplayName("복합 조건으로 Hub를 검색할 수 있다.")
     public void search_ByMultipleConditions_success() {
         HubSearchCondition condition = HubSearchCondition.builder()
-                .productId(product1)
-                .minStockQuantity(150)
+                .name("인천 허브")
+                .street("인천시 연수구")
                 .build();
         Pageable pageable = PageRequest.of(0, 10);
 
         Page<HubRes> result = hubRepositoryCustom.searchHubsByCondition(condition, pageable);
 
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).name()).isEqualTo("부산 허브");
+        assertThat(result.getContent().get(0).name()).isEqualTo("인천 허브");
     }
 
     @Test
@@ -228,7 +196,6 @@ class JpaHubRepositoryCustomImplTest extends CommonTestContainer {
         return Hub.builder()
                 .name(name)
                 .address(Address.of(street, Coordinate.of(lat, lon)))
-                .stockList(new ArrayList<>())
                 .build();
     }
 }
