@@ -22,4 +22,9 @@ public class HubRepositoryAdapter implements HubRepository {
     public Optional<Hub> findById(UUID id) {
         return jpaHubRepository.findById(id);
     }
+
+    @Override
+    public Boolean existById(UUID hubId) {
+        return jpaHubRepository.existsById(hubId);
+    }
 }

@@ -5,6 +5,7 @@ import com.jumunhasyeo.hub.application.command.DeleteHubCommand;
 import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,4 +22,6 @@ public interface HubService {
     HubRes getById(UUID hubId);
     //허브 검색 조회
     Page<HubRes> search(HubSearchCondition condition, Pageable pageable);
+    //존재 하는지 조회
+    Boolean existById(UUID uuid);
 }

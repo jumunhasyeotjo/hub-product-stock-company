@@ -280,6 +280,36 @@ class HubWebControllerTest {
         assertValidationFailed(request, "userId=삭제 요청자 id는 필수입니다");
     }
 
+    @Test
+    @DisplayName("허브 존재 여부 확인 - 허브가 존재하는 경우")
+    void exist_hub_when_hub_exists() throws Exception {
+        // given
+        UUID hubId = UUID.randomUUID();
+        given(hubService.existById(hubId)).willReturn(true);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/hubs/{hubId}/exist", hubId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.exist").value(true))
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("허브 존재 여부 확인 - 허브가 존재하지 않는 경우")
+    void exist_hub_when_hub_not_exists() throws Exception {
+        // given
+        UUID hubId = UUID.randomUUID();
+        given(hubService.existById(hubId)).willReturn(false);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/hubs/{hubId}/exist", hubId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.exist").value(false))
+                .andReturn();
+    }
+
     private void assertValidationFailed(DeleteHubReq request, String substring) throws Exception {
         given(hubService.delete(any())).willReturn(request.hubId());
 
