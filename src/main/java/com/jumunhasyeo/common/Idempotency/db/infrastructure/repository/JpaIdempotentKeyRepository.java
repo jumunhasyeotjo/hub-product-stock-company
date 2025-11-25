@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,4 +17,10 @@ public interface JpaIdempotentKeyRepository extends JpaRepository<DbIdempotentKe
             @Param("key") String key,
             @Param("now") LocalDateTime now
     );
+
+    @Query("SELECT i FROM DbIdempotentKey i WHERE i.status = 'PROCESSING' AND i.createdAt < :threshold")
+    List<DbIdempotentKey> findStaleProcessingKeys(@Param("threshold") LocalDateTime threshold);
+
+    @Query("SELECT i FROM DbIdempotentKey i WHERE i.expiresAt < :now")
+    List<DbIdempotentKey> findExpiredKeys(@Param("now") LocalDateTime now);
 }
