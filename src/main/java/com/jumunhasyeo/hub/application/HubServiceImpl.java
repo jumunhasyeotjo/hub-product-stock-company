@@ -1,5 +1,7 @@
 package com.jumunhasyeo.hub.application;
 
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.hub.application.command.CreateHubCommand;
 import com.jumunhasyeo.hub.application.command.DeleteHubCommand;
 import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
@@ -10,34 +12,28 @@ import com.jumunhasyeo.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import com.jumunhasyeo.hub.domain.vo.Coordinate;
-import com.jumunhasyeo.hub.exception.BusinessException;
-import com.jumunhasyeo.hub.exception.ErrorCode;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-@Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Slf4j
 public class HubServiceImpl implements HubService{
     private final HubRepository hubRepository;
     private final HubRepositoryCustom hubRepositoryCustom;
-    private final ApplicationEventPublisher eventPublisher;
+    private final HubEventPublisher hubEventPublisher;
 
     @Transactional
     public HubRes create(CreateHubCommand command) {
         Coordinate coordinate = Coordinate.of(command.latitude(), command.longitude());
         Address address = Address.of(command.address(), coordinate);
         Hub hub = Hub.of(command.name(), address);
-        eventPublisher.publishEvent(HubCreatedEvent.of(hub));
+        hubEventPublisher.publishEvent(HubCreatedEvent.of(hub));
         log.info("[HubCreatedEvent] Publish - 허브가 생성되었습니다.");
         hubRepository.save(hub);
         return HubRes.from(hub);

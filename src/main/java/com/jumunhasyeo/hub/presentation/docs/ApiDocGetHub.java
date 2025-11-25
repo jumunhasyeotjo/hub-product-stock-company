@@ -3,7 +3,6 @@ package com.jumunhasyeo.hub.presentation.docs;
 import com.jumunhasyeo.common.ApiRes;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

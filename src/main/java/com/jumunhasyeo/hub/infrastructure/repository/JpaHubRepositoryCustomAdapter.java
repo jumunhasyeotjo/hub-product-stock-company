@@ -1,7 +1,6 @@
 package com.jumunhasyeo.hub.infrastructure.repository;
 
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
-import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
 import lombok.RequiredArgsConstructor;

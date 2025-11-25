@@ -1,9 +1,9 @@
-package com.jumunhasyeo.hub.e2e;
+package com.jumunhasyeo.e2e;
 
 import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
 import com.jumunhasyeo.TestConfig;
-import com.jumunhasyeo.hub.exception.ErrorCode;
+import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.hub.presentation.dto.request.CreateHubReq;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static io.restassured.RestAssured.given;

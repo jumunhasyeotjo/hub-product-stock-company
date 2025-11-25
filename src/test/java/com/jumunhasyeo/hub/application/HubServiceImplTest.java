@@ -1,6 +1,8 @@
 package com.jumunhasyeo.hub.application;
 
 
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.hub.application.command.CreateHubCommand;
 import com.jumunhasyeo.hub.application.command.DeleteHubCommand;
 import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
@@ -11,8 +13,6 @@ import com.jumunhasyeo.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import com.jumunhasyeo.hub.domain.vo.Coordinate;
-import com.jumunhasyeo.hub.exception.BusinessException;
-import com.jumunhasyeo.hub.exception.ErrorCode;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -45,7 +44,7 @@ public class HubServiceImplTest {
     @Mock
     private HubRepositoryCustom hubRepositoryCustom;
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private HubEventPublisher eventPublisher;
     @InjectMocks
     private HubServiceImpl hubService;
 
@@ -103,7 +102,7 @@ public class HubServiceImplTest {
     }
 
     @Test
-    @DisplayName("hub를 수정할 때 없는 허브를 조회하지 못하면 예외반환")
+    @DisplayName("hub를 수정할 때 없는 허브를 조회하지 못하면 예외 반환")
     public void update_hubIdIsIncorrect_ShouldThrowException() {
         //given
         UUID incorrectHubId = UUID.randomUUID();

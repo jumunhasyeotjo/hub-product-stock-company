@@ -1,4 +1,4 @@
-package com.jumunhasyeo.hub.exception;
+package com.jumunhasyeo.common.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

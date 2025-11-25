@@ -1,7 +1,6 @@
 package com.jumunhasyeo.hub.infrastructure.repository;
 
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
-import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.entity.QHub;
 import com.jumunhasyeo.hub.presentation.dto.HubSearchCondition;
 import com.querydsl.core.types.Projections;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -47,9 +45,7 @@ public class JpaHubRepositoryCustomImpl implements JpaHubRepositoryCustom {
                 .where(
                         isNotDeleted(),
                         nameContains(condition.getName()),
-                        streetContains(condition.getStreet()),
-                        hasProductStock(condition.getProductId()),
-                        hasMinimumStockQuantity(condition.getMinStockQuantity())
+                        streetContains(condition.getStreet())
                 )
                 .orderBy(hub.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -63,9 +59,7 @@ public class JpaHubRepositoryCustomImpl implements JpaHubRepositoryCustom {
                 .where(
                         isNotDeleted(),
                         nameContains(condition.getName()),
-                        streetContains(condition.getStreet()),
-                        hasProductStock(condition.getProductId()),
-                        hasMinimumStockQuantity(condition.getMinStockQuantity())
+                        streetContains(condition.getStreet())
                 )
                 .fetchOne();
 
@@ -87,15 +81,5 @@ public class JpaHubRepositoryCustomImpl implements JpaHubRepositoryCustom {
     private BooleanExpression streetContains(String street) {
         QHub hub = QHub.hub;
         return StringUtils.hasText(street) ? hub.address.street.containsIgnoreCase(street) : null;
-    }
-
-    private BooleanExpression hasProductStock(UUID productId) {
-        QHub hub = QHub.hub;
-        return productId != null ? hub.stockList.any().productId.eq(productId) : null;
-    }
-
-    private BooleanExpression hasMinimumStockQuantity(Integer minQuantity) {
-        QHub hub = QHub.hub;
-        return minQuantity != null ? hub.stockList.any().quantity.goe(minQuantity) : null;
     }
 }

@@ -1,14 +1,14 @@
 package com.jumunhasyeo.hub.domain.entity;
 
 import com.jumunhasyeo.common.BaseEntity;
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.hub.domain.vo.Address;
-import com.jumunhasyeo.hub.exception.BusinessException;
-import com.jumunhasyeo.hub.exception.ErrorCode;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "p_hub")
@@ -28,9 +28,6 @@ public class Hub extends BaseEntity {
 
     @Embedded
     private Address address;
-
-    @OneToMany(mappedBy = "hub", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Stock> stockList = new ArrayList<>();
 
     private Hub(String name, Address address) {
         this.name = name;
@@ -58,38 +55,5 @@ public class Hub extends BaseEntity {
         if (userId == null)
             throw new BusinessException(ErrorCode.MUST_NOT_NULL, "userId");
         markDeleted(userId);
-    }
-
-    public Stock registerNewStock(UUID productId, Integer quantity) {
-        // 기존 재고 확인
-        Optional<Stock> existingStock = getStock(productId);
-        if (existingStock.isPresent()) {
-            throw new BusinessException(ErrorCode.ALREADY_EXISTS, "해당 상품은 이미 존재합니다.");
-        }
-
-        Stock stock = Stock.of(this, productId, quantity);
-        this.stockList.add(stock);
-        return stock;
-    }
-
-    public void stockDecrease(UUID productId, int amount) {
-        Stock targetStock = getStock(productId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "해당 상품의 재고를 찾을 수 없습니다."));
-
-        targetStock.decrease(amount);
-    }
-
-    public void stockIncrease(UUID productId, int amount) {
-        Stock targetStock = getStock(productId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "해당 상품의 재고를 찾을 수 없습니다."));
-        targetStock.increase(amount);
-    }
-
-    public List<Stock> getStockList() {
-        return Collections.unmodifiableList(stockList);
-    }
-
-    public Optional<Stock> getStock(UUID productId) {
-        return stockList.stream().filter(stock -> stock.isSameProduct(productId)).findFirst();
     }
 }

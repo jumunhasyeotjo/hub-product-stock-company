@@ -1,16 +1,12 @@
 package com.jumunhasyeo.hub.domain.entity;
 
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import com.jumunhasyeo.hub.domain.vo.Coordinate;
-import com.jumunhasyeo.hub.exception.BusinessException;
-import com.jumunhasyeo.hub.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -102,82 +98,10 @@ public class HubTest {
         assertThat(businessException.getMessage()).contains("userId는(은) null일 수 없습니다.");
     }
 
-    @Test
-    @DisplayName("hub에 상품 재고를 추가할 수 있다.")
-    public void registerStock_hub_success() {
-        //given
-        Hub hub = createHub();
-        UUID productId = UUID.randomUUID();
-        int quantity = 100;
-        //when
-        hub.registerNewStock(productId, quantity);
-        //then
-        assertThat(hub.getStockList().size()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("hub에서 재고를 감소시킬 수 있다.")
-    public void stockDecrease_hub_success() {
-        //given
-        Hub hub = createHub();;
-        UUID productId = UUID.randomUUID();
-        int quantity = 100;
-        hub.registerNewStock(productId, quantity);
-        //when
-        hub.stockDecrease(productId, 10);
-        //then
-        assertThat(hub.getStock(productId)).isPresent();
-        assertThat(hub.getStock(productId).get().getQuantity()).isEqualTo(90);
-    }
-
-    @Test
-    @DisplayName("hub에서 재고를 증가시킬 수 있다.")
-    public void stockIncrease_hub_success() {
-        //given
-        Hub hub = createHub();
-        UUID productId = UUID.randomUUID();
-        int quantity = 100;
-        hub.registerNewStock(productId, quantity);
-        //when
-        hub.stockIncrease(productId, 10);
-        //then
-        assertThat(hub.getStock(productId)).isPresent();
-        assertThat(hub.getStock(productId).get().getQuantity()).isEqualTo(110);
-    }
-
-    @Test
-    @DisplayName("hub에서 재고를 조회할 수 있다.")
-    public void getStock_hub_success() {
-        //given
-        Hub hub = createHub();
-        UUID productId = UUID.randomUUID();
-        int quantity = 100;
-        hub.registerNewStock(productId, quantity);
-        //when
-        Optional<Stock> stockOpt = hub.getStock(productId);
-        //then
-        assertThat(stockOpt).isPresent();
-        assertThat(stockOpt.get().getProductId()).isEqualTo(productId);
-        assertThat(stockOpt.get().getQuantity()).isEqualTo(100);
-    }
-
-    @Test
-    @DisplayName("동일 상품 재고 중복 등록 시 예외 반환")
-    public void registerNewStock_DuplicateProduct_ShouldThrowException() {
-        //given
-        Hub hub = createHub();
-        UUID productId = UUID.randomUUID();
-        //when
-        hub.registerNewStock(productId, 100);
-        //then
-        assertThrows(BusinessException.class, () -> hub.registerNewStock(productId, 50));
-    }
-
     private static Hub createHub() {
         return Hub.builder()
                 .name("송파 허브")
                 .address(Address.of("street", Coordinate.of(12.6, 12.6)))
-                .stockList(new ArrayList<>())
                 .build();
     }
 
