@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>허브 네트워크 시각화</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #667eea;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 25px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.95em;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .visualization-container {
+            position: relative;
+            padding: 20px;
+            background: white;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 30px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        #visualization {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            background: #fafafa;
+            cursor: grab;
+        }
+
+        #visualization:active {
+            cursor: grabbing;
+        }
+
+        .legend {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+
+        .legend-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 0.95em;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #333;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 300px;
+        }
+
+        .tooltip-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #4CAF50;
+        }
+
+        .tooltip-content {
+            line-height: 1.6;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .zoom-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            color: #667eea;
+        }
+
+        .zoom-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: #667eea;
+            color: white;
+        }
+
+        /* 노드 및 링크 스타일 */
+        .link {
+            stroke: #4CAF50;
+            stroke-opacity: 0.6;
+            stroke-width: 2;
+        }
+
+        .link:hover {
+            stroke-opacity: 1;
+            stroke-width: 3;
+        }
+
+        .node-center {
+            fill: #4CAF50;
+            stroke: #2E7D32;
+            stroke-width: 3;
+            cursor: pointer;
+        }
+
+        .node-branch {
+            fill: #2196F3;
+            stroke: #1565C0;
+            stroke-width: 3;
+            cursor: pointer;
+        }
+
+        .node:hover {
+            stroke-width: 5;
+            filter: brightness(1.2);
+        }
+
+        .node-label {
+            font-size: 13px;
+            font-weight: 600;
+            fill: #333;
+            text-anchor: middle;
+            pointer-events: none;
+            text-shadow: 
+                -1px -1px 0 white,
+                1px -1px 0 white,
+                -1px 1px 0 white,
+                1px 1px 0 white;
+        }
+
+        .link-label {
+            font-size: 11px;
+            fill: #666;
+            text-anchor: middle;
+            pointer-events: none;
+            font-weight: 600;
+            text-shadow: 
+                -1px -1px 0 white,
+                1px -1px 0 white,
+                -1px 1px 0 white,
+                1px 1px 0 white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚚 허브 네트워크 시각화</h1>
+            <p>물류 허브 간 연결 관계 및 경로 정보</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" th:text="${visualizationData.totalHubs}">0</div>
+                <div class="stat-label">총 허브</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" th:text="${visualizationData.centerHubCount}">0</div>
+                <div class="stat-label">센터 허브</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" th:text="${visualizationData.branchHubCount}">0</div>
+                <div class="stat-label">지점 허브</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" th:text="${visualizationData.totalRoutes}">0</div>
+                <div class="stat-label">연결 경로</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="resetVisualization()">🔄 초기화</button>
+            <button class="control-btn" onclick="toggleLabels()">🏷️ 레이블 토글</button>
+            <button class="control-btn" onclick="toggleDistance()">📏 거리 표시</button>
+            <button class="control-btn" onclick="centerView()">🎯 중앙 정렬</button>
+        </div>
+
+        <div class="visualization-container">
+            <svg id="visualization"></svg>
+            
+            <div class="legend">
+                <div class="legend-title">범례</div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #4CAF50; border-color: #2E7D32;"></div>
+                    <span>센터 허브 (CENTER)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2196F3; border-color: #1565C0;"></div>
+                    <span>지점 허브 (BRANCH)</span>
+                </div>
+            </div>
+
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">+</button>
+                <button class="zoom-btn" onclick="zoomOut()">−</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Thymeleaf에서 데이터 전달
+        const hubsData = /*[[${visualizationData.hubs}]]*/ [];
+        const routesData = /*[[${visualizationData.routes}]]*/ [];
+        
+        // D3.js 변수
+        let svg, g, gLabels, simulation;
+        let showLabels = true;
+        let showDistance = true;
+        let zoom;
+        let currentTransform = d3.zoomIdentity;
+
+        // 초기화
+        function initVisualization() {
+            const container = document.getElementById('visualization');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // SVG 초기화
+            d3.select('#visualization').selectAll('*').remove();
+            
+            svg = d3.select('#visualization')
+                .attr('width', width)
+                .attr('height', height);
+
+            // 줌 설정
+            zoom = d3.zoom()
+                .scaleExtent([0.1, 4])
+                .on('zoom', (event) => {
+                    currentTransform = event.transform;
+                    // 노드와 링크만 변환 (글자는 제외)
+                    g.attr('transform', event.transform);
+                    // 글자는 위치만 이동, 크기는 줌에 반비례하여 조정
+                    updateLabelsTransform(event.transform);
+                });
+
+            svg.call(zoom);
+
+            // 노드/링크 그룹
+            g = svg.append('g');
+            // 레이블 그룹 (별도)
+            gLabels = svg.append('g');
+
+            // 노드 데이터 준비
+            const nodes = hubsData.map(hub => ({
+                id: hub.hubId,
+                name: hub.name,
+                type: hub.type,
+                lat: hub.latitude,
+                lon: hub.longitude,
+                address: hub.address
+            }));
+
+            // 링크 데이터 준비
+            const links = routesData.map(route => ({
+                source: route.fromHubId,
+                target: route.toHubId,
+                distance: route.distance,
+                duration: route.duration
+            }));
+
+            // 좌표 변환 (위경도 -> SVG 좌표)
+            const latExtent = d3.extent(nodes, d => d.lat);
+            const lonExtent = d3.extent(nodes, d => d.lon);
+            
+            const padding = 100;
+            const xScale = d3.scaleLinear()
+                .domain(lonExtent)
+                .range([padding, width - padding]);
+            
+            const yScale = d3.scaleLinear()
+                .domain(latExtent)
+                .range([height - padding, padding]);
+
+            // 노드 위치 초기화
+            nodes.forEach(node => {
+                node.x = xScale(node.lon);
+                node.y = yScale(node.lat);
+                node.fx = node.x; // 고정 위치
+                node.fy = node.y;
+            });
+
+            // Force Simulation
+            simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('collision', d3.forceCollide().radius(50));
+
+            // 링크 그리기
+            const link = g.append('g')
+                .selectAll('line')
+                .data(links)
+                .join('line')
+                .attr('class', 'link')
+                .attr('stroke-width', 2);
+
+            // 노드 그리기
+            const node = g.append('g')
+                .selectAll('circle')
+                .data(nodes)
+                .join('circle')
+                .attr('class', d => d.type === 'CENTER' ? 'node node-center' : 'node node-branch')
+                .attr('r', d => d.type === 'CENTER' ? 14 : 10)
+                .call(drag(simulation));
+
+            // 링크 레이블 (거리) - 별도 그룹
+            const linkLabel = gLabels.append('g')
+                .selectAll('text')
+                .data(links)
+                .join('text')
+                .attr('class', 'link-label')
+                .style('display', showDistance ? 'block' : 'none')
+                .text(d => `${d.distance.toFixed(1)}km`);
+
+            // 노드 레이블 - 별도 그룹
+            const nodeLabel = gLabels.append('g')
+                .selectAll('text')
+                .data(nodes)
+                .join('text')
+                .attr('class', 'node-label')
+                .style('display', showLabels ? 'block' : 'none')
+                .text(d => d.name);
+
+            // 툴팁
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'tooltip')
+                .style('opacity', 0);
+
+            node.on('mouseover', function(event, d) {
+                tooltip.transition()
+                    .duration(200)
+                    .style('opacity', 1);
+                tooltip.html(`
+                    <div class="tooltip-title">${d.name}</div>
+                    <div class="tooltip-content">
+                        <strong>타입:</strong> ${d.type}<br>
+                        <strong>주소:</strong> ${d.address}<br>
+                        <strong>좌표:</strong> ${d.lat.toFixed(4)}, ${d.lon.toFixed(4)}
+                    </div>
+                `)
+                    .style('left', (event.pageX + 15) + 'px')
+                    .style('top', (event.pageY - 15) + 'px');
+            })
+            .on('mouseout', function() {
+                tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+            });
+
+            link.on('mouseover', function(event, d) {
+                tooltip.transition()
+                    .duration(200)
+                    .style('opacity', 1);
+                tooltip.html(`
+                    <div class="tooltip-content">
+                        <strong>거리:</strong> ${d.distance.toFixed(2)} km<br>
+                        <strong>시간:</strong> ${d.duration} 분
+                    </div>
+                `)
+                    .style('left', (event.pageX + 15) + 'px')
+                    .style('top', (event.pageY - 15) + 'px');
+            })
+            .on('mouseout', function() {
+                tooltip.transition()
+                    .duration(500)
+                    .style('opacity', 0);
+            });
+
+            // Simulation 업데이트
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                // 레이블 위치 업데이트
+                updateLabels(linkLabel, nodeLabel);
+            });
+        }
+
+        // 레이블 위치 및 크기 업데이트
+        function updateLabels(linkLabel, nodeLabel) {
+            const scale = currentTransform.k;
+            const tx = currentTransform.x;
+            const ty = currentTransform.y;
+
+            // 링크 레이블 업데이트
+            linkLabel
+                .attr('x', d => (d.source.x + d.target.x) / 2 * scale + tx)
+                .attr('y', d => (d.source.y + d.target.y) / 2 * scale + ty)
+                .style('font-size', `${11 / Math.sqrt(scale)}px`);  // 줌에 반비례
+
+            // 노드 레이블 업데이트
+            nodeLabel
+                .attr('x', d => d.x * scale + tx)
+                .attr('y', d => (d.y - 20) * scale + ty)
+                .style('font-size', `${13 / Math.sqrt(scale)}px`);  // 줌에 반비례
+        }
+
+        // 줌 시 레이블 변환
+        function updateLabelsTransform(transform) {
+            const scale = transform.k;
+            const tx = transform.x;
+            const ty = transform.y;
+
+            // 모든 링크 레이블 업데이트
+            d3.selectAll('.link-label')
+                .attr('x', function() {
+                    const d = d3.select(this).datum();
+                    return (d.source.x + d.target.x) / 2 * scale + tx;
+                })
+                .attr('y', function() {
+                    const d = d3.select(this).datum();
+                    return (d.source.y + d.target.y) / 2 * scale + ty;
+                })
+                .style('font-size', `${11 / Math.sqrt(scale)}px`);
+
+            // 모든 노드 레이블 업데이트
+            d3.selectAll('.node-label')
+                .attr('x', function() {
+                    const d = d3.select(this).datum();
+                    return d.x * scale + tx;
+                })
+                .attr('y', function() {
+                    const d = d3.select(this).datum();
+                    return (d.y - 20) * scale + ty;
+                })
+                .style('font-size', `${13 / Math.sqrt(scale)}px`);
+        }
+
+        // 드래그 기능
+        function drag(simulation) {
+            function dragstarted(event) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+            }
+
+            function dragended(event) {
+                if (!event.active) simulation.alphaTarget(0);
+            }
+
+            return d3.drag()
+                .on('start', dragstarted)
+                .on('drag', dragged)
+                .on('end', dragended);
+        }
+
+        // 컨트롤 함수들
+        function resetVisualization() {
+            currentTransform = d3.zoomIdentity;
+            initVisualization();
+        }
+
+        function toggleLabels() {
+            showLabels = !showLabels;
+            d3.selectAll('.node-label')
+                .style('display', showLabels ? 'block' : 'none');
+        }
+
+        function toggleDistance() {
+            showDistance = !showDistance;
+            d3.selectAll('.link-label')
+                .style('display', showDistance ? 'block' : 'none');
+        }
+
+        function centerView() {
+            currentTransform = d3.zoomIdentity;
+            svg.transition()
+                .duration(750)
+                .call(zoom.transform, d3.zoomIdentity);
+        }
+
+        function zoomIn() {
+            svg.transition()
+                .duration(300)
+                .call(zoom.scaleBy, 1.3);
+        }
+
+        function zoomOut() {
+            svg.transition()
+                .duration(300)
+                .call(zoom.scaleBy, 0.7);
+        }
+
+        // 창 크기 변경 시 재렌더링
+        window.addEventListener('resize', () => {
+            currentTransform = d3.zoomIdentity;
+            initVisualization();
+        });
+
+        // 초기 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            initVisualization();
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

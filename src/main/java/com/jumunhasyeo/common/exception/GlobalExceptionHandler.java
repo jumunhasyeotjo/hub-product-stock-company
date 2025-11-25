@@ -26,10 +26,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiRes<Void>> handleDataIntegrityViolation(
             DataIntegrityViolationException ex
     ) {
-        log.error("DataIntegrityViolationException error: {}", ex.getMessage());
-        String message = ex.getMessage();
+        log.error("DataIntegrityViolationException error: {}", ex.toString());
+        String message = ex.toString();
 
-        if (message != null && message.contains("p_hub_name_key")) {
+        if (message != null && (message.contains("uk_hub_name_deleted") || message.contains("p_hub_name_key"))) {
             // 허브 이름 중복
             return ResponseEntity
                     .status(ErrorCode.ALREADY_EXISTS.getStatus())
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiRes<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        log.error("JSON parsing error: {}", ex.getMessage());
+        log.error("JSON parsing error: {}", ex.toString());
         return ResponseEntity
                 .badRequest()
                 .body(ApiRes.error(INVALID_JSON.name(), INVALID_JSON.getMessage()));
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiRes<?>> handleBusinessException(BusinessException ex) {
         ErrorCode errorCode = ex.getErrorCode();
-        log.error("BusinessException: {}", ex.getMessage());
+        log.error("BusinessException: {}", ex.toString());
         return ResponseEntity
                 .status(errorCode.getStatus())
                 .body(ApiRes.error(errorCode.getCode(), errorCode.getMessage()));
@@ -94,7 +94,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiRes<?>> handleException(Exception ex) {
-        log.error("Unhandled exception: {}", ex.getMessage());
+        log.error("Unhandled exception: {}", ex.toString());
         return ResponseEntity
                 .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(ApiRes.error(ErrorCode.INTERNAL_SERVER_ERROR.getCode(),

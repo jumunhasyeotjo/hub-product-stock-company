@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Primary
@@ -90,5 +91,10 @@ public class HubCachedDecoratorService implements HubService {
     @Override
     public Boolean existById(UUID hubId) {
         return hubService.existById(hubId);
+    }
+
+    @Override
+    public List<HubRes> getAll() {
+        return hubService.getAll();
     }
 }

@@ -1,8 +1,13 @@
+server:
+  port: 8088
+
 spring:
   config:
     import: optional:file:./.env[.properties]
   application:
     name: hub-product-stock-company
+  profiles:
+    active: dev
 
   data:
     redis:
@@ -10,8 +15,8 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
       timeout: 3000ms
-    ssl:
-      enabled: true  # TLS 활성화
+      ssl:
+        enabled: true  # TLS 활성화
 
   datasource:
     url: ${POSTGRES_URL}
@@ -20,12 +25,11 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: ${DB_POOL_SIZE:10}
-      connection-timeout: ${DB_CONNECTION_TIMEOUT:2500}
-
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:3000}
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     defer-datasource-initialization: true
     properties:
       jakarta.persistence.lock.timeout: ${DB_LOCK_TIME_OUT:2000}
@@ -40,6 +44,7 @@ spring:
 
 logging:
   level:
+    org.hibernate.orm.jdbc.bind: TRACE      # 바인딩값 로그
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.orm.jpa: DEBUG
@@ -47,4 +52,20 @@ logging:
 
 cache:
   config:
-    hubService: ${HUB_SERVICE_CACHEABLE}  # true면 캐시 주입, false면 원본 Service 주입
+    hubService: ${HUB_SERVICE_CACHEABLE:true}  # true면 캐시주입, false면 원본 Service 주입
+
+kakao:
+  mobility:
+    api-key: "KakaoAK your_api_key_here"
+---
+# test profile
+spring:
+  config:
+    activate:
+      on-profile: test
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev

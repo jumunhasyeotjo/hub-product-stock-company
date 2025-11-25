@@ -7,19 +7,18 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public interface JpaStockRepository extends JpaRepository<Stock, UUID> {
-    @Query("SELECT s FROM Stock s WHERE s.stockId = :id AND s.deletedAt IS NULL")
+    @Query("SELECT s FROM Stock s WHERE s.stockId = :id AND s.isDeleted = false")
     Optional<Stock> findById(@Param("id") UUID id);
 
     @Query("SELECT s FROM Stock s " +
             "WHERE s.productId = :productId " +
-            "AND s.deletedAt IS NULL")
+            "AND s.isDeleted = false")
     Optional<Stock> findByProductId(UUID productId);
 
     @Modifying
@@ -35,7 +34,7 @@ public interface JpaStockRepository extends JpaRepository<Stock, UUID> {
     @Lock(LockModeType.PESSIMISTIC_READ)
     @Query("SELECT s FROM Stock s " +
             "WHERE s.productId = :productId " +
-            "AND s.deletedAt IS NULL")
+            "AND s.isDeleted = false")
     Optional<Stock> findStockByProductIdWithLock(UUID productId);
 
 }

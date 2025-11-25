@@ -8,6 +8,7 @@ import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.event.HubCreatedEvent;
+import com.jumunhasyeo.hub.domain.event.HubDeletedEvent;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
 import com.jumunhasyeo.hub.domain.vo.Address;
@@ -19,7 +20,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -32,10 +35,13 @@ public class HubServiceImpl implements HubService{
     public HubRes create(CreateHubCommand command) {
         Coordinate coordinate = Coordinate.of(command.latitude(), command.longitude());
         Address address = Address.of(command.address(), coordinate);
-        Hub hub = Hub.of(command.name(), address);
-        hubEventPublisher.publishEvent(HubCreatedEvent.of(hub));
-        log.info("[HubCreatedEvent] Publish - 허브가 생성되었습니다.");
-        hubRepository.save(hub);
+        Hub hub = Hub.of(command.name(), address, command.hubType());
+
+        switch (hub.getHubType()) {
+            case BRANCH -> createBranchHub(command.centerHubId(), hub);
+            case CENTER -> createCenterHub(hub);
+            default -> throw new BusinessException(ErrorCode.INVALID_HUB_TYPE);
+        }
         return HubRes.from(hub);
     }
 
@@ -51,13 +57,22 @@ public class HubServiceImpl implements HubService{
     @Transactional
     public UUID delete(DeleteHubCommand command) {
         Hub hub = getHub(command.hubId());
-        hub.markDeleted(command.userId());
+        hub.delete(command.userId());
+        hubEventPublisher.publishEvent(HubDeletedEvent.from(hub, command.userId()));
         return hub.getHubId();
     }
 
     @Override
     public Boolean existById(UUID uuid) {
         return hubRepository.existById(uuid);
+    }
+
+    @Override
+    public List<HubRes> getAll() {
+        return hubRepository.findAll()
+                .stream()
+                .map(HubRes::from)
+                .collect(Collectors.toList());
     }
 
     public HubRes getById(UUID hubId) {
@@ -70,6 +85,18 @@ public class HubServiceImpl implements HubService{
 
     private Hub getHub(UUID hubId) {
         return hubRepository.findById(hubId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new BusinessException(ErrorCode.HUB_NOT_FOUND));
+    }
+
+    private void createCenterHub(Hub hub) {
+        hubRepository.save(hub);
+        hubEventPublisher.publishEvent(HubCreatedEvent.centerHub(hub));
+    }
+
+    private void createBranchHub(UUID centerHubId, Hub hub) {
+        Hub centerHub = getHub(centerHubId);
+        hub.addCenterHub(centerHub);
+        hubRepository.save(hub);
+        hubEventPublisher.publishEvent(HubCreatedEvent.branchHub(hub, centerHub.getHubId()));
     }
 }

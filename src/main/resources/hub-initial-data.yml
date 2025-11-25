@@ -1,0 +1,128 @@
+# src/main/resources/hub-initial-data.yml
+centerHubs:
+  # ========== 대전광역시 센터 (CENTER) ==========
+  - name: "대전광역시 센터"
+    street: "대전 서구 둔산로 100"
+    latitude: 36.3505
+    longitude: 127.3845
+    type: "CENTER"
+    center: null
+
+  # ========== 대구광역시 센터 (CENTER) ==========
+  - name: "대구광역시 센터"
+    street: "대구 북구 태평로 161"
+    latitude: 35.8853
+    longitude: 128.6113
+    type: "CENTER"
+    center: null
+
+  # ========== 경상북도 센터 (CENTER) ==========
+  - name: "경상북도 센터"
+    street: "경북 안동시 풍천면 도청대로 455"
+    latitude: 36.5684
+    longitude: 128.7294
+    type: "CENTER"
+    center: null
+
+  # ========== 경기 남부 센터 (CENTER) ==========
+  - name: "경기 남부 센터"
+    street: "경기도 이천시 덕평로 257-21"
+    latitude: 37.1998
+    longitude: 127.3775
+    type: "CENTER"
+    center: null
+
+branchHubs:
+  # 경기 남부의 BRANCH들
+  - name: "경기 북부 센터"
+    street: "경기도 고양시 덕양구 권율대로 570"
+    latitude: 37.6584
+    longitude: 126.8320
+    type: "BRANCH"
+    center: "경기 남부 센터"
+
+  - name: "서울특별시 센터"
+    street: "서울특별시 송파구 송파대로 55"
+    latitude: 37.5146
+    longitude: 127.1061
+    type: "BRANCH"
+    center: "경기 남부 센터"
+
+  - name: "인천광역시 센터"
+    street: "인천 남동구 정각로 29"
+    latitude: 37.4489
+    longitude: 126.7319
+    type: "BRANCH"
+    center: "경기 남부 센터"
+
+  - name: "강원특별자치도 센터"
+    street: "강원특별자치도 춘천시 중앙로 1"
+    latitude: 37.8813
+    longitude: 127.7300
+    type: "BRANCH"
+    center: "경기 남부 센터"
+
+  # 대전의 BRANCH들
+  - name: "충청남도 센터"
+    street: "충남 홍성군 홍북읍 충남대로 21"
+    latitude: 36.6018
+    longitude: 126.6661
+    type: "BRANCH"
+    center: "대전광역시 센터"
+
+  - name: "충청북도 센터"
+    street: "충북 청주시 상당구 상당로 82"
+    latitude: 36.6357
+    longitude: 127.4912
+    type: "BRANCH"
+    center: "대전광역시 센터"
+
+  - name: "세종특별자치시 센터"
+    street: "세종특별자치시 한누리대로 2130"
+    latitude: 36.4800
+    longitude: 127.2890
+    type: "BRANCH"
+    center: "대전광역시 센터"
+
+  - name: "전북특별자치도 센터"
+    street: "전북특별자치도 전주시 완산구 효자로 225"
+    latitude: 35.8204
+    longitude: 127.1089
+    type: "BRANCH"
+    center: "대전광역시 센터"
+
+  - name: "광주광역시 센터"
+    street: "광주 서구 내방로 111"
+    latitude: 35.1601
+    longitude: 126.8514
+    type: "BRANCH"
+    center: "대전광역시 센터"
+
+  - name: "전라남도 센터"
+    street: "전남 무안군 삼향읍 오룡길 1"
+    latitude: 34.9900
+    longitude: 126.4806
+    type: "BRANCH"
+    center: "대전광역시 센터"
+
+  # 대구의 BRANCH들
+  - name: "경상남도 센터"
+    street: "경남 창원시 의창구 중앙대로 300"
+    latitude: 35.2272
+    longitude: 128.6811
+    type: "BRANCH"
+    center: "대구광역시 센터"
+
+  - name: "부산광역시 센터"
+    street: "부산 동구 중앙대로 206"
+    latitude: 35.1162
+    longitude: 129.0421
+    type: "BRANCH"
+    center: "대구광역시 센터"
+
+  - name: "울산광역시 센터"
+    street: "울산 남구 중앙로 201"
+    latitude: 35.5396
+    longitude: 129.3114
+    type: "BRANCH"
+    center: "대구광역시 센터"

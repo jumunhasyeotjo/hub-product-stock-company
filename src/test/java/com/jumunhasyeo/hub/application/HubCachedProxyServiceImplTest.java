@@ -67,7 +67,7 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
     @DisplayName("허브 첫 조회 시 Cache Miss 후 DB 조회")
     void getById_FirstCall_CacheMiss() {
         // given
-        Hub hub = createAndSaveHub();
+        Hub hub = createHubAndSave();
         UUID hubId = hub.getHubId();
 
         // when
@@ -85,7 +85,7 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
     @DisplayName("허브 두 번째 조회 시 Cache Hit으로 DB 조회 안함")
     void getById_SecondCall_CacheHit() {
         // given
-        Hub hub = createAndSaveHub();
+        Hub hub = createHubAndSave();
         UUID hubId = hub.getHubId();
         // 첫 번째 호출 (Cache Miss - DB 조회)
         HubRes firstCall = hubService.getById(hubId);
@@ -108,7 +108,7 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
     @DisplayName("허브 수정 시 이전 캐시가 새 값으로 교체됨")
     void update_ShouldReplaceOldCache() {
         // given
-        Hub hub = createAndSaveHub();
+        Hub hub = createHubAndSave();
         UUID hubId = hub.getHubId();
         // 첫 조회로 캐시 생성
         HubRes beforeUpdate = hubService.getById(hubId);
@@ -134,7 +134,7 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
     @DisplayName("허브 삭제 시 캐시 제거 된다.")
     void delete_ShouldEvictCache() {
         // given
-        Hub hub = createAndSaveHub();
+        Hub hub = createHubAndSave();
         UUID hubId = hub.getHubId();
         // 첫 조회로 캐시 생성
         hubService.getById(hubId);
@@ -152,8 +152,8 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
     @DisplayName("서로 다른 허브는 독립적으로 캐싱된다.")
     void differentHubs_ShouldCacheSeparately() {
         // given
-        Hub hub1 = createAndSaveHub("허브1");
-        Hub hub2 = createAndSaveHub("허브2");
+        Hub hub1 = createHubAndSave("허브1");
+        Hub hub2 = createHubAndSave("허브2");
 
         // when
         HubRes result1 = hubService.getById(hub1.getHubId());
@@ -171,12 +171,12 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
         assertThat(redisTemplate.hasKey(cacheKey2)).isTrue();
     }
 
-    private Hub createAndSaveHub() {
-        return createAndSaveHub("송파허브");
+    private Hub createHubAndSave() {
+        return createHubAndSave("송파허브");
     }
 
-    private Hub createAndSaveHub(String name) {
-        Hub hub = Hub.of(
+    private Hub createHubAndSave(String name) {
+        Hub hub = Hub.createBranchHub(
                 name,
                 Address.of("서울시 송파구", Coordinate.of(37.5, 127.0))
         );
