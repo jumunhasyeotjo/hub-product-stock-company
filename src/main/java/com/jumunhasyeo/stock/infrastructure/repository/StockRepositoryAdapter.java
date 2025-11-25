@@ -50,5 +50,4 @@ public class StockRepositoryAdapter implements StockRepository {
     public Stock save(Stock stock) {
         return jpaStockRepository.save(stock);
     }
-
 }

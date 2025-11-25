@@ -1,6 +1,5 @@
 package com.jumunhasyeo.stock.application;
 
-import com.jumunhasyeo.common.Idempotency.Idempotent;
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.stock.application.command.CreateStockCommand;
@@ -52,13 +51,13 @@ public class StockService {
     }
 
     //상품 재고 감소
-    @Idempotent(ttlDays = 1)
+    @DbIdempotent(ttlDays = 1)
     public StockRes decrement(String idempotencyKey,DecreaseStockCommand command){
         return stockVariationService.decrement(command);
     }
 
     //상품 재고 증가
-    @Idempotent(ttlDays = 1)
+    @DbIdempotent(ttlDays = 1)
     public StockRes increment(String idempotencyKey, IncreaseStockCommand command){
         return stockVariationService.increment(command);
     }
