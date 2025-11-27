@@ -2,23 +2,22 @@ package com.jumunhasyeo.hub.application;
 
 import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
+import com.jumunhasyeo.InternalIntegrationTestConfig;
 import com.jumunhasyeo.hub.application.command.DeleteHubCommand;
 import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
-import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import com.jumunhasyeo.hub.domain.vo.Coordinate;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,10 +30,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
-@Import(HubCachedDecoratorServiceIntegrationTest.HubCachedTestConfig.class)
+@Import(InternalIntegrationTestConfig.class)
 class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
 
     @Autowired
+    @Qualifier("hubServiceCached")
     private HubService hubService;
 
     @Autowired
@@ -198,23 +198,5 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
                 .getConnection()
                 .serverCommands()
                 .flushAll();
-    }
-
-    @TestConfiguration
-    @RequiredArgsConstructor
-    public static class HubCachedTestConfig {
-
-        public HubService hubServiceNonCached(
-                HubRepository hubRepository,
-                HubRepositoryCustom hubRepositoryCustom,
-                HubEventPublisher hubEventPublisher
-        ) {
-            HubServiceImpl hubServiceImpl = new HubServiceImpl(
-                    hubRepository,
-                    hubRepositoryCustom,
-                    hubEventPublisher
-            );
-            return new HubCachedDecoratorService(hubServiceImpl);
-        }
     }
 }

@@ -2,7 +2,7 @@ package com.jumunhasyeo.stock.infrastructure.repository;
 
 import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
-import com.jumunhasyeo.TestConfig;
+import com.jumunhasyeo.InternalIntegrationTestConfig;
 import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.vo.Address;
 import com.jumunhasyeo.hub.domain.vo.Coordinate;
@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Import(TestConfig.class)
+@Import(InternalIntegrationTestConfig.class)
 public class JpaStockRepositoryConcurrencyTest extends CommonTestContainer {
 
     @Autowired

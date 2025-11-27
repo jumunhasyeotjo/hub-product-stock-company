@@ -2,6 +2,7 @@ package com.jumunhasyeo.hub.domain.repository;
 
 import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
+import com.jumunhasyeo.RepositoryTestConfig;
 import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.entity.HubType;
 import com.jumunhasyeo.hub.domain.vo.Address;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({HubRepositoryAdapter.class, CleanUp.class})
+@Import({HubRepositoryAdapter.class, CleanUp.class, RepositoryTestConfig.class})
 class HubRepositoryTest extends CommonTestContainer {
 
     @Autowired
