@@ -81,6 +81,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiRes<?>> handleBusinessException(BusinessException ex) {
+        ex.printStackTrace();
         ErrorCode errorCode = ex.getErrorCode();
         log.error("BusinessException: {}", ex.toString());
         return ResponseEntity

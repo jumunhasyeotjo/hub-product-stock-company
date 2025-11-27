@@ -10,6 +10,6 @@ import java.util.UUID;
 public class UserClientImpl implements UserClient {
     @Override
     public Optional<UUID> getOrganizationId(Long userId) {
-        return Optional.empty();
+        return Optional.of(UUID.randomUUID());
     }
 }
