@@ -151,28 +151,28 @@ class CompanyWebControllerTest {
 
     @Test
     @DisplayName("업체 소속 허브를 검증할 수 있다 - 소속인 경우")
-    void belongsToHub_true() throws Exception {
+    void existToHub_true() throws Exception {
         //given
         UUID companyId = UUID.randomUUID();
         UUID hubId = UUID.randomUUID();
         given(companyService.existsByIdAndHubId(companyId, hubId)).willReturn(true);
 
         //when & then
-        mockMvc.perform(get("/api/v1/companies/{companyId}/hub/{hubId}/belongs", companyId, hubId))
+        mockMvc.perform(get("/api/v1/companies/{companyId}/hub/{hubId}/exist", companyId, hubId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(true));
     }
 
     @Test
     @DisplayName("업체 소속 허브를 검증할 수 있다 - 소속이 아닌 경우")
-    void belongsToHub_false() throws Exception {
+    void existToHub_false() throws Exception {
         //given
         UUID companyId = UUID.randomUUID();
         UUID hubId = UUID.randomUUID();
         given(companyService.existsByIdAndHubId(companyId, hubId)).willReturn(false);
 
         //when & then
-        mockMvc.perform(get("/api/v1/companies/{companyId}/hub/{hubId}/belongs", companyId, hubId))
+        mockMvc.perform(get("/api/v1/companies/{companyId}/hub/{hubId}/exist", companyId, hubId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(false));
     }

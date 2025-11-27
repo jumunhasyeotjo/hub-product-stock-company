@@ -96,14 +96,14 @@ public class CompanyWebController {
     }
 
     @Operation(summary = "업체 소속 허브 검증", description = "해당 허브가 해당 업체 소속인지 검증")
-    @GetMapping("/{companyId}/hub/{hubId}/belongs")
-    public ResponseEntity<ApiRes<Boolean>> belongsToHub(
+    @GetMapping("/{companyId}/hub/{hubId}/exist")
+    public ResponseEntity<ApiRes<Boolean>> existToHub(
             @Parameter(description = "검증할 업체 ID", required = true)
             @PathVariable UUID companyId,
             @Parameter(description = "검증할 허브 ID", required = true)
             @PathVariable UUID hubId
     ) {
-        boolean belongs = companyService.existsByIdAndHubId(companyId, hubId);
-        return ResponseEntity.ok(ApiRes.success(belongs));
+        boolean exist = companyService.existsByIdAndHubId(companyId, hubId);
+        return ResponseEntity.ok(ApiRes.success(exist));
     }
 }
