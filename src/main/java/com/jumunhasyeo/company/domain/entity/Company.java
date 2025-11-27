@@ -42,4 +42,14 @@ public class Company extends BaseEntity {
         return new Company(hubId, name, companyType, address);
     }
 
+    public void update(UUID hubId, String name, CompanyType companyType, String address) {
+        this.hubId = hubId;
+        this.name = name;
+        this.companyType = companyType;
+        this.address = address;
+    }
+
+    public void delete(Long userId) {
+        markDeleted(userId);
+    }
 }
