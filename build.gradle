@@ -79,6 +79,9 @@ dependencies {
 
     // YAML parsing
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+
+    implementation 'com.library:passport:1.0.1' // 1.0.1 버전 => user belong 추가
+    implementation 'com.google.protobuf:protobuf-java:3.21.12'
 }
 
 dependencyManagement {
