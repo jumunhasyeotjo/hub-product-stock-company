@@ -54,7 +54,7 @@ public class HubRouteDomainService {
         
         validateBranchHub(branchHub);
         validateCenterHub(centerHub);
-        validateBranchBelongsToCenter(branchHub, centerHub);
+        validateBranchExistToCenter(branchHub, centerHub);
         validateRouteCreation(branchHub, centerHub);
 
         HashSet<HubRoute> branchToCenter = createTwoWayRoutes(branchHub, centerHub, calculator);
@@ -122,7 +122,7 @@ public class HubRouteDomainService {
         }
     }
 
-    private void validateBranchBelongsToCenter(Hub branchHub, Hub centerHub) {
+    private void validateBranchExistToCenter(Hub branchHub, Hub centerHub) {
         boolean isConnected = branchHub.getCenterHubs().contains(centerHub);
         if (!isConnected) {
             throw new BusinessException(ErrorCode.BRANCH_NOT_CONNECTED_TO_CENTER,
