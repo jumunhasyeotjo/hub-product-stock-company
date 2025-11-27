@@ -5,10 +5,12 @@ import com.jumunhasyeo.product.application.dto.ProductRes;
 import com.jumunhasyeo.product.domain.entity.Product;
 import com.jumunhasyeo.product.domain.repository.ProductRepository;
 import com.jumunhasyeo.product.domain.vo.ProductName;
+import com.jumunhasyeo.product.presentation.dto.res.OrderProductRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,5 +48,10 @@ public class ProductRepositoryAdapter implements ProductRepository {
     @Override
     public Boolean existsByNameAndIdNot(ProductName name, UUID id) {
         return jpaProductRepository.existsByNameAndId(name, id);
+    }
+
+    @Override
+    public List<OrderProductRes> findAllByIds(List<UUID> products) {
+        return jpaProductRepository.findAllByIds(products);
     }
 }

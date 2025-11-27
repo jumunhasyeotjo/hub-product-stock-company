@@ -33,9 +33,10 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 .select(Projections.constructor(
                         ProductRes.class,
                         product.id,
-                        product.name,
-                        product.price,
-                        product.description))
+                        product.companyId.companyId,
+                        product.name.name,
+                        product.price.price,
+                        product.description.description))
                 .from(product)
                 .where(
                         eqCompanyId(condition.companyId()),

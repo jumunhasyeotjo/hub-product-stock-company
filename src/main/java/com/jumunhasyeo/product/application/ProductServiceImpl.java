@@ -12,11 +12,13 @@ import com.jumunhasyeo.product.domain.vo.CompanyId;
 import com.jumunhasyeo.product.domain.vo.Price;
 import com.jumunhasyeo.product.domain.vo.ProductDescription;
 import com.jumunhasyeo.product.domain.vo.ProductName;
+import com.jumunhasyeo.product.presentation.dto.res.OrderProductRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -131,5 +133,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public Boolean existsProduct(UUID productId) {
         return productRepository.existsById(productId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderProductRes> searchOrderProduct(List<UUID> orderProductIds) {
+        return productRepository.findAllByIds(orderProductIds);
     }
 }

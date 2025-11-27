@@ -1,8 +1,15 @@
 package com.jumunhasyeo.product.infrastructure.external;
 
 import com.jumunhasyeo.product.application.service.UserClient;
-import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.stereotype.Component;
 
-@FeignClient(name = "user-service", url = "http://localhost:8081")
-public interface UserClientImpl extends UserClient {
+import java.util.Optional;
+import java.util.UUID;
+
+@Component
+public class UserClientImpl implements UserClient {
+    @Override
+    public Optional<UUID> getOrganizationId(Long userId) {
+        return Optional.of(UUID.randomUUID());
+    }
 }

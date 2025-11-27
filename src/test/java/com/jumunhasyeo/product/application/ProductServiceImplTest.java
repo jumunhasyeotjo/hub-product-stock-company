@@ -243,8 +243,8 @@ public class ProductServiceImplTest {
         SearchProductCommand req = new SearchProductCommand(condition, pageable);
 
         List<ProductRes> content = List.of(
-                new ProductRes(UUID.randomUUID(), "상품 A", 1500, "설명 A"),
-                new ProductRes(UUID.randomUUID(), "상품 B", 5000, "설명 B")
+                new ProductRes(UUID.randomUUID(), UUID.randomUUID(), "상품 A", 1500, "설명 A"),
+                new ProductRes(UUID.randomUUID(), UUID.randomUUID(),"상품 B", 5000, "설명 B")
         );
         Page<ProductRes> expectedPage = new PageImpl<>(content, pageable, content.size());
 

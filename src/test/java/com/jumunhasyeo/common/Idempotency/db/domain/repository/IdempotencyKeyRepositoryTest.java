@@ -2,6 +2,7 @@ package com.jumunhasyeo.common.Idempotency.db.domain.repository;
 
 import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
+import com.jumunhasyeo.RepositoryTestConfig;
 import com.jumunhasyeo.common.Idempotency.db.domain.DbIdempotentKey;
 import com.jumunhasyeo.common.Idempotency.db.domain.IdempotentStatus;
 import com.jumunhasyeo.common.Idempotency.db.infrastructure.repository.IdempotentKeyRepositoryAdapter;
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({IdempotentKeyRepositoryAdapter.class, CleanUp.class})
+@Import({IdempotentKeyRepositoryAdapter.class, CleanUp.class, RepositoryTestConfig.class})
 class IdempotencyKeyRepositoryTest extends CommonTestContainer {
 
     @Autowired

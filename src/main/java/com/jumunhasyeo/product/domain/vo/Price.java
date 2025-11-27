@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Price {
 
-    int price;
+    private int price;
 
     public Price(int price) {
         if (price <= 0) {

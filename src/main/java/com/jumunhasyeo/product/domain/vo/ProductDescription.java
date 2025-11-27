@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductDescription {
 
-    String description;
+    private String description;
 
     public ProductDescription(String description) {
         if (description == null || description.isEmpty()) {

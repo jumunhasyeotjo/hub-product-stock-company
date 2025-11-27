@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductName {
 
-    String name;
+    private String name;
 
     public ProductName(String name) {
         if (name == null || name.isEmpty()) {
