@@ -13,6 +13,9 @@ import com.jumunhasyeo.product.domain.vo.ProductDescription;
 import com.jumunhasyeo.product.domain.vo.ProductName;
 import com.jumunhasyeo.product.presentation.dto.res.OrderProductRes;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -27,6 +31,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     private final CompanyClient companyClient;
+
+    private final static String CACHE_NAME = "product";
 
     @Transactional
     public ProductRes createProduct(CreateProductCommand req) {
@@ -59,6 +65,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional
+    @CacheEvict(value = CACHE_NAME, key = "#req.productId()")
     public ProductRes updateProduct(UpdateProductCommand req) {
         Product product = getProduct(req.productId());
 
@@ -92,6 +99,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional
+    @CacheEvict(value = CACHE_NAME, key = "#req.productId()")
     public void deleteProduct(DeleteProductCommand req) {
         Product product = getProduct(req.productId());
 
@@ -110,6 +118,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "#req.productId()", unless = "#result == null")
     public ProductRes getProduct(GetProductCommand req) {
         Product product = getProduct(req.productId());
         return ProductRes.of(product);
