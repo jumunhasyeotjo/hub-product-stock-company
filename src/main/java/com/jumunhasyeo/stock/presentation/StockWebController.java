@@ -57,6 +57,7 @@ public class StockWebController {
     }
 
     //재고 증가 (TODO: HUB_MANAGER/MASTER, SYSTEM)
+    //TODO: Input List 변경
     @ApiDocDecrementStock
     @PostMapping("/decrement")
     public ResponseEntity<ApiRes<StockRes>> decrement(

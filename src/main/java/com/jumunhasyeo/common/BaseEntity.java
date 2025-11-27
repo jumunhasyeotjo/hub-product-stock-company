@@ -39,13 +39,22 @@ public class BaseEntity {
     @Column
     private Long deletedBy;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
     public void markDeleted(Long userId) {
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = userId;
+        isDeleted = true;
     }
 
     public void cancelDeleted(Long userId) {
         this.deletedAt = null;
         this.deletedBy = userId;
+        isDeleted = false;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 }

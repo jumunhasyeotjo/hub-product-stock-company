@@ -6,6 +6,7 @@ import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.common.exception.GlobalExceptionHandler;
 import com.jumunhasyeo.hub.application.HubService;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
+import com.jumunhasyeo.hub.domain.entity.HubType;
 import com.jumunhasyeo.hub.presentation.dto.request.CreateHubReq;
 import com.jumunhasyeo.hub.presentation.dto.request.DeleteHubReq;
 import com.jumunhasyeo.hub.presentation.dto.request.UpdateHubReq;
@@ -46,7 +47,8 @@ class HubWebControllerTest {
     @DisplayName("허브 생성 API로 허브 생성을 요청할 수 있다.")
     void create_hub_success() throws Exception {
         // given
-        CreateHubReq request = new CreateHubReq("이름", "서울시 송파구 허브", 12.6, 12.6);
+
+        CreateHubReq request = new CreateHubReq(null, "이름", "서울시 송파구 허브", 12.6, 12.6, HubType.CENTER);
         UUID hubId = UUID.randomUUID();
         HubRes response = HubRes.builder()
                 .id(hubId)
@@ -75,7 +77,7 @@ class HubWebControllerTest {
     @DisplayName("허브 생성 API로 허브 생성시 중복된 이름은 예외 반환")
     void create_duplicateName_shouldThrowException() throws Exception {
         // given
-        CreateHubReq request = new CreateHubReq("이름", "서울시 송파구 허브", 12.6, 12.6);
+        CreateHubReq request = new CreateHubReq(null, "이름", "서울시 송파구 허브", 12.6, 12.6, HubType.CENTER);
         UUID hubId = UUID.randomUUID();
         HubRes response = HubRes.builder()
                 .id(hubId)
@@ -101,7 +103,7 @@ class HubWebControllerTest {
     @DisplayName("허브 생성 API를 요청할 때 name == null일 경우 예외반환")
     void create_NameIsNull_ShouldThrowException() throws Exception {
         // given
-        CreateHubReq request = new CreateHubReq(null, "서울시 송파구 허브", 12.6, 12.6);
+        CreateHubReq request = new CreateHubReq(null, null, "서울시 송파구 허브", 12.6, 12.6, HubType.CENTER);
         assertValidationFailed(request,"name=허브 이름은 필수입니다");
     }
 
@@ -109,7 +111,7 @@ class HubWebControllerTest {
     @DisplayName("허브 생성 API를 요청할 때 address == null일 경우 예외반환")
     void create_AddressIsNull_ShouldThrowException() throws Exception {
         // given
-        CreateHubReq request = new CreateHubReq("이름", null, 12.6, 12.6);
+        CreateHubReq request = new CreateHubReq(null, "이름", null, 12.6, 12.6, HubType.CENTER);
         assertValidationFailed(request, "");
     }
 
@@ -117,7 +119,7 @@ class HubWebControllerTest {
     @DisplayName("허브 생성 API를 요청할 때 Longitude == null일 경우 예외반환")
     void create_LongitudeIsNull_ShouldThrowException() throws Exception {
         // given
-        CreateHubReq request = new CreateHubReq("이름", "서울시 송파구 허브", 12.6, null);
+        CreateHubReq request = new CreateHubReq(null, "이름", "서울시 송파구 허브", 12.6, null, HubType.CENTER);
         assertValidationFailed(request, "");
     }
 
@@ -125,7 +127,7 @@ class HubWebControllerTest {
     @DisplayName("허브 생성 API를 요청할 때 Latitude == null일 경우 예외반환")
     void create_LatitudeIsNull_ShouldThrowException() throws Exception {
         // given
-        CreateHubReq request = new CreateHubReq("이름", "서울시 송파구 허브", null, 12.6);
+        CreateHubReq request = new CreateHubReq(null, "이름", "서울시 송파구 허브", null, 12.6, HubType.CENTER);
         assertValidationFailed(request, "");
     }
 

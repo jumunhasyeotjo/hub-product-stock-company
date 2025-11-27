@@ -1,10 +1,12 @@
 package com.jumunhasyeo.hub.infrastructure.repository;
 
 import com.jumunhasyeo.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.domain.entity.HubType;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,5 +28,20 @@ public class HubRepositoryAdapter implements HubRepository {
     @Override
     public Boolean existById(UUID hubId) {
         return jpaHubRepository.existsById(hubId);
+    }
+
+    @Override
+    public long count() {
+        return jpaHubRepository.count();
+    }
+
+    @Override
+    public List<Hub> findAllByHubType(HubType type) {
+        return jpaHubRepository.findAllByHubType(type);
+    }
+
+    @Override
+    public List<Hub> findAll() {
+        return jpaHubRepository.findAll();
     }
 }

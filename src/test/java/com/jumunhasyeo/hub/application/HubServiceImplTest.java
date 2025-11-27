@@ -8,7 +8,9 @@ import com.jumunhasyeo.hub.application.command.DeleteHubCommand;
 import com.jumunhasyeo.hub.application.command.UpdateHubCommand;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.domain.entity.HubType;
 import com.jumunhasyeo.hub.domain.event.HubCreatedEvent;
+import com.jumunhasyeo.hub.domain.event.HubDeletedEvent;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
 import com.jumunhasyeo.hub.domain.vo.Address;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,16 +54,19 @@ public class HubServiceImplTest {
     private static Hub createHub(UUID hubId) {
         return Hub.builder()
                 .hubId(hubId)
+                .centerHubRelations(new HashSet<>())
+                .branchHubRelations(new HashSet<>())
                 .name("송파 허브")
+                .hubType(HubType.CENTER)
                 .address(Address.of("street", Coordinate.of(12.6, 12.6)))
                 .build();
     }
 
     @Test
     @DisplayName("hub를 생성할 수 있다.")
-    public void create_hub_success() {
+    public void create_CenterHub_hub_success() {
         //given
-        CreateHubCommand command = new CreateHubCommand("이름", "주소", 12.7, 12.7);
+        CreateHubCommand command = CreateHubCommand.createCenter("이름", "주소", 12.7, 12.7, HubType.CENTER);
         //when
         HubRes hubRes = hubService.create(command);
         //then
@@ -72,9 +78,10 @@ public class HubServiceImplTest {
 
     @Test
     @DisplayName("hub 생성 시 HubCreatedEvent가 발행된다")
-    void createHub_ShouldPublishHubCreatedEvent() {
+    void createHubHub_ShouldPublishCreatedEvent() {
         // given
-        CreateHubCommand command = new CreateHubCommand("이름", "주소", 12.7, 12.7);
+
+        CreateHubCommand command = CreateHubCommand.createCenter("이름", "주소", 12.7, 12.7, HubType.CENTER);
         HubRes hubRes = hubService.create(command);
         //when
         ArgumentCaptor<HubCreatedEvent> eventCaptor =
@@ -115,7 +122,7 @@ public class HubServiceImplTest {
         );
 
         //then
-        assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND_EXCEPTION);
+        assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.HUB_NOT_FOUND);
     }
 
     @Test
@@ -143,7 +150,7 @@ public class HubServiceImplTest {
         );
 
         //then
-        assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND_EXCEPTION);
+        assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.HUB_NOT_FOUND);
     }
 
     @Test
@@ -174,5 +181,126 @@ public class HubServiceImplTest {
 
         //then
         assertThat(deletedId).isEqualTo(hub.getHubId());
+    }
+
+    @Test
+    @DisplayName("지점 허브(BRANCH)를 생성할 수 있다.")
+    public void create_BranchHub_success() {
+        //given
+        UUID centerHubId = UUID.randomUUID();
+        Hub centerHub = createHub(centerHubId);
+        when(hubRepository.findById(centerHubId)).thenReturn(Optional.of(centerHub));
+
+        CreateHubCommand command = CreateHubCommand.createBranch(
+                centerHubId, "강남 지점", "강남구 테헤란로", 37.5, 127.0, HubType.BRANCH
+        );
+
+        //when
+        HubRes hubRes = hubService.create(command);
+
+        //then
+        assertThat(hubRes.name()).isEqualTo(command.name());
+        assertThat(hubRes.address()).isEqualTo(command.address());
+        assertThat(hubRes.latitude()).isEqualTo(command.latitude());
+        assertThat(hubRes.longitude()).isEqualTo(command.longitude());
+    }
+
+    @Test
+    @DisplayName("지점 허브 생성 시 중앙 허브가 없으면 예외가 발생한다.")
+    public void create_BranchHub_centerHubNotFound_ShouldThrowException() {
+        //given
+        UUID incorrectCenterHubId = UUID.randomUUID();
+        CreateHubCommand command = CreateHubCommand.createBranch(
+                incorrectCenterHubId, "강남 지점", "강남구", 37.5, 127.0, HubType.BRANCH
+        );
+        when(hubRepository.findById(incorrectCenterHubId)).thenReturn(Optional.empty());
+
+        //when
+        BusinessException businessException = assertThrows(
+                BusinessException.class, () -> hubService.create(command)
+        );
+
+        //then
+        assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.HUB_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("지점 허브 생성 시 HubCreatedEvent가 centerHubId와 함께 발행된다.")
+    void create_BranchHub_ShouldPublishCreatedEventWithCenterHubId() {
+        //given
+        UUID centerHubId = UUID.randomUUID();
+        Hub centerHub = createHub(centerHubId);
+        when(hubRepository.findById(centerHubId)).thenReturn(Optional.of(centerHub));
+
+        CreateHubCommand command = CreateHubCommand.createBranch(
+                centerHubId, "강남 지점", "강남구", 37.5, 127.0, HubType.BRANCH
+        );
+
+        //when
+        hubService.create(command);
+
+        //then
+        ArgumentCaptor<HubCreatedEvent> eventCaptor = ArgumentCaptor.forClass(HubCreatedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        HubCreatedEvent capturedEvent = eventCaptor.getValue();
+        assertThat(capturedEvent.getCenterHubId()).isEqualTo(centerHubId);
+        assertThat(capturedEvent.getType()).isEqualTo(HubType.BRANCH);
+    }
+
+    @Test
+    @DisplayName("중앙 허브 생성 시 HubCreatedEvent의 centerHubId는 null이다.")
+    void create_CenterHub_ShouldPublishCreatedEventWithNullCenterHubId() {
+        //given
+        CreateHubCommand command = CreateHubCommand.createCenter(
+                "서울 중앙 허브", "서울시 송파구", 37.5, 127.0, HubType.CENTER
+        );
+
+        //when
+        hubService.create(command);
+
+        //then
+        ArgumentCaptor<HubCreatedEvent> eventCaptor = ArgumentCaptor.forClass(HubCreatedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        HubCreatedEvent capturedEvent = eventCaptor.getValue();
+        assertThat(capturedEvent.getCenterHubId()).isNull();
+        assertThat(capturedEvent.getType()).isEqualTo(HubType.CENTER);
+    }
+
+    @Test
+    @DisplayName("hub 삭제 시 HubDeletedEvent가 발행된다.")
+    void delete_Hub_ShouldPublishDeletedEvent() {
+        //given
+        UUID hubId = UUID.randomUUID();
+        Hub hub = createHub(hubId);
+        Long userId = 1L;
+        DeleteHubCommand command = new DeleteHubCommand(hubId, userId);
+        when(hubRepository.findById(hubId)).thenReturn(Optional.of(hub));
+
+        //when
+        hubService.delete(command);
+
+        //then
+        ArgumentCaptor<HubDeletedEvent> eventCaptor = ArgumentCaptor.forClass(HubDeletedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        HubDeletedEvent capturedEvent = eventCaptor.getValue();
+        assertThat(capturedEvent.getHubId()).isEqualTo(hubId);
+        assertThat(capturedEvent.getDeletedBy()).isEqualTo(userId);
+    }
+
+    @Test
+    @DisplayName("hub 삭제 시 존재하지 않는 허브면 예외가 발생한다.")
+    public void delete_HubNotFound_ShouldThrowException() {
+        //given
+        UUID incorrectHubId = UUID.randomUUID();
+        DeleteHubCommand command = new DeleteHubCommand(incorrectHubId, 1L);
+        when(hubRepository.findById(incorrectHubId)).thenReturn(Optional.empty());
+
+        //when
+        BusinessException businessException = assertThrows(
+                BusinessException.class, () -> hubService.delete(command)
+        );
+
+        //then
+        assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.HUB_NOT_FOUND);
     }
 }

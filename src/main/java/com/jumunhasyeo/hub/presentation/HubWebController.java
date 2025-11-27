@@ -1,6 +1,8 @@
 package com.jumunhasyeo.hub.presentation;
 
 import com.jumunhasyeo.common.ApiRes;
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.hub.application.HubService;
 import com.jumunhasyeo.hub.application.command.CreateHubCommand;
 import com.jumunhasyeo.hub.application.command.DeleteHubCommand;
@@ -22,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,6 +44,13 @@ public class HubWebController {
             @PathVariable(name = "hubId") UUID hubId
     ) {
         HubRes hubRes = hubService.getById(hubId);
+        return ResponseEntity.ok(ApiRes.success(hubRes));
+    }
+
+    //허브 전체 조회
+    @GetMapping
+    public ResponseEntity<ApiRes<List<HubRes>>> getAll() {
+        List<HubRes> hubRes = hubService.getAll();
         return ResponseEntity.ok(ApiRes.success(hubRes));
     }
 
@@ -64,7 +74,10 @@ public class HubWebController {
             @Parameter(description = "허브 생성 요청 정보", required = true)
             @RequestBody @Valid CreateHubReq req
     ) {
-        CreateHubCommand command = new CreateHubCommand(req.name(), req.address(), req.latitude(), req.longitude());
+        if(!req.validate()){
+            throw new BusinessException(ErrorCode.CONTROLLER_INVALID_REQUEST);
+        }
+        CreateHubCommand command = new CreateHubCommand(req.centerHubId(), req.name(), req.address(), req.latitude(), req.longitude(), req.hubType());
         HubRes hubRes = hubService.create(command);
         return ResponseEntity.created(URI.create("/api/v1/hubs/" + hubRes.id())).body(ApiRes.success(hubRes));
     }

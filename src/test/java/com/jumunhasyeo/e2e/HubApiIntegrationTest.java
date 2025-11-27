@@ -4,6 +4,7 @@ import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
 import com.jumunhasyeo.InternalIntegrationTestConfig;
 import com.jumunhasyeo.common.exception.ErrorCode;
+import com.jumunhasyeo.hub.domain.entity.HubType;
 import com.jumunhasyeo.hub.presentation.dto.request.CreateHubReq;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -40,7 +41,7 @@ public class HubApiIntegrationTest extends CommonTestContainer {
     @DisplayName("허브 생성부터 조회까지 전체 플로우")
     void createAndGetHub_EndToEndFlow() {
         // given
-        CreateHubReq request = new CreateHubReq("이름", "서울시 송파구 허브", 12.6, 12.6);
+        CreateHubReq request = new CreateHubReq(null,"이름", "서울시 송파구 허브", 12.6, 12.6, HubType.CENTER);
 
         // when: 허브 생성
         String hubId = given()
@@ -65,7 +66,7 @@ public class HubApiIntegrationTest extends CommonTestContainer {
     @DisplayName("허브 생성시 중복된 이름일 경우 예외 반환")
     void createDuplicateName_shouldThrowException() {
         // given
-        CreateHubReq request = new CreateHubReq("이름", "서울시 송파구 허브", 12.6, 12.6);
+        CreateHubReq request = new CreateHubReq(null,"이름", "서울시 송파구 허브", 36.3505, 127.3845, HubType.CENTER);
 
         // when: 허브 2개 생성
         String hubId = given()
