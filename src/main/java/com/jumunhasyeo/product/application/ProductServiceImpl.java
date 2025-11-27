@@ -5,7 +5,6 @@ import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.product.application.command.*;
 import com.jumunhasyeo.product.application.dto.ProductRes;
 import com.jumunhasyeo.product.application.service.CompanyClient;
-import com.jumunhasyeo.product.application.service.UserClient;
 import com.jumunhasyeo.product.domain.entity.Product;
 import com.jumunhasyeo.product.domain.repository.ProductRepository;
 import com.jumunhasyeo.product.domain.vo.CompanyId;
@@ -27,13 +26,11 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
 
-    private final UserClient userClient;
     private final CompanyClient companyClient;
 
     @Transactional
     public ProductRes createProduct(CreateProductCommand req) {
-        UUID companyId = getCompanyId(req.userId());
-        validateCompanyId(companyId);
+        validateCompanyId(req.organizationId());
 
         ProductName productName = ProductName.of(req.name());
         validateCreateProductName(productName);
@@ -41,16 +38,10 @@ public class ProductServiceImpl implements ProductService {
         Price price = Price.of(req.price());
         ProductDescription productDescription = ProductDescription.of(req.description());
 
-        Product product = Product.create(CompanyId.of(companyId), productName, productDescription, price);
+        Product product = Product.create(CompanyId.of(req.organizationId()), productName, productDescription, price);
         productRepository.save(product);
 
         return ProductRes.of(product);
-    }
-
-    // 소속 업체 ID 조회
-    private UUID getCompanyId(Long userId) {
-        return userClient.getOrganizationId(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT));
     }
 
     // 업체 ID 검증
@@ -71,8 +62,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductRes updateProduct(UpdateProductCommand req) {
         Product product = getProduct(req.productId());
 
-        UUID companyId = getCompanyId(req.userId());
-        validateUpdate(product, companyId);
+        validateUpdate(product, req.organizationId());
 
         ProductName name = ProductName.of(req.name());
         validateUpdateProductName(req);
@@ -113,7 +103,7 @@ public class ProductServiceImpl implements ProductService {
     // 업체 담당자 검증
     private void validateCompanyManager(DeleteProductCommand req, Product product) {
         if (req.role().equals("COMPANY_MANAGER")) {
-            if (!product.getCompanyId().getCompanyId().equals(getCompanyId(req.userId()))) {
+            if (!product.getCompanyId().getCompanyId().equals(req.organizationId())) {
                 throw new BusinessException(ErrorCode.FORBIDDEN);
             }
         }

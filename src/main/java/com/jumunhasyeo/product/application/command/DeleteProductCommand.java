@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record DeleteProductCommand(
         UUID productId,
+        UUID organizationId,
         Long userId,
         String role
 ) {
