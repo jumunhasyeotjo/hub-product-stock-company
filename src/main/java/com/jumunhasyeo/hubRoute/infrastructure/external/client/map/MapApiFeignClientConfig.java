@@ -3,13 +3,11 @@ package com.jumunhasyeo.hubRoute.infrastructure.external.client.map;
 import feign.Logger;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Slf4j
-@EnableFeignClients(basePackages = "com.jumunhasyeo.hubRoute.infrastructure.external.client.map")
 public class MapApiFeignClientConfig {
     @Bean
     Logger.Level feignLoggerLevel() {

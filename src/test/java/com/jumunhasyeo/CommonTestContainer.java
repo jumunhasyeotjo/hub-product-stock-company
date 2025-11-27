@@ -43,12 +43,13 @@ public abstract class CommonTestContainer {
         registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
 
         // JPA 설정
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create");
         registry.add("spring.jpa.show-sql", () -> "true");
         registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.PostgreSQLDialect");
 
         // Redis 설정
         registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
         registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
+        registry.add("spring.data.redis.ssl.enabled", () -> "true");
     }
 }
