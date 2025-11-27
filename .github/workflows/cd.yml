@@ -1,0 +1,29 @@
+name: CD
+
+on:
+  push:
+    branches: [ "dev" ]  # dev push 시 배포
+
+jobs:
+  deploy:
+    runs-on: self-hosted  # 서버에서 실행됨
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: ./deploy
+
+      - name: Stop existing JAR
+        run: |
+          PID=$(pgrep -f 'java -jar' || true)
+          if [ -n "$PID" ]; then
+            echo "Stopping running app with PID $PID"
+            kill -9 $PID
+          fi
+
+      - name: Deploy new JAR
+        run: |
+          chmod +x ./deploy/*.jar
+          nohup java -jar ./deploy/*.jar > app.log 2>&1 &
+          echo "App started"
