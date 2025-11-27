@@ -2,7 +2,7 @@ package com.jumunhasyeo.e2e;
 
 import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
-import com.jumunhasyeo.TestConfig;
+import com.jumunhasyeo.InternalIntegrationTestConfig;
 import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.hub.presentation.dto.request.CreateHubReq;
 import io.restassured.RestAssured;
@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({CleanUp.class, TestConfig.class})
+@Import({CleanUp.class, InternalIntegrationTestConfig.class})
 public class HubApiIntegrationTest extends CommonTestContainer {
 
     @LocalServerPort
