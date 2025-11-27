@@ -1,0 +1,55 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Docker 확인 (Testcontainers용)
+      - name: Check Docker
+        run: docker info
+
+      - name: Build & Test with Testcontainers
+        run: ./gradlew clean test bootJar
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/app.jar   # bootJar 이름 고정
+
+  deploy:
+    runs-on: self-hosted
+    needs: build   # build job 성공 후 실행
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: ./deploy
+
+      - name: Stop existing JAR
+        run: |
+          PID=$(pgrep -f 'java -jar ./deploy/app.jar' || true)
+          if [ -n "$PID" ]; then
+            echo "Stopping running app with PID $PID"
+            kill -9 $PID
+          fi
+
+      - name: Deploy new JAR
+        run: |
+          chmod +x ./deploy/app.jar
+          nohup java -jar ./deploy/app.jar > app.log 2>&1 &
+          echo "App started"
