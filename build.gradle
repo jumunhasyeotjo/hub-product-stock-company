@@ -113,6 +113,10 @@ jacoco {
     toolVersion = '0.8.12'
 }
 
+tasks.named('jar') {
+    enabled = false   // 일반 jar 비활성화
+}
+
 jacocoTestReport {
     dependsOn test
     reports {
