@@ -5,7 +5,6 @@ import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.product.application.command.*;
 import com.jumunhasyeo.product.application.dto.ProductRes;
 import com.jumunhasyeo.product.application.service.CompanyClient;
-import com.jumunhasyeo.product.application.service.UserClient;
 import com.jumunhasyeo.product.domain.entity.Product;
 import com.jumunhasyeo.product.domain.repository.ProductRepository;
 import com.jumunhasyeo.product.domain.vo.CompanyId;
@@ -14,6 +13,9 @@ import com.jumunhasyeo.product.domain.vo.ProductDescription;
 import com.jumunhasyeo.product.domain.vo.ProductName;
 import com.jumunhasyeo.product.presentation.dto.res.OrderProductRes;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,19 +23,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
 
-    private final UserClient userClient;
     private final CompanyClient companyClient;
+
+    private final static String CACHE_NAME = "product";
 
     @Transactional
     public ProductRes createProduct(CreateProductCommand req) {
-        UUID companyId = getCompanyId(req.userId());
-        validateCompanyId(companyId);
+        validateCompanyId(req.organizationId());
 
         ProductName productName = ProductName.of(req.name());
         validateCreateProductName(productName);
@@ -41,16 +44,10 @@ public class ProductServiceImpl implements ProductService {
         Price price = Price.of(req.price());
         ProductDescription productDescription = ProductDescription.of(req.description());
 
-        Product product = Product.create(CompanyId.of(companyId), productName, productDescription, price);
+        Product product = Product.create(CompanyId.of(req.organizationId()), productName, productDescription, price);
         productRepository.save(product);
 
         return ProductRes.of(product);
-    }
-
-    // 소속 업체 ID 조회
-    private UUID getCompanyId(Long userId) {
-        return userClient.getOrganizationId(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT));
     }
 
     // 업체 ID 검증
@@ -68,11 +65,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional
+    @CacheEvict(value = CACHE_NAME, key = "#req.productId()")
     public ProductRes updateProduct(UpdateProductCommand req) {
         Product product = getProduct(req.productId());
 
-        UUID companyId = getCompanyId(req.userId());
-        validateUpdate(product, companyId);
+        validateUpdate(product, req.organizationId());
 
         ProductName name = ProductName.of(req.name());
         validateUpdateProductName(req);
@@ -102,6 +99,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional
+    @CacheEvict(value = CACHE_NAME, key = "#req.productId()")
     public void deleteProduct(DeleteProductCommand req) {
         Product product = getProduct(req.productId());
 
@@ -113,13 +111,14 @@ public class ProductServiceImpl implements ProductService {
     // 업체 담당자 검증
     private void validateCompanyManager(DeleteProductCommand req, Product product) {
         if (req.role().equals("COMPANY_MANAGER")) {
-            if (!product.getCompanyId().getCompanyId().equals(getCompanyId(req.userId()))) {
+            if (!product.getCompanyId().getCompanyId().equals(req.organizationId())) {
                 throw new BusinessException(ErrorCode.FORBIDDEN);
             }
         }
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = CACHE_NAME, key = "#req.productId()", unless = "#result == null")
     public ProductRes getProduct(GetProductCommand req) {
         Product product = getProduct(req.productId());
         return ProductRes.of(product);

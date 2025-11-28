@@ -57,6 +57,12 @@ cache:
 kakao:
   mobility:
     api-key: "KakaoAK your_api_key_here"
+
+eas:
+  passport:
+    secretKey: ""
+    expiration: 604800
+    algorithm: ""
 ---
 # test profile
 spring:
@@ -69,3 +75,9 @@ spring:
   config:
     activate:
       on-profile: dev
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

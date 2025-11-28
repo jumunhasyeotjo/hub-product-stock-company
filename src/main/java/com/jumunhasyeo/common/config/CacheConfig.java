@@ -69,6 +69,7 @@ public class CacheConfig {
         // 캐시별로 다른 TTL TODO 나중에 설정 파일로 분리
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
         cacheConfigs.put("hub", cacheConfig.entryTtl(Duration.ofDays(1)));  // hub 캐시는 24시간
+        cacheConfigs.put("product", cacheConfig.entryTtl(Duration.ofMinutes(30))); // 상품 단건 조회 30분
 
         return RedisCacheManager.builder(factory)
                 .cacheDefaults(cacheConfig)

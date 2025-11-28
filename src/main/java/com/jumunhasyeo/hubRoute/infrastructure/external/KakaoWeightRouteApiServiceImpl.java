@@ -63,6 +63,7 @@ class KakaoWeightRouteApiServiceImpl implements RouteWeightApiService {
             return new RouteWeightRes(distanceKm, durationMinutes);
 
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Failed to get route from Kakao API, {}", e.toString());
             throw new BusinessException(ErrorCode.MAP_API_EXCEPTION);
         }

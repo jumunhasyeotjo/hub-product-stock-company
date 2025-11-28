@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record UpdateProductCommand(
         UUID productId,
+        UUID organizationId,
         Long userId,
         String name,
         Integer price,
