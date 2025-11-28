@@ -64,7 +64,7 @@ public class ProductServiceImplTest {
 
     @Test
     @DisplayName("상품은 존재하는 업체에서만 생성할 수 있다.")
-    void 존재하는_업체만_가능() {
+    void createProduct_whenCompanyDoesNotExist_shouldTrowException() {
         // given
         UUID companyId = UUID.randomUUID();
         CreateProductCommand req = new CreateProductCommand("상품", companyId,1000, "설명", 1L);
@@ -120,7 +120,7 @@ public class ProductServiceImplTest {
 
     @Test
     @DisplayName("존재하는 상품만 수정 가능하다")
-    void updateProduct__shouldTrowException() {
+    void updateProduct_whenProductNotFound_shouldTrowException() {
         // given
         Product product = getProduct();
         UpdateProductCommand req = new UpdateProductCommand(product.getId(), UUID.randomUUID(),1L, "수정", 5000, "설명 수정");
