@@ -7,10 +7,7 @@ import com.jumunhasyeo.common.exception.GlobalExceptionHandler;
 import com.jumunhasyeo.stock.application.StockService;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.presentation.StockWebController;
-import com.jumunhasyeo.stock.presentation.dto.request.CreateStockReq;
-import com.jumunhasyeo.stock.presentation.dto.request.DecreaseStockReq;
-import com.jumunhasyeo.stock.presentation.dto.request.DeleteStockReq;
-import com.jumunhasyeo.stock.presentation.dto.request.IncrementStockReq;
+import com.jumunhasyeo.stock.presentation.dto.request.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +18,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
@@ -129,7 +128,11 @@ class StockWebControllerTest {
         // given
         UUID productId = UUID.randomUUID();
         UUID stockId = UUID.randomUUID();
-        IncrementStockReq request = new IncrementStockReq(stockId, 100);
+        ArrayList<IncrementStockReq> reqs = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            reqs.add(new IncrementStockReq(stockId, 100));
+        }
+        IncrementStockReqList request = new IncrementStockReqList(reqs);
         StockRes stockRes = StockRes.builder()
                 .stockId(stockId)
                 .hubId(UUID.randomUUID())
@@ -137,7 +140,7 @@ class StockWebControllerTest {
                 .quantity(200)
                 .build();
 
-        given(stockService.increment(any(), any())).willReturn(stockRes);
+        given(stockService.increment(any(), any())).willReturn(List.of(stockRes));
 
         // when & then
         mockMvc.perform(post("/api/v1/stocks/increment")
@@ -145,10 +148,10 @@ class StockWebControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.stockId").value(stockId.toString()))
-                .andExpect(jsonPath("$.data.productId").value(productId.toString()))
-                .andExpect(jsonPath("$.data.hubId").exists())
-                .andExpect(jsonPath("$.data.quantity").value(200))
+                .andExpect(jsonPath("$.data[0].stockId").value(stockId.toString()))
+                .andExpect(jsonPath("$.data[0].productId").value(productId.toString()))
+                .andExpect(jsonPath("$.data[0].hubId").exists())
+                .andExpect(jsonPath("$.data[0].quantity").value(200))
                 .andReturn();
     }
 
@@ -158,7 +161,11 @@ class StockWebControllerTest {
         // given
         UUID productId = UUID.randomUUID();
         UUID stockId = UUID.randomUUID();
-        DecreaseStockReq request = new DecreaseStockReq(stockId, 100);
+        ArrayList<DecreaseStockReq> reqs = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            reqs.add(new DecreaseStockReq(stockId, 100));
+        }
+        DecreaseStockReqList request = new DecreaseStockReqList(reqs);
         StockRes stockRes = StockRes.builder()
                 .stockId(stockId)
                 .hubId(UUID.randomUUID())
@@ -166,7 +173,7 @@ class StockWebControllerTest {
                 .quantity(200)
                 .build();
 
-        given(stockService.decrement(any(), any())).willReturn(stockRes);
+        given(stockService.decrement(any(), any())).willReturn(List.of(stockRes));
 
         // when & then
         mockMvc.perform(post("/api/v1/stocks/decrement")
@@ -174,10 +181,10 @@ class StockWebControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.stockId").value(stockId.toString()))
-                .andExpect(jsonPath("$.data.productId").value(productId.toString()))
-                .andExpect(jsonPath("$.data.hubId").exists())
-                .andExpect(jsonPath("$.data.quantity").value(200))
+                .andExpect(jsonPath("$.data[0].stockId").value(stockId.toString()))
+                .andExpect(jsonPath("$.data[0].productId").value(productId.toString()))
+                .andExpect(jsonPath("$.data[0].hubId").exists())
+                .andExpect(jsonPath("$.data[0].quantity").value(200))
                 .andReturn();
     }
 

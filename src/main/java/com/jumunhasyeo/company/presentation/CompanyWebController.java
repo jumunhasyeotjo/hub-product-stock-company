@@ -30,7 +30,7 @@ public class CompanyWebController {
 
     private final CompanyService companyService;
 
-    @Operation(summary = "업체 단건 조회")
+    @Operation(summary = "나의 업체 단건 조회")
     @GetMapping("/{companyId}")
     public ResponseEntity<ApiRes<CompanyRes>> getById(
             @Parameter(description = "조회할 업체 ID", required = true)

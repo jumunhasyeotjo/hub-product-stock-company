@@ -48,6 +48,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiRes<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        ex.printStackTrace();
         log.error("JSON parsing error: {}", ex.toString());
         return ResponseEntity
                 .badRequest()
