@@ -65,7 +65,7 @@ class CompanyInternalWebControllerTest {
         given(companyService.existsByIdAndHubId(companyId, hubId)).willReturn(true);
 
         //when & then
-        mockMvc.perform(get("/internal/api/v1/companies/{companyId}/hub/{hubId}/exist", companyId, hubId))
+        mockMvc.perform(get("/internal/api/v1/companies/{companyId}/hub/{hubId}/exists", companyId, hubId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(true));
     }
@@ -79,7 +79,7 @@ class CompanyInternalWebControllerTest {
         given(companyService.existsByIdAndHubId(companyId, hubId)).willReturn(false);
 
         //when & then
-        mockMvc.perform(get("/internal/api/v1/companies/{companyId}/hub/{hubId}/exist", companyId, hubId))
+        mockMvc.perform(get("/internal/api/v1/companies/{companyId}/hub/{hubId}/exists", companyId, hubId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value(false));
     }

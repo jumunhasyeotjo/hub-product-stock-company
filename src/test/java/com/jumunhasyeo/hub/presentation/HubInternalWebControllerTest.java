@@ -49,7 +49,7 @@ class HubInternalWebControllerTest {
         given(hubService.existById(hubId)).willReturn(true);
 
         // when & then
-        mockMvc.perform(get("/internal/api/v1/hubs/{hubId}/exist", hubId)
+        mockMvc.perform(get("/internal/api/v1/hubs/{hubId}/exists", hubId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.exist").value(true))
@@ -64,7 +64,7 @@ class HubInternalWebControllerTest {
         given(hubService.existById(hubId)).willReturn(false);
 
         // when & then
-        mockMvc.perform(get("/internal/api/v1/hubs/{hubId}/exist", hubId)
+        mockMvc.perform(get("/internal/api/v1/hubs/{hubId}/exists", hubId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.exist").value(false))

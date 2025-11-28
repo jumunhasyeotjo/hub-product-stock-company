@@ -43,7 +43,7 @@ public class CompanyInternalWebController {
     }
 
     @Operation(summary = "업체 소속 허브 검증", description = "해당 허브가 해당 업체 소속인지 검증")
-    @GetMapping("/{companyId}/hub/{hubId}/exist")
+    @GetMapping("/{companyId}/hub/{hubId}/exists")
     public ResponseEntity<ApiRes<Boolean>> existToHub(
             @Parameter(description = "검증할 업체 ID", required = true)
             @PathVariable UUID companyId,

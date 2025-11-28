@@ -44,7 +44,7 @@ public class HubInternalWebController {
     }
 
     @ApiDocExistHub
-    @GetMapping("/{hubId}/exist")
+    @GetMapping("/{hubId}/exists")
     public ResponseEntity<ApiRes<Map<String, Boolean>>> exist(
             @Parameter(description = "조회할 허브의 ID", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable(name = "hubId") UUID hubId
