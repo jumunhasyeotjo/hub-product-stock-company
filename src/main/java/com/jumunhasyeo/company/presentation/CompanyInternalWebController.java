@@ -3,7 +3,9 @@ package com.jumunhasyeo.company.presentation;
 import com.jumunhasyeo.common.ApiRes;
 import com.jumunhasyeo.company.application.CompanyService;
 import com.jumunhasyeo.company.application.dto.response.CompanyRes;
-import io.swagger.v3.oas.annotations.Operation;
+import com.jumunhasyeo.company.presentation.docs.ApiDocExistsCompany;
+import com.jumunhasyeo.company.presentation.docs.ApiDocExistsCompanyToHub;
+import com.jumunhasyeo.company.presentation.docs.ApiDocGetCompany;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -22,36 +24,38 @@ import java.util.UUID;
 public class CompanyInternalWebController {
     private final CompanyService companyService;
 
-    @Operation(summary = "업체 단건 조회")
+    //업체 단건 조회
+    @ApiDocGetCompany
     @GetMapping("/{companyId}")
     public ResponseEntity<ApiRes<CompanyRes>> getById(
-            @Parameter(description = "조회할 업체 ID", required = true)
+            @Parameter(description = "조회할 업체 ID", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID companyId
     ) {
         CompanyRes companyRes = companyService.getById(companyId);
         return ResponseEntity.ok(ApiRes.success(companyRes));
     }
 
-    @Operation(summary = "업체 존재 여부 검증", description = "주문 등록시 존재하는 업체인지 확인")
+    //업체 존재 여부 검증
+    @ApiDocExistsCompany
     @GetMapping("/{companyId}/exists")
     public ResponseEntity<ApiRes<Boolean>> exists(
-            @Parameter(description = "검증할 업체 ID", required = true)
+            @Parameter(description = "검증할 업체 ID", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID companyId
     ) {
         boolean exists = companyService.existsById(companyId);
         return ResponseEntity.ok(ApiRes.success(exists));
     }
 
-    @Operation(summary = "업체 소속 허브 검증", description = "해당 허브가 해당 업체 소속인지 검증")
+    //업체 소속 허브 검증
+    @ApiDocExistsCompanyToHub
     @GetMapping("/{companyId}/hub/{hubId}/exists")
     public ResponseEntity<ApiRes<Boolean>> existToHub(
-            @Parameter(description = "검증할 업체 ID", required = true)
+            @Parameter(description = "검증할 업체 ID", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID companyId,
-            @Parameter(description = "검증할 허브 ID", required = true)
+            @Parameter(description = "검증할 허브 ID", required = true, example = "660e8400-e29b-41d4-a716-446655440001")
             @PathVariable UUID hubId
     ) {
         boolean exist = companyService.existsByIdAndHubId(companyId, hubId);
         return ResponseEntity.ok(ApiRes.success(exist));
     }
 }
-

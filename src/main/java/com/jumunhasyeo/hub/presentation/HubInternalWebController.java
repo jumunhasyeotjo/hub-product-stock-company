@@ -4,6 +4,7 @@ import com.jumunhasyeo.common.ApiRes;
 import com.jumunhasyeo.hub.application.HubService;
 import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.presentation.docs.ApiDocExistHub;
+import com.jumunhasyeo.hub.presentation.docs.ApiDocGetAllHubs;
 import com.jumunhasyeo.hub.presentation.docs.ApiDocGetHub;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Tag(name = "Internal-Hub", description = "허브 관리 API")
+@Tag(name = "Internal-Hub", description = "내부용 허브 관리 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/internal/api/v1/hubs")
@@ -37,12 +38,14 @@ public class HubInternalWebController {
     }
 
     //허브 전체 조회
+    @ApiDocGetAllHubs
     @GetMapping
     public ResponseEntity<ApiRes<List<HubRes>>> getAll() {
         List<HubRes> hubRes = hubService.getAll();
         return ResponseEntity.ok(ApiRes.success(hubRes));
     }
 
+    //허브 존재 여부 확인
     @ApiDocExistHub
     @GetMapping("/{hubId}/exists")
     public ResponseEntity<ApiRes<Map<String, Boolean>>> exist(
