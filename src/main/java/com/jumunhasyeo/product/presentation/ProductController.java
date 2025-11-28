@@ -8,6 +8,8 @@ import com.jumunhasyeo.product.presentation.dto.req.CreateProductReq;
 import com.jumunhasyeo.product.presentation.dto.req.ProductSearchCondition;
 import com.jumunhasyeo.product.presentation.dto.req.UpdateProductReq;
 import com.jumunhasyeo.product.presentation.dto.res.OrderProductRes;
+import com.library.passport.annotation.PassportUser;
+import com.library.passport.proto.PassportProto.Passport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,14 +29,15 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ApiRes<ProductRes>> createProduct(@RequestBody CreateProductReq req
-//                                                            @RequestHeader("user-id") Long userId
+    public ResponseEntity<ApiRes<ProductRes>> createProduct(@RequestBody CreateProductReq req,
+                                                            @PassportUser Passport passport
     ) {
         CreateProductCommand command = new CreateProductCommand(
                 req.name(),
+                UUID.fromString(passport.getBelong()),
                 req.price(),
                 req.description(),
-                1L
+                passport.getUserId()
         );
 
         ProductRes response = productService.createProduct(command);
@@ -46,11 +49,12 @@ public class ProductController {
 
     @PutMapping("/{productId}")
     public ResponseEntity<ApiRes<ProductRes>> updateProduct(@RequestBody UpdateProductReq req,
-//                                                            @RequestHeader("user-id") Long userId,
+                                                            @PassportUser Passport passport,
                                                             @PathVariable UUID productId) {
         UpdateProductCommand command = new UpdateProductCommand(
                 productId,
-                1L,
+                UUID.fromString(passport.getBelong()),
+                passport.getUserId(),
                 req.name(),
                 req.price(),
                 req.description()
@@ -64,14 +68,14 @@ public class ProductController {
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiRes<?>> deleteProduct(@PathVariable UUID productId
-//                                                   @RequestHeader("user-id") Long userId,
-//                                                   @RequestHeader("user-role") String userRole) {
+    public ResponseEntity<ApiRes<?>> deleteProduct(@PathVariable UUID productId,
+                                                   @PassportUser Passport passport
     ) {
         DeleteProductCommand command = new DeleteProductCommand(
                 productId,
-                1L,
-                "MASTER");
+                UUID.fromString(passport.getBelong()),
+                passport.getUserId(),
+                passport.getRole());
 
         productService.deleteProduct(command);
 

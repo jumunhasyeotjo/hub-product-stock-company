@@ -3,6 +3,8 @@ plugins {
     id 'org.springframework.boot' version '3.5.7'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
+    id 'com.google.protobuf' version '0.9.4'
+    id 'org.springdoc.openapi-gradle-plugin' version '1.8.0'  // ✅ 추가
 }
 
 group = 'com.jumunhasyeo'
@@ -23,6 +25,14 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/jumunhasyeotjo/passport")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 ext {
@@ -61,11 +71,18 @@ dependencies {
     implementation 'net.javacrumbs.shedlock:shedlock-spring:5.9.0'
     implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.9.0'
 
+    // passport 의존성 추가
+    implementation 'com.library:passport:1.0.1'
+    implementation 'com.google.protobuf:protobuf-java:3.21.12'
+
     // Spring Cloud OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    
+
     // YAML parsing
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+
+    implementation 'com.library:passport:1.0.1' // 1.0.1 버전 => user belong 추가
+    implementation 'com.google.protobuf:protobuf-java:3.21.12'
 }
 
 dependencyManagement {
@@ -131,4 +148,11 @@ jacocoTestReport {
                 })
         )
     }
+}
+
+openApi {
+    apiDocsUrl.set("http://localhost:8088/v3/api-docs")
+    outputDir.set(file("$projectDir/src/main/resources")) // 저장 위치
+    outputFileName.set("openapi.json")                    // 파일명
+    waitTimeInSeconds.set(30)                             // 대기 시간
 }

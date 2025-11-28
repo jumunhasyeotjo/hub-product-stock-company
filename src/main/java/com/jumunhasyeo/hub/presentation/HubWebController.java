@@ -36,24 +36,6 @@ public class HubWebController {
 
     private final HubService hubService;
 
-    //허브 단건 조회
-    @ApiDocGetHub
-    @GetMapping("/{hubId}")
-    public ResponseEntity<ApiRes<HubRes>> getById(
-            @Parameter(description = "조회할 허브의 ID", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @PathVariable(name = "hubId") UUID hubId
-    ) {
-        HubRes hubRes = hubService.getById(hubId);
-        return ResponseEntity.ok(ApiRes.success(hubRes));
-    }
-
-    //허브 전체 조회
-    @GetMapping
-    public ResponseEntity<ApiRes<List<HubRes>>> getAll() {
-        List<HubRes> hubRes = hubService.getAll();
-        return ResponseEntity.ok(ApiRes.success(hubRes));
-    }
-
     //허브 검색 조회
     @ApiDocSearchHub
     @GetMapping("/search")
@@ -104,15 +86,5 @@ public class HubWebController {
         DeleteHubCommand command = new DeleteHubCommand(req.hubId(), req.userId());
         UUID deletedHubId = hubService.delete(command);
         return ResponseEntity.ok(ApiRes.success(Map.of("id", deletedHubId)));
-    }
-
-    @ApiDocExistHub
-    @GetMapping("/{hubId}/exist")
-    public ResponseEntity<ApiRes<Map<String, Boolean>>> exist(
-            @Parameter(description = "조회할 허브의 ID", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @PathVariable(name = "hubId") UUID hubId
-    ) {
-        boolean result = hubService.existById(hubId);
-        return ResponseEntity.ok(ApiRes.success(Map.of("exist", result)));
     }
 }

@@ -56,7 +56,7 @@ public class HubApiIntegrationTest extends CommonTestContainer {
         // then: 생성된 허브 조회
         given()
                 .when()
-                .get("/api/v1/hubs/{hubId}", hubId)
+                .get("/internal/api/v1/hubs/{hubId}", hubId)
                 .then()
                 .statusCode(200)
                 .body("data.id", equalTo(hubId));

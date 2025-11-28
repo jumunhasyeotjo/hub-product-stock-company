@@ -4,12 +4,8 @@ import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.product.application.command.*;
 import com.jumunhasyeo.product.application.dto.ProductRes;
 import com.jumunhasyeo.product.application.service.CompanyClient;
-import com.jumunhasyeo.product.application.service.UserClient;
 import com.jumunhasyeo.product.domain.entity.Product;
 import com.jumunhasyeo.product.domain.repository.ProductRepository;
-import com.jumunhasyeo.product.domain.vo.CompanyId;
-import com.jumunhasyeo.product.domain.vo.Price;
-import com.jumunhasyeo.product.domain.vo.ProductDescription;
 import com.jumunhasyeo.product.domain.vo.ProductName;
 import com.jumunhasyeo.product.presentation.dto.req.ProductSearchCondition;
 import org.junit.jupiter.api.DisplayName;
@@ -36,9 +32,6 @@ import static org.mockito.BDDMockito.*;
 public class ProductServiceImplTest {
 
     @Mock
-    private UserClient userClient;
-
-    @Mock
     private CompanyClient companyClient;
 
     @Mock
@@ -52,12 +45,10 @@ public class ProductServiceImplTest {
     @DisplayName("상품 생성 정상 프로세스")
     void createProduct_SuccessProcess() {
         // given
-        CreateProductCommand req = new CreateProductCommand("상품", 1000, "설명", 1L);
-        UUID companyID = UUID.randomUUID();
+        UUID companyId = UUID.randomUUID();
+        CreateProductCommand req = new CreateProductCommand("상품", companyId,1000, "설명", 1L);
 
-        given(userClient.getOrganizationId(1L))
-                .willReturn(Optional.of(companyID));
-        given(companyClient.existsCompany(companyID))
+        given(companyClient.existsCompany(companyId))
                 .willReturn(true);
         given(productRepository.existsByName(ProductName.of(req.name())))
                 .willReturn(false);
@@ -73,14 +64,12 @@ public class ProductServiceImplTest {
 
     @Test
     @DisplayName("상품은 존재하는 업체에서만 생성할 수 있다.")
-    void 존재하는_업체만_가능() {
+    void createProduct_whenCompanyDoesNotExist_shouldTrowException() {
         // given
-        CreateProductCommand req = new CreateProductCommand("상품", 1000, "설명", 1L);
-        UUID companyID = UUID.randomUUID();
+        UUID companyId = UUID.randomUUID();
+        CreateProductCommand req = new CreateProductCommand("상품", companyId,1000, "설명", 1L);
 
-        given(userClient.getOrganizationId(1L))
-                .willReturn(Optional.of(companyID));
-        given(companyClient.existsCompany(companyID))
+        given(companyClient.existsCompany(companyId))
                 .willReturn(false);
 
         // when & then
@@ -93,11 +82,9 @@ public class ProductServiceImplTest {
     @DisplayName("상품 명은 중복되어 생성할 수 없다.")
     void createProduct_WhenDuplicateName_shouldTrowException() {
         // given
-        CreateProductCommand req = new CreateProductCommand("상품", 1000, "설명", 1L);
         UUID companyId = UUID.randomUUID();
+        CreateProductCommand req = new CreateProductCommand("상품", companyId,1000, "설명", 1L);
 
-        given(userClient.getOrganizationId(1L))
-                .willReturn(Optional.of(companyId));
         given(companyClient.existsCompany(companyId))
                 .willReturn(true);
         given(productRepository.existsByName(ProductName.of(req.name())))
@@ -115,12 +102,10 @@ public class ProductServiceImplTest {
     void updateProduct_SuccessProcess() {
         // given
         Product product = getProduct();
-        UpdateProductCommand req = new UpdateProductCommand(product.getId(), 1L, "수정", 5000, "설명 수정");
+        UpdateProductCommand req = new UpdateProductCommand(product.getId(), product.getCompanyId().getCompanyId(), 1L, "수정", 5000, "설명 수정");
 
         given(productRepository.findById(product.getId()))
                 .willReturn(Optional.of(product));
-        given(userClient.getOrganizationId(1L))
-                .willReturn(Optional.ofNullable(product.getCompanyId().getCompanyId()));
         given(productRepository.existsByNameAndIdNot(ProductName.of(req.name()), product.getId()))
                 .willReturn(false);
 
@@ -135,10 +120,10 @@ public class ProductServiceImplTest {
 
     @Test
     @DisplayName("존재하는 상품만 수정 가능하다")
-    void updateProduct__shouldTrowException() {
+    void updateProduct_whenProductNotFound_shouldTrowException() {
         // given
         Product product = getProduct();
-        UpdateProductCommand req = new UpdateProductCommand(product.getId(), 1L, "수정", 5000, "설명 수정");
+        UpdateProductCommand req = new UpdateProductCommand(product.getId(), UUID.randomUUID(),1L, "수정", 5000, "설명 수정");
 
         given(productRepository.findById(product.getId()))
                 .willReturn(Optional.empty());
@@ -153,12 +138,10 @@ public class ProductServiceImplTest {
     void updateProduct_WhenDuplicateName_shouldTrowException() {
         // given
         Product product = getProduct();
-        UpdateProductCommand req = new UpdateProductCommand(product.getId(), 1L, "수정", 5000, "설명 수정");
+        UpdateProductCommand req = new UpdateProductCommand(product.getId(), product.getCompanyId().getCompanyId(), 1L, "수정", 5000, "설명 수정");
 
         given(productRepository.findById(product.getId()))
                 .willReturn(Optional.of(product));
-        given(userClient.getOrganizationId(1L))
-                .willReturn(Optional.ofNullable(product.getCompanyId().getCompanyId()));
         given(productRepository.existsByNameAndIdNot(ProductName.of(req.name()), product.getId()))
                 .willReturn(true);
 
@@ -173,7 +156,7 @@ public class ProductServiceImplTest {
     void deleteProduct_Master_SuccessProcess() {
         // given
         Product product = getProduct();
-        DeleteProductCommand req = new DeleteProductCommand(product.getId(), 1L, "MASTER");
+        DeleteProductCommand req = new DeleteProductCommand(product.getId(), UUID.randomUUID(), 1L, "MASTER");
 
         given(productRepository.findById(product.getId()))
                 .willReturn(Optional.of(product));
@@ -190,12 +173,10 @@ public class ProductServiceImplTest {
     void deleteProduct_HubManager_SuccessProcess() {
         // given
         Product product = getProduct();
-        DeleteProductCommand req = new DeleteProductCommand(product.getId(), 1L, "COMPANY_MANAGER");
+        DeleteProductCommand req = new DeleteProductCommand(product.getId(), product.getCompanyId().getCompanyId(), 1L, "COMPANY_MANAGER");
 
         given(productRepository.findById(product.getId()))
                 .willReturn(Optional.of(product));
-        given(userClient.getOrganizationId(1L))
-                .willReturn(Optional.ofNullable(product.getCompanyId().getCompanyId()));
 
         // when
         productServiceImpl.deleteProduct(req);

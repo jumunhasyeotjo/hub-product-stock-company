@@ -20,7 +20,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/internal/api/v1/companies")
 public class CompanyInternalWebController {
-
     private final CompanyService companyService;
 
     @Operation(summary = "업체 단건 조회")
@@ -31,6 +30,28 @@ public class CompanyInternalWebController {
     ) {
         CompanyRes companyRes = companyService.getById(companyId);
         return ResponseEntity.ok(ApiRes.success(companyRes));
+    }
+
+    @Operation(summary = "업체 존재 여부 검증", description = "주문 등록시 존재하는 업체인지 확인")
+    @GetMapping("/{companyId}/exists")
+    public ResponseEntity<ApiRes<Boolean>> exists(
+            @Parameter(description = "검증할 업체 ID", required = true)
+            @PathVariable UUID companyId
+    ) {
+        boolean exists = companyService.existsById(companyId);
+        return ResponseEntity.ok(ApiRes.success(exists));
+    }
+
+    @Operation(summary = "업체 소속 허브 검증", description = "해당 허브가 해당 업체 소속인지 검증")
+    @GetMapping("/{companyId}/hub/{hubId}/exist")
+    public ResponseEntity<ApiRes<Boolean>> existToHub(
+            @Parameter(description = "검증할 업체 ID", required = true)
+            @PathVariable UUID companyId,
+            @Parameter(description = "검증할 허브 ID", required = true)
+            @PathVariable UUID hubId
+    ) {
+        boolean exist = companyService.existsByIdAndHubId(companyId, hubId);
+        return ResponseEntity.ok(ApiRes.success(exist));
     }
 }
 
