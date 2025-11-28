@@ -15,8 +15,8 @@ import java.util.List;
 @Tag(name = "HubRoute", description = "허브 경로 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/hubs")
-public class HubRouteWebController {
+@RequestMapping("/internal/api/v1/hubs")
+public class HubRouteInternalWebController {
 
     private final HubRouteService hubRouteService;
 
