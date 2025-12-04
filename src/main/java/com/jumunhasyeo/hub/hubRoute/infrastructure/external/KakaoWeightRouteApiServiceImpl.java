@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-class KakaoWeightRouteApiServiceImpl implements RouteWeightApiService {
+public class KakaoWeightRouteApiServiceImpl implements RouteWeightApiService {
 
     private final KakaoMobilityClient kakaoMobilityClient;
 

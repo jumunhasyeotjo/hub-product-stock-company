@@ -1,7 +1,7 @@
 package com.jumunhasyeo.hub.hub.infrastructure.repository;
 
 import com.jumunhasyeo.hub.hub.application.dto.response.HubRes;
-import com.jumunhasyeo.hub.domain.entity.QHub;
+import com.jumunhasyeo.hub.hub.domain.entity.QHub;
 import com.jumunhasyeo.hub.hub.presentation.dto.HubSearchCondition;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
