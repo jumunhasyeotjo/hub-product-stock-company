@@ -52,7 +52,7 @@ class HubRouteInternalWebControllerTest {
         given(hubRouteService.getALLRoute()).willReturn(hubRouteResList);
 
         // when & then
-        mockMvc.perform(get("/api/v1/hubs/routes")
+        mockMvc.perform(get("/internal/api/v1/hubs/routes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
@@ -77,7 +77,7 @@ class HubRouteInternalWebControllerTest {
         given(hubRouteService.getALLRoute()).willReturn(List.of());
 
         // when & then
-        mockMvc.perform(get("/api/v1/hubs/routes")
+        mockMvc.perform(get("/internal/api/v1/hubs/routes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())

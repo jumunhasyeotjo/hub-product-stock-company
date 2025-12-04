@@ -19,7 +19,7 @@ spring:
         enabled: true  # TLS 활성화
 
   datasource:
-    url: ${POSTGRES_URL}
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -60,9 +60,36 @@ kakao:
 
 eas:
   passport:
-    secretKey: ""
-    expiration: 604800
-    algorithm: ""
+    secretKey: ${PASSPORT_SECRET}
+    expiration: ${PASSPORT_EXPIRATION:604800}
+    algorithm: ${PASSPORT_ALGO}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      redisIdempotency:
+        registerHealthIndicator: true  # Actuator health endpoint에 Circuit Breaker 상태 노출 (/actuator/health)
+        slidingWindowSize: 10  # 실패율 계산을 위해 추적할 최근 호출 개수 (최근 10개) 낮은 트래픽 가정
+        minimumNumberOfCalls: 5  # 실패율 계산 전 필요한 최소 호출 수 (5번 미만이면 무조건 CLOSED)
+        failureRateThreshold: 50  # Circuit OPEN 전환 실패율 임계값 (50% 이상 실패 시 OPEN)
+        waitDurationInOpenState: 10s  # OPEN 상태 유지 시간 (30초 후 HALF_OPEN으로 전환)
+        permittedNumberOfCallsInHalfOpenState: 5  # HALF_OPEN 상태에서 허용할 테스트 호출 수
+        automaticTransitionFromOpenToHalfOpenEnabled: true  # OPEN → HALF_OPEN 자동 전환 활성화 minimumNumberOfCalls과동일
+        recordExceptions:  # 실패로 기록할 예외 목록 (이 예외들만 실패율 계산에 포함)
+          - org.springframework.data.redis.RedisConnectionFailureException  # Redis 연결 실패
+          - java.net.ConnectException  # 네트워크 연결 실패
+          - java.io.IOException  # I/O 예외
+  retry:
+    instances:
+      redisIdempotency:
+        maxAttempts: 3  # 최대 3번 시도 (첫 시도 + 재시도 2번)
+        waitDuration: 500ms  # 재시도 간격 500ms
+        enableExponentialBackoff: true  # 지수 백오프 활성화
+        exponentialBackoffMultiplier: 2  # 2배씩 증가 (500ms → 1s → 2s)
+        retryExceptions: # 이 예외들만 재시도
+          - org.springframework.data.redis.RedisConnectionFailureException
+          - java.net.ConnectException
+          - java.io.IOException
 ---
 # test profile
 spring:

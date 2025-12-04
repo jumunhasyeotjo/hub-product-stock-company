@@ -77,8 +77,8 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
         assertThat(result.id()).isEqualTo(hubId);
         assertThat(result.name()).isEqualTo("송파허브");
         //캐시 조회
-        String cacheKey = "hub::" + hubId;
-        assertThat(redisTemplate.hasKey(cacheKey)).isTrue();
+        HubRes hubRes = (HubRes) cacheManager.getCache("hub").get(hubId).get();
+        assertThat(hubRes).isNotNull();
     }
 
     @Test
@@ -164,11 +164,10 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
         assertThat(result2.name()).isEqualTo("허브2");
 
         // 각각 독립적으로 캐싱되었는지 확인
-        String cacheKey1 = "hub::" + hub1.getHubId();
-        String cacheKey2 = "hub::" + hub2.getHubId();
-
-        assertThat(redisTemplate.hasKey(cacheKey1)).isTrue();
-        assertThat(redisTemplate.hasKey(cacheKey2)).isTrue();
+        HubRes hubRes1 = (HubRes) cacheManager.getCache("hub").get(hub1.getHubId()).get();
+        HubRes hubRes2 = (HubRes) cacheManager.getCache("hub").get(hub2.getHubId()).get();
+        assertThat(hubRes1).isNotNull();
+        assertThat(hubRes2).isNotNull();
     }
 
     private Hub createHubAndSave() {
