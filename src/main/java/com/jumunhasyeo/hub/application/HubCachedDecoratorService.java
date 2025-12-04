@@ -22,6 +22,7 @@ import java.util.UUID;
 public class HubCachedDecoratorService implements HubService {
 
     private static final String CACHE_NAME = "hub";
+    private static final String CACHE_MANAGER_NAME = "caffeineCacheManager";
 
     private final HubService hubService;
 
@@ -33,8 +34,8 @@ public class HubCachedDecoratorService implements HubService {
      * Hub 생성 후 캐시에 저장
      */
     @Transactional
-    @CachePut(value = CACHE_NAME, key = "#result.id()", condition = "#result != null")
-    @CacheEvict(value = CACHE_NAME, key = "'all'", beforeInvocation = false)
+    @CachePut(value = CACHE_NAME, key = "#result.id()", condition = "#result != null", cacheManager = CACHE_MANAGER_NAME)
+    @CacheEvict(value = CACHE_NAME, key = "'all'", beforeInvocation = false, cacheManager = CACHE_MANAGER_NAME)
     public HubRes create(CreateHubCommand command) {
         HubRes created = hubService.create(command);
         log.info(" Hub Created & Cached - hubId: {}", created.id());
@@ -45,8 +46,8 @@ public class HubCachedDecoratorService implements HubService {
      * Hub 수정 후 캐시 업데이트
      */
     @Transactional
-    @CachePut(value = CACHE_NAME, key = "#command.hubId()", condition = "#result != null")
-    @CacheEvict(value = CACHE_NAME, key = "'all'", beforeInvocation = false)
+    @CachePut(value = CACHE_NAME, key = "#command.hubId()", condition = "#result != null", cacheManager = CACHE_MANAGER_NAME)
+    @CacheEvict(value = CACHE_NAME, key = "'all'", beforeInvocation = false, cacheManager = CACHE_MANAGER_NAME)
     public HubRes update(UpdateHubCommand command) {
         HubRes updated = hubService.update(command);
         log.info("Hub Updated & Cached - hubId: {}", updated.id());
@@ -59,8 +60,8 @@ public class HubCachedDecoratorService implements HubService {
     @Transactional
     @Caching(
             evict = {
-                    @CacheEvict(value = "hub", key = "#command.hubId()", beforeInvocation = false),
-                    @CacheEvict(value = "hub", key = "'all'", beforeInvocation = false)
+                    @CacheEvict(value = "hub", key = "#command.hubId()", beforeInvocation = false, cacheManager = CACHE_MANAGER_NAME),
+                    @CacheEvict(value = "hub", key = "'all'", beforeInvocation = false, cacheManager = CACHE_MANAGER_NAME)
             }
     )
     public UUID delete(DeleteHubCommand command) {
@@ -72,7 +73,7 @@ public class HubCachedDecoratorService implements HubService {
     /**
      * Hub 단건 조회
      */
-    @Cacheable(value = CACHE_NAME, key = "#hubId", unless = "#result == null")
+    @Cacheable(value = CACHE_NAME, key = "#hubId", unless = "#result == null", cacheManager = CACHE_MANAGER_NAME)
     public HubRes getById(UUID hubId) {
         log.info(" DB 조회 - hubId: {}", hubId);
         return hubService.getById(hubId);
@@ -91,7 +92,7 @@ public class HubCachedDecoratorService implements HubService {
     }
 
     @Override
-    @Cacheable(value = CACHE_NAME, key = "'all'", unless = "#result == null or #result.isEmpty()")
+    @Cacheable(value = CACHE_NAME, key = "'all'", unless = "#result == null or #result.isEmpty()", cacheManager = CACHE_MANAGER_NAME)
     public List<HubRes> getAll() {
         return hubService.getAll();
     }

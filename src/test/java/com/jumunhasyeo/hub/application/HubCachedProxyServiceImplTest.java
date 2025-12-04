@@ -44,6 +44,7 @@ class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
     private EntityManager entityManager;
 
     @Autowired
+    @Qualifier("caffeineCacheManager")
     private CacheManager cacheManager;
 
     @Autowired

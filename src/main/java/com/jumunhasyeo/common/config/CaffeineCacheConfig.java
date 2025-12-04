@@ -27,8 +27,8 @@ public class CaffeineCacheConfig {
                 .expireAfterWrite(Duration.ofHours(1));
     }
 
-    @Bean
-    public CacheManager cacheManager(Caffeine<Object, Object> caffeine) {
+    @Bean(name = "caffeineCacheManager")
+    public CacheManager CaffeineCacheManager(Caffeine<Object, Object> caffeine) {
         return new CaffeineCacheManager("hub") {{
             setCaffeine(caffeine);
         }};
