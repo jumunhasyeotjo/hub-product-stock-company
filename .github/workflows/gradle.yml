@@ -1,17 +1,15 @@
 name: Java CI/CD with Gradle
-
 on:
   push:
     branches: [ "dev" ]
   pull_request:
     branches: [ "dev" ]
-
 jobs:
   build-and-deploy:
     runs-on: self-hosted
     permissions:
       contents: read
-      packages: read  # for passport custom lib
+      packages: read
     
     steps:
     - name: Checkout code
@@ -25,6 +23,11 @@ jobs:
     
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    
+    - name: Create application.yml from sample
+      run: |
+        cp src/main/resources/application-sample.yml src/main/resources/application.yml
+        echo "application.yml created from sample"
     
     - name: Build with Gradle (including Testcontainers tests)
       env:
