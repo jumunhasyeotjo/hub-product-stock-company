@@ -41,6 +41,29 @@ jobs:
         REDIS_PORT: ${{ secrets.REDIS_PORT }}
         REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
       run: ./gradlew clean build
+
+    - name: Create systemd environment file
+      run: |
+        cat > /tmp/app.env << EOF
+        POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+        POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
+        POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+        POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+        REDIS_HOST=${{ secrets.REDIS_HOST }}
+        REDIS_PORT=${{ secrets.REDIS_PORT }}
+        REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+        DB_CONNECTION_TIMEOUT=${{ secrets.DB_CONNECTION_TIMEOUT }}
+        DB_LOCK_TIME_OUT=${{ secrets.DB_LOCK_TIME_OUT }}
+        DB_POOL_SIZE=${{ secrets.DB_POOL_SIZE }}
+        HUB_SERVICE_CACHEABLE=${{ secrets.HUB_SERVICE_CACHEABLE }}
+        KAKAO_API=${{ secrets.KAKAO_API }}
+        KAKAO_MOBILITY_API_KEY=${{ secrets.KAKAO_MOBILITY_API_KEY }}
+        PASSPORT_ALGO=${{ secrets.PASSPORT_ALGO }}
+        PASSPORT_EXPIRATION=${{ secrets.PASSPORT_EXPIRATION }}
+        PASSPORT_SECRET=${{ secrets.PASSPORT_SECRET }}
+        EOF
+
+        mv /tmp/app.env $HOME/deploy/.env
     
     - name: Stop existing application
       run: |
@@ -74,28 +97,16 @@ jobs:
         echo "Deployed new version to $DEPLOY_DIR/app.jar"
     
     - name: Start application
-      env:
-        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-        POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        REDIS_HOST: ${{ secrets.REDIS_HOST }}
-        REDIS_PORT: ${{ secrets.REDIS_PORT }}
-        REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-        DB_CONNECTION_TIMEOUT: ${{ secrets.DB_CONNECTION_TIMEOUT }}
-        DB_LOCK_TIME_OUT: ${{ secrets.DB_LOCK_TIME_OUT }}
-        DB_POOL_SIZE: ${{ secrets.DB_POOL_SIZE }}
-        HUB_SERVICE_CACHEABLE: ${{ secrets.HUB_SERVICE_CACHEABLE }}
-        KAKAO_API: ${{ secrets.KAKAO_API }}
-        KAKAO_MOBILITY_API_KEY: ${{ secrets.KAKAO_MOBILITY_API_KEY }}
-        PASSPORT_ALGO: ${{ secrets.PASSPORT_ALGO }}
-        PASSPORT_EXPIRATION: ${{ secrets.PASSPORT_EXPIRATION }}
-        PASSPORT_SECRET: ${{ secrets.PASSPORT_SECRET }}
       run: |
         DEPLOY_DIR="$HOME/deploy"
         LOG_DIR="$HOME/logs"
         
         mkdir -p $LOG_DIR
+        
+        # 환경변수 파일을 읽어서 실행
+        set -a
+        source $DEPLOY_DIR/app.env
+        set +a
         
         nohup java -jar $DEPLOY_DIR/app.jar > $LOG_DIR/app.log 2>&1 &
         
