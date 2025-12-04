@@ -11,6 +11,7 @@ jobs:
     runs-on: self-hosted
     permissions:
       contents: read
+      packages: read  # for passport custom lib
     
     steps:
     - name: Checkout code
@@ -27,6 +28,8 @@ jobs:
     
     - name: Build with Gradle (including Testcontainers tests)
       env:
+        GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
         POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
         POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
@@ -44,7 +47,6 @@ jobs:
           echo "Found process $PID running on port 8088"
           kill -15 $PID
           sleep 5
-          # 강제 종료가 필요한 경우
           if lsof -ti:8088 > /dev/null; then
             echo "Process still running, forcing kill..."
             kill -9 $(lsof -ti:8088)
@@ -61,7 +63,6 @@ jobs:
         
         mkdir -p $DEPLOY_DIR
         
-        # 기존 JAR 백업
         if [ -f "$DEPLOY_DIR/app.jar" ]; then
           mv "$DEPLOY_DIR/app.jar" "$DEPLOY_DIR/app.jar.bak.$(date +%Y%m%d_%H%M%S)"
         fi
@@ -93,28 +94,17 @@ jobs:
         
         mkdir -p $LOG_DIR
         
-        # 환경변수를 사용하여 애플리케이션 시작
-        nohup java -jar $DEPLOY_DIR/app.jar \
-          -Dspring.datasource.url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB} \
-          -Dspring.datasource.password=${POSTGRES_PASSWORD} \
-          -Dspring.data.redis.host=${REDIS_HOST} \
-          -Dspring.data.redis.port=${REDIS_PORT} \
-          -Dspring.data.redis.password=${REDIS_PASSWORD} \
-          > $LOG_DIR/app.log 2>&1 &
+        nohup java -jar $DEPLOY_DIR/app.jar > $LOG_DIR/app.log 2>&1 &
         
         APP_PID=$!
         echo "Application started. PID: $APP_PID"
         
-        # 애플리케이션 시작 대기
-        echo "Waiting for application to start..."
         sleep 10
         
-        # 포트 확인
         if lsof -ti:8088 > /dev/null; then
-          echo " Application is running on port 8088"
+          echo "Application is running on port 8088"
         else
-          echo " Application failed to start"
-          echo "=== Last 50 lines of log ==="
+          echo "Application failed to start"
           tail -n 50 $LOG_DIR/app.log
           exit 1
         fi
@@ -125,8 +115,8 @@ jobs:
         sleep 5
         
         if lsof -ti:8088 > /dev/null; then
-          echo " Deployment successful - Application is running"
+          echo "Deployment successful - Application is running"
         else
-          echo " Deployment failed - Application is not running"
+          echo "Deployment failed - Application is not running"
           exit 1
         fi
