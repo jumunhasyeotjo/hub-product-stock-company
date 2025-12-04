@@ -2,6 +2,7 @@ package com.jumunhasyeo.hub.domain.vo;
 
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
+import com.jumunhasyeo.hub.hub.domain.vo.Coordinate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

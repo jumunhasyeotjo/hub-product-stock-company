@@ -1,8 +1,9 @@
 package com.jumunhasyeo.hub.application.dto.response;
 
-import com.jumunhasyeo.hub.domain.entity.Hub;
-import com.jumunhasyeo.hub.domain.vo.Address;
-import com.jumunhasyeo.hub.domain.vo.Coordinate;
+import com.jumunhasyeo.hub.hub.application.dto.response.HubRes;
+import com.jumunhasyeo.hub.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.hub.domain.vo.Address;
+import com.jumunhasyeo.hub.hub.domain.vo.Coordinate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

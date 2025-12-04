@@ -2,8 +2,11 @@ package com.jumunhasyeo.hub.domain.entity;
 
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
-import com.jumunhasyeo.hub.domain.vo.Address;
-import com.jumunhasyeo.hub.domain.vo.Coordinate;
+import com.jumunhasyeo.hub.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.hub.domain.entity.HubRelation;
+import com.jumunhasyeo.hub.hub.domain.entity.HubType;
+import com.jumunhasyeo.hub.hub.domain.vo.Address;
+import com.jumunhasyeo.hub.hub.domain.vo.Coordinate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;

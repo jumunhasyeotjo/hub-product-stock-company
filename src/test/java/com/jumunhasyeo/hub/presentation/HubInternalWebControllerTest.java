@@ -2,28 +2,21 @@ package com.jumunhasyeo.hub.presentation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jumunhasyeo.ControllerTestConfig;
-import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.common.exception.GlobalExceptionHandler;
-import com.jumunhasyeo.hub.application.HubService;
-import com.jumunhasyeo.hub.application.dto.response.HubRes;
-import com.jumunhasyeo.hub.presentation.dto.request.DeleteHubReq;
-import com.jumunhasyeo.hub.presentation.dto.request.UpdateHubReq;
+import com.jumunhasyeo.hub.hub.application.HubService;
+import com.jumunhasyeo.hub.hub.application.dto.response.HubRes;
+import com.jumunhasyeo.hub.hub.presentation.HubInternalWebController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

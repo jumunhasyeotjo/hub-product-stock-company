@@ -2,10 +2,11 @@ package com.jumunhasyeo.hubRoute.infrastructure.external;
 
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
-import com.jumunhasyeo.hub.domain.vo.Coordinate;
-import com.jumunhasyeo.hubRoute.application.dto.response.RouteWeightRes;
-import com.jumunhasyeo.hubRoute.infrastructure.external.client.map.KakaoMobilityClient;
-import com.jumunhasyeo.hubRoute.infrastructure.response.KakaoRouteResponse;
+import com.jumunhasyeo.hub.hub.domain.vo.Coordinate;
+import com.jumunhasyeo.hub.hubRoute.application.dto.response.RouteWeightRes;
+import com.jumunhasyeo.hub.hubRoute.infrastructure.external.KakaoWeightRouteApiServiceImpl;
+import com.jumunhasyeo.hub.hubRoute.infrastructure.external.client.map.KakaoMobilityClient;
+import com.jumunhasyeo.hub.hubRoute.infrastructure.response.KakaoRouteResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
