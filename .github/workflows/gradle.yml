@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: [self-hosted, linux, hoding-VivoBook-ASUSLaptop-X712EA-X712EA]
+    runs-on: self-hosted
     permissions:
       contents: read
     
