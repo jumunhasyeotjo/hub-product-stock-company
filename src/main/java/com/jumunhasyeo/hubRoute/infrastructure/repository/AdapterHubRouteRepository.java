@@ -4,6 +4,8 @@ import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hubRoute.domain.entity.HubRoute;
 import com.jumunhasyeo.hubRoute.domain.repository.HubRouteRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class AdapterHubRouteRepository implements HubRouteRepository {
     private final JpaHubRouteRepositoryImpl repository;
 
@@ -25,14 +28,13 @@ public class AdapterHubRouteRepository implements HubRouteRepository {
     }
 
     @Override
-    public void insertAllIgnore(Set<HubRoute> createAllRoute) {
+    public void insertIgnore(Set<HubRoute> createAllRoute) {
         for (HubRoute hubRoute : createAllRoute) {
-            repository.insertIgnore(
-                    hubRoute.getStartHub().getHubId(),
-                    hubRoute.getEndHub().getHubId(),
-                    hubRoute.getRouteWeight().getDistanceKm().doubleValue(),
-                    hubRoute.getRouteWeight().getDurationMinutes()
-            );
+            try {
+                repository.save(hubRoute);
+            }catch (DataIntegrityViolationException e) {
+                log.warn("Duplicate hub route detected, ignoring: {}", hubRoute);
+            }
         }
     }
 

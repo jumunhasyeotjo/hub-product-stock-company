@@ -20,18 +20,4 @@ public interface JpaHubRouteRepositoryImpl extends JpaRepository<HubRoute, UUID>
     
     @Query("SELECT hr FROM HubRoute hr WHERE hr.isDeleted = false")
     List<HubRoute> findAll();
-
-    @Modifying
-    @Query(value = """
-                INSERT INTO p_hub_route(route_id, start_hub_id, end_hub_id, distance_km, duration_minutes, created_at, modified_at, deleted_at, is_deleted)
-                VALUES (gen_random_uuid(), :startId, :endId, :distanceKm, :durationMinutes, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, false)
-                ON CONFLICT (start_hub_id, end_hub_id, is_deleted) 
-                DO NOTHING;
-            """, nativeQuery = true)
-    void insertIgnore( //TODO 테스트
-            @Param("startId") UUID startId,
-            @Param("endId") UUID endId,
-            @Param("distanceKm") double distanceKm,
-            @Param("durationMinutes") int durationMinutes
-    );
 }

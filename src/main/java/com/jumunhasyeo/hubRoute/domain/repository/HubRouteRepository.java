@@ -9,7 +9,7 @@ import java.util.Set;
 public interface HubRouteRepository {
     void save(HubRoute forwardRoute);
     void saveAll(List<HubRoute> routes);
-    void insertAllIgnore(Set<HubRoute> createAllRoute);
+    void insertIgnore(Set<HubRoute> createAllRoute);
     List<HubRoute> findAll();
     List<HubRoute> findByStartHubOrEndHub(Hub startHub, Hub endHub);
 }

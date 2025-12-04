@@ -2,7 +2,6 @@ package com.jumunhasyeo.hubRoute.application.service;
 
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
-import com.jumunhasyeo.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.domain.entity.HubType;
 import com.jumunhasyeo.hub.domain.repository.HubRepository;
@@ -57,8 +56,8 @@ public class HubRouteService {
             existingCenterHubs,
             this::calculateRouteWeight
         );
-        
-        hubRouteRepository.insertAllIgnore(routes);
+
+        hubRouteRepository.insertIgnore(routes);
     }
 
     /**
@@ -74,7 +73,7 @@ public class HubRouteService {
             this::calculateRouteWeight
         );
         
-        hubRouteRepository.insertAllIgnore(routes);
+        hubRouteRepository.insertIgnore(routes);
     }
 
     /**

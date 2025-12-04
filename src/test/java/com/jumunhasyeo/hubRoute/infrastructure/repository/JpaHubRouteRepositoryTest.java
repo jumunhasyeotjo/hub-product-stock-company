@@ -100,45 +100,6 @@ class JpaHubRouteRepositoryTest extends CommonTestContainer {
         assertThat(routes).hasSize(2);
     }
 
-    @Test
-    @DisplayName("insertIgnore로 경로를 저장할 수 있다.")
-    void insertIgnore_success() {
-        //given
-        Hub hub1 = createHub("서울");
-        Hub hub2 = createHub("부산");
-        em.persist(hub1);
-        em.persist(hub2);
-        em.flush();
-
-        //when
-        hubRouteRepository.insertIgnore(hub1.getHubId(), hub2.getHubId(), 300.0, 180);
-        em.clear();
-
-        //then
-        List<HubRoute> routes = hubRouteRepository.findAll();
-        assertThat(routes).hasSize(1);
-    }
-
-    @Test
-    @DisplayName("insertIgnore로 중복 경로는 무시된다.")
-    void insertIgnore_duplicateIgnored() {
-        //given
-        Hub hub1 = createHub("서울");
-        Hub hub2 = createHub("부산");
-        em.persist(hub1);
-        em.persist(hub2);
-        em.flush();
-
-        //when
-        hubRouteRepository.insertIgnore(hub1.getHubId(), hub2.getHubId(), 300.0, 180);
-        hubRouteRepository.insertIgnore(hub1.getHubId(), hub2.getHubId(), 400.0, 200);
-        em.clear();
-
-        //then
-        List<HubRoute> routes = hubRouteRepository.findAll();
-        assertThat(routes).hasSize(1);
-    }
-
     private Hub createHub(String name) {
         return Hub.builder()
                 .name(name)
