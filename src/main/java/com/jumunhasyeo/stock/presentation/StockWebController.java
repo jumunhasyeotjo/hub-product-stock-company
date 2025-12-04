@@ -3,18 +3,12 @@ package com.jumunhasyeo.stock.presentation;
 import com.jumunhasyeo.common.ApiRes;
 import com.jumunhasyeo.stock.application.StockService;
 import com.jumunhasyeo.stock.application.command.CreateStockCommand;
-import com.jumunhasyeo.stock.application.command.DecreaseStockCommand;
 import com.jumunhasyeo.stock.application.command.DeleteStockCommand;
-import com.jumunhasyeo.stock.application.command.IncreaseStockCommand;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;
-import com.jumunhasyeo.stock.presentation.docs.ApiDocDecrementStock;
 import com.jumunhasyeo.stock.presentation.docs.ApiDocDeleteStock;
 import com.jumunhasyeo.stock.presentation.docs.ApiDocGetStock;
-import com.jumunhasyeo.stock.presentation.docs.ApiDocIncrementStock;
 import com.jumunhasyeo.stock.presentation.dto.request.CreateStockReq;
-import com.jumunhasyeo.stock.presentation.dto.request.DecreaseStockReq;
 import com.jumunhasyeo.stock.presentation.dto.request.DeleteStockReq;
-import com.jumunhasyeo.stock.presentation.dto.request.IncrementStockReq;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -39,35 +33,6 @@ public class StockWebController {
     ) {
         CreateStockCommand command = new CreateStockCommand(req.hubId(), req.productId(), req.quantity());
         StockRes stockRes = stockService.create(command);
-        return ResponseEntity.ok(ApiRes.success(stockRes));
-    }
-
-    //재고 증가 (TODO: HUB_MANAGER/MASTER, SYSTEM)
-    @ApiDocIncrementStock
-    @PostMapping("/increment")
-    public ResponseEntity<ApiRes<StockRes>> increment(
-            @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
-            @Parameter(description = "재고 증가 요청 정보", required = true)
-            @RequestBody @Valid IncrementStockReq req
-    ) {
-        IncreaseStockCommand command = new IncreaseStockCommand(req.productId(), req.amount());
-        StockRes stockRes = stockService.increment(idempotencyKey, command);
-        return ResponseEntity.ok(ApiRes.success(stockRes));
-    }
-
-    //재고 증가 (TODO: HUB_MANAGER/MASTER, SYSTEM)
-    //TODO: Input List 변경
-    @ApiDocDecrementStock
-    @PostMapping("/decrement")
-    public ResponseEntity<ApiRes<StockRes>> decrement(
-            @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
-            @Parameter(description = "재고 감소 요청 정보", required = true)
-            @RequestBody @Valid DecreaseStockReq req
-    ) {
-        DecreaseStockCommand command = new DecreaseStockCommand(req.productId(), req.amount());
-        StockRes stockRes = stockService.decrement(idempotencyKey, command);
         return ResponseEntity.ok(ApiRes.success(stockRes));
     }
 

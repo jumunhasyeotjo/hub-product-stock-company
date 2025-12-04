@@ -17,7 +17,7 @@ class StockTest {
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2, 10})
-    @DisplayName("amount >=0 인 경우 생성할 수 있다.")
+    @DisplayName("quantity >=0 인 경우 생성할 수 있다.")
     public void of_stock_success() {
         // given
         Hub hub = createHub();
@@ -43,7 +43,7 @@ class StockTest {
     }
 
     @Test
-    @DisplayName("Stock을 Of로 생성할 때 amount == null일 경우 예외 반환")
+    @DisplayName("Stock을 Of로 생성할 때 quantity == null일 경우 예외 반환")
     public void of_quantityIsNull_ShouldThrowException() {
         // given
         Integer quantity = null;
@@ -60,7 +60,7 @@ class StockTest {
 
     @ParameterizedTest
     @ValueSource(ints = {-10, -5, -1})
-    @DisplayName("Stock을 Of로 생성할 때 amount < 0일 경우 예외 반환")
+    @DisplayName("Stock을 Of로 생성할 때 quantity < 0일 경우 예외 반환")
     public void of_quantityLessThanZero_ShouldThrowException(int quantity) {
         // given
         UUID productId = UUID.randomUUID();

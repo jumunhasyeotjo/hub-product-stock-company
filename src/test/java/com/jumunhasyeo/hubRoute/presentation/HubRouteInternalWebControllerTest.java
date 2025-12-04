@@ -22,9 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(HubRouteWebController.class)
+@WebMvcTest(HubRouteInternalWebController.class)
 @Import({ControllerTestConfig.class, GlobalExceptionHandler.class})
-class HubRouteWebControllerTest {
+class HubRouteInternalWebControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired

@@ -56,7 +56,7 @@ cache:
 
 kakao:
   mobility:
-    api-key: "KakaoAK your_api_key_here"
+    api-key: ${KAKAO_MOBILITY_API_KEY}
 
 eas:
   passport:
