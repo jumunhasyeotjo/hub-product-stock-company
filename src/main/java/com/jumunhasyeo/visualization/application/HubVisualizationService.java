@@ -1,9 +1,9 @@
 package com.jumunhasyeo.visualization.application;
 
-import com.jumunhasyeo.hub.domain.entity.Hub;
-import com.jumunhasyeo.hub.domain.repository.HubRepository;
-import com.jumunhasyeo.hubRoute.domain.entity.HubRoute;
-import com.jumunhasyeo.hubRoute.domain.repository.HubRouteRepository;
+import com.jumunhasyeo.hub.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.hub.domain.repository.HubRepository;
+import com.jumunhasyeo.hub.hubRoute.domain.entity.HubRoute;
+import com.jumunhasyeo.hub.hubRoute.domain.repository.HubRouteRepository;
 import com.jumunhasyeo.visualization.dto.HubDto;
 import com.jumunhasyeo.visualization.dto.RouteDto;
 import com.jumunhasyeo.visualization.dto.VisualizationData;

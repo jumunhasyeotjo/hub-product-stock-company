@@ -1,6 +1,6 @@
 package com.jumunhasyeo.visualization.dto;
 
-import com.jumunhasyeo.hubRoute.domain.entity.HubRoute;
+import com.jumunhasyeo.hub.hubRoute.domain.entity.HubRoute;
 import lombok.Builder;
 import lombok.Getter;
 
