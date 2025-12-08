@@ -1,5 +1,7 @@
 package com.jumunhasyeo.hub.domain.vo;
 
+import com.jumunhasyeo.hub.hub.domain.vo.Address;
+import com.jumunhasyeo.hub.hub.domain.vo.Coordinate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

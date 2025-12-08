@@ -6,6 +6,7 @@ import com.jumunhasyeo.common.Idempotency.db.domain.DbIdempotentKey;
 import com.jumunhasyeo.common.Idempotency.db.domain.repository.IdempotencyKeyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +31,13 @@ public class DbIdempotentService implements IdempotentService {
             DbIdempotentKey entity = DbIdempotentKey.create(key, ttlSeconds, IdempotentType.STOCK);
             repository.save(entity);
             return true;
-        } catch (Exception e) {
-            // 이미 존재하는 경우 (unique constraint violation)
-            log.info("Key already exists: {}", key);
+        } catch (DataIntegrityViolationException e) {
+            // Unique constraint 위반 - 이미 존재하는 경우
+            log.info("Key already exists (race condition): {}", key);
             return false;
+        } catch (Exception e) {
+            log.error("Unexpected error while setting key: {}", key, e);
+            throw e;
         }
     }
 

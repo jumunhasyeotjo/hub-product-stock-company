@@ -1,11 +1,11 @@
 package com.jumunhasyeo.common.config;
 
-import com.jumunhasyeo.hub.application.HubCachedDecoratorService;
-import com.jumunhasyeo.hub.application.HubEventPublisher;
-import com.jumunhasyeo.hub.application.HubService;
-import com.jumunhasyeo.hub.application.HubServiceImpl;
-import com.jumunhasyeo.hub.domain.repository.HubRepository;
-import com.jumunhasyeo.hub.domain.repository.HubRepositoryCustom;
+import com.jumunhasyeo.hub.hub.application.HubCachedDecoratorService;
+import com.jumunhasyeo.hub.hub.application.HubEventPublisher;
+import com.jumunhasyeo.hub.hub.application.HubService;
+import com.jumunhasyeo.hub.hub.application.HubServiceImpl;
+import com.jumunhasyeo.hub.hub.domain.repository.HubRepository;
+import com.jumunhasyeo.hub.hub.domain.repository.HubRepositoryCustom;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

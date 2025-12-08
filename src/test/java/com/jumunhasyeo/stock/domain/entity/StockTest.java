@@ -2,7 +2,7 @@ package com.jumunhasyeo.stock.domain.entity;
 
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
-import com.jumunhasyeo.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.hub.domain.entity.Hub;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

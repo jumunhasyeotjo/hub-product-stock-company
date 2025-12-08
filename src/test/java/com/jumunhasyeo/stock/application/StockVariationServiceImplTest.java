@@ -1,8 +1,8 @@
 package com.jumunhasyeo.stock.application;
 
-import com.jumunhasyeo.hub.domain.entity.Hub;
-import com.jumunhasyeo.hub.domain.vo.Address;
-import com.jumunhasyeo.hub.domain.vo.Coordinate;
+import com.jumunhasyeo.hub.hub.domain.entity.Hub;
+import com.jumunhasyeo.hub.hub.domain.vo.Address;
+import com.jumunhasyeo.hub.hub.domain.vo.Coordinate;
 import com.jumunhasyeo.stock.application.command.DecreaseStockCommand;
 import com.jumunhasyeo.stock.application.command.IncreaseStockCommand;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;

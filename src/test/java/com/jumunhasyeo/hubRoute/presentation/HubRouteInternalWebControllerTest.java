@@ -3,8 +3,9 @@ package com.jumunhasyeo.hubRoute.presentation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jumunhasyeo.ControllerTestConfig;
 import com.jumunhasyeo.common.exception.GlobalExceptionHandler;
-import com.jumunhasyeo.hubRoute.application.dto.response.HubRouteRes;
-import com.jumunhasyeo.hubRoute.application.service.HubRouteService;
+import com.jumunhasyeo.hub.hubRoute.application.dto.response.HubRouteRes;
+import com.jumunhasyeo.hub.hubRoute.application.service.HubRouteService;
+import com.jumunhasyeo.hub.hubRoute.presentation.HubRouteInternalWebController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ class HubRouteInternalWebControllerTest {
         given(hubRouteService.getALLRoute()).willReturn(hubRouteResList);
 
         // when & then
-        mockMvc.perform(get("/api/v1/hubs/routes")
+        mockMvc.perform(get("/internal/api/v1/hubs/routes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
@@ -77,7 +78,7 @@ class HubRouteInternalWebControllerTest {
         given(hubRouteService.getALLRoute()).willReturn(List.of());
 
         // when & then
-        mockMvc.perform(get("/api/v1/hubs/routes")
+        mockMvc.perform(get("/internal/api/v1/hubs/routes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
