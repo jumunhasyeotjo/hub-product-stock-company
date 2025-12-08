@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Table(
-        name = "inbox_events",
+        name = "p_inbox_events",
         indexes = {
                 @Index(name = "idx_inbox_event_key", columnList = "eventKey")
         }
@@ -28,8 +28,8 @@ public class InboxEvent extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String eventKey;  // 멱등성 키
 
-    @Enumerated(EnumType.STRING)
-    private EventType eventType;
+    @Column(nullable = false)
+    private String eventName;
 
     @Type(JsonBinaryType.class)
     @Column(nullable = false, columnDefinition = "JSONB")
@@ -55,10 +55,10 @@ public class InboxEvent extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String errorMessage;
 
-    public static InboxEvent from(String eventKey, EventType eventType, String payload) {
+    public static InboxEvent from(String eventKey, String eventName, String payload) {
         return InboxEvent.builder()
                 .eventKey(eventKey)
-                .eventType(eventType)
+                .eventKey(eventName)
                 .payload(payload)
                 .status(InboxStatus.RECEIVED)
                 .receivedAt(LocalDateTime.now())
@@ -83,5 +83,25 @@ public class InboxEvent extends BaseEntity {
 
     public boolean canRetry() {
         return this.retryCount < this.maxRetries;
+    }
+
+    public void markFailed(String errorMessage) {
+        this.status = InboxStatus.FAILED;
+        this.errorMessage = errorMessage;
+    }
+
+    public void markCompleted() {
+        this.status = InboxStatus.COMPLETED;
+        this.processedAt = LocalDateTime.now();
+    }
+
+    public void dispatchSuccess() {
+        incrementRetryCount();
+        markCompleted();
+    }
+
+    public void dispatchFail(String errMessage) {
+        incrementRetryCount();
+        setErrorMessage(errMessage);
     }
 }

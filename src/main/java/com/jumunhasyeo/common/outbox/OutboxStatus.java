@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 public enum OutboxStatus {
     PENDING("대기중"),
-    COMPLETE("완료");
+    COMPLETE("완료"),
+    FAILED("실패");
 
     private final String description;
 }

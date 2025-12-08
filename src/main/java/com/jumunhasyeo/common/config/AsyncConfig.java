@@ -13,13 +13,13 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AsyncConfig {
 
-    @Bean(name = "IdempotentSchedulerExecutor")
-    public Executor idempotentSchedulerExecutor() {
+    @Bean(name = "schedulerExecutor")
+    public Executor schedulerExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);      // 스케줄러 4개
-        executor.setMaxPoolSize(4);       // 여유분
+        executor.setCorePoolSize(6);      // 스케줄러 6개
+        executor.setMaxPoolSize(10);       // 여유분
         executor.setQueueCapacity(0);    // 대기큐 불필요
-        executor.setThreadNamePrefix("idempotent-scheduler-");
+        executor.setThreadNamePrefix("scheduler-");
         executor.setRejectedExecutionHandler((task, executor1) -> {
             log.error("[{}] Scheduler task rejected: {}, Active: {}, Queue: {}",
                     Thread.currentThread().getName(),
