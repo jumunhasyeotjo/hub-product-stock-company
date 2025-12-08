@@ -2,12 +2,12 @@ package com.jumunhasyeo.product.domain.entity;
 
 
 import com.jumunhasyeo.common.BaseEntity;
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.product.domain.vo.CompanyId;
 import com.jumunhasyeo.product.domain.vo.Price;
 import com.jumunhasyeo.product.domain.vo.ProductDescription;
 import com.jumunhasyeo.product.domain.vo.ProductName;
-import com.jumunhasyeo.common.exception.BusinessException;
-import com.jumunhasyeo.common.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
