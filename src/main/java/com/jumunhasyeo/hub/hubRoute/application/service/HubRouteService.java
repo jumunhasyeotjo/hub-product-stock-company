@@ -48,7 +48,7 @@ public class HubRouteService {
         } else if (type == HubType.BRANCH) {
             hubRoutes.addAll(buildForBranch(command));
         }
-        //TODO outbox
+
         List<HubRouteCreatedEvent> createEventList = hubRoutes.stream()
                 .map(HubRouteCreatedEvent::from)
                 .collect(Collectors.toList());

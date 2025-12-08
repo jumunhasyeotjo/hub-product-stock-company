@@ -9,7 +9,6 @@ import lombok.Getter;
 import java.util.UUID;
 
 @Schema(description = "HubCreatedEvent")
-
 @Getter
 public final class HubCreatedEvent extends HubDomainEvent {
 

@@ -9,7 +9,7 @@ public enum ListenEventRegistry {
 
     HUB_CREATED_EVENT("HubCreatedEvent"),
     HUB_DELETED_EVENT("HubDeletedEvent"),
-    HUB_NAME_UPDATE_EVENT("HubNameUpdateEvent");
+    HUB_NAME_UPDATE_EVENT("HubNameUpdatedEvent");
 
     private final String eventName;
 }

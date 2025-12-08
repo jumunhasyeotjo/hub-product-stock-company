@@ -1,8 +1,10 @@
 package com.jumunhasyeo.common.inbox;
 
 import com.jumunhasyeo.common.BaseEntity;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -29,6 +31,7 @@ public class InboxEvent extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
+    @Type(JsonBinaryType.class)
     @Column(nullable = false, columnDefinition = "JSONB")
     private String payload;  // JSON 형태로 저장
 
