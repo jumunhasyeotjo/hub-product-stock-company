@@ -1,6 +1,6 @@
 package com.jumunhasyeo.stock.infrastructure.external;
 
-import com.jumunhasyeo.hub.application.HubService;
+import com.jumunhasyeo.hub.hub.application.HubService;
 import com.jumunhasyeo.stock.application.service.HubClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

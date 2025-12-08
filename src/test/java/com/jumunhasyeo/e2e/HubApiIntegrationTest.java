@@ -4,8 +4,8 @@ import com.jumunhasyeo.CleanUp;
 import com.jumunhasyeo.CommonTestContainer;
 import com.jumunhasyeo.InternalIntegrationTestConfig;
 import com.jumunhasyeo.common.exception.ErrorCode;
-import com.jumunhasyeo.hub.domain.entity.HubType;
-import com.jumunhasyeo.hub.presentation.dto.request.CreateHubReq;
+import com.jumunhasyeo.hub.hub.domain.entity.HubType;
+import com.jumunhasyeo.hub.hub.presentation.dto.request.CreateHubReq;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +56,7 @@ public class HubApiIntegrationTest extends CommonTestContainer {
         // then: 생성된 허브 조회
         given()
                 .when()
-                .get("/api/v1/hubs/{hubId}", hubId)
+                .get("/internal/api/v1/hubs/{hubId}", hubId)
                 .then()
                 .statusCode(200)
                 .body("data.id", equalTo(hubId));

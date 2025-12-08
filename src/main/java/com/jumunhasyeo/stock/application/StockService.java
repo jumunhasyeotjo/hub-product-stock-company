@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -53,14 +55,24 @@ public class StockService {
 
     //상품 재고 감소
     @DbIdempotent(ttlDays = 1)
-    public StockRes decrement(String idempotencyKey,DecreaseStockCommand command){
-        return stockVariationService.decrement(command);
+    @Transactional
+    public List<StockRes> decrement(String idempotencyKey, List<DecreaseStockCommand> commandList){
+        List<StockRes> result = new ArrayList<>();
+        for (DecreaseStockCommand command : commandList) {
+            result.add(stockVariationService.decrement(command));
+        }
+        return result;
     }
 
     //상품 재고 증가
     @DbIdempotent(ttlDays = 1)
-    public StockRes increment(String idempotencyKey, IncreaseStockCommand command){
-        return stockVariationService.increment(command);
+    @Transactional
+    public List<StockRes> increment(String idempotencyKey, List<IncreaseStockCommand> commandList){
+        List<StockRes> result = new ArrayList<>();
+        for (IncreaseStockCommand command : commandList) {
+            result.add(stockVariationService.increment(command));
+        }
+        return result;
     }
 
     private Stock getStock(UUID stockId){

@@ -4,6 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
     id 'com.google.protobuf' version '0.9.4'
+    id 'org.springdoc.openapi-gradle-plugin' version '1.8.0'
 }
 
 group = 'com.jumunhasyeo'
@@ -52,9 +53,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'io.rest-assured:rest-assured'
+    //testcontainers
     testImplementation 'org.testcontainers:testcontainers' // Testcontainers Core 라이브러리
     testImplementation 'org.testcontainers:junit-jupiter:' // JUnit 5와의 통합
     testImplementation 'org.testcontainers:postgresql' // postgresql 컨테이너
+    //swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5' // Swagger (springdoc-openapi)
 
     // QueryDSL
@@ -62,26 +65,26 @@ dependencies {
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
+    // dotenv
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
-
+    //actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     //shedlock
     implementation 'net.javacrumbs.shedlock:shedlock-spring:5.9.0'
     implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.9.0'
-
     // passport 의존성 추가
     implementation 'com.library:passport:1.0.1'
     implementation 'com.google.protobuf:protobuf-java:3.21.12'
-
     // Spring Cloud OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
     // YAML parsing
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
-
-    implementation 'com.library:passport:1.0.1' // 1.0.1 버전 => user belong 추가
-    implementation 'com.google.protobuf:protobuf-java:3.21.12'
+    // Resilience4j
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.1.0'
+    // Caffeine Cache (L1 Cache)
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 }
 
 dependencyManagement {
@@ -111,6 +114,10 @@ clean {
 
 jacoco {
     toolVersion = '0.8.12'
+}
+
+tasks.named('jar') {
+    enabled = false   // 일반 jar 비활성화
 }
 
 jacocoTestReport {
@@ -143,4 +150,11 @@ jacocoTestReport {
                 })
         )
     }
+}
+
+openApi {
+    apiDocsUrl.set("http://localhost:8088/v3/api-docs")
+    outputDir.set(file("$projectDir/src/main/resources")) // 저장 위치
+    outputFileName.set("openapi.json")                    // 파일명
+    waitTimeInSeconds.set(30)                             // 대기 시간
 }

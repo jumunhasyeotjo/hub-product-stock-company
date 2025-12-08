@@ -7,10 +7,7 @@ import com.jumunhasyeo.common.exception.GlobalExceptionHandler;
 import com.jumunhasyeo.stock.application.StockService;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.presentation.StockWebController;
-import com.jumunhasyeo.stock.presentation.dto.request.CreateStockReq;
-import com.jumunhasyeo.stock.presentation.dto.request.DecreaseStockReq;
-import com.jumunhasyeo.stock.presentation.dto.request.DeleteStockReq;
-import com.jumunhasyeo.stock.presentation.dto.request.IncrementStockReq;
+import com.jumunhasyeo.stock.presentation.dto.request.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +18,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
@@ -120,64 +119,6 @@ class StockWebControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_FAILED.name()))
                 .andExpect(jsonPath("$.message").value(containsString("재고 수량은 필수 입니다.")))
-                .andReturn();
-    }
-
-    @Test
-    @DisplayName("재고 증가 API로 재고 증가를 요청할 수 있다.")
-    void increment_stock_success() throws Exception {
-        // given
-        UUID productId = UUID.randomUUID();
-        UUID stockId = UUID.randomUUID();
-        IncrementStockReq request = new IncrementStockReq(stockId, 100);
-        StockRes stockRes = StockRes.builder()
-                .stockId(stockId)
-                .hubId(UUID.randomUUID())
-                .productId(productId)
-                .quantity(200)
-                .build();
-
-        given(stockService.increment(any(), any())).willReturn(stockRes);
-
-        // when & then
-        mockMvc.perform(post("/api/v1/stocks/increment")
-                        .header("Idempotency-Key", UUID.randomUUID().toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.stockId").value(stockId.toString()))
-                .andExpect(jsonPath("$.data.productId").value(productId.toString()))
-                .andExpect(jsonPath("$.data.hubId").exists())
-                .andExpect(jsonPath("$.data.quantity").value(200))
-                .andReturn();
-    }
-
-    @Test
-    @DisplayName("재고 감소 API로 재고 감소를 요청할 수 있다.")
-    void decrement_stock_success() throws Exception {
-        // given
-        UUID productId = UUID.randomUUID();
-        UUID stockId = UUID.randomUUID();
-        DecreaseStockReq request = new DecreaseStockReq(stockId, 100);
-        StockRes stockRes = StockRes.builder()
-                .stockId(stockId)
-                .hubId(UUID.randomUUID())
-                .productId(productId)
-                .quantity(200)
-                .build();
-
-        given(stockService.decrement(any(), any())).willReturn(stockRes);
-
-        // when & then
-        mockMvc.perform(post("/api/v1/stocks/decrement")
-                        .header("Idempotency-Key", UUID.randomUUID().toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.stockId").value(stockId.toString()))
-                .andExpect(jsonPath("$.data.productId").value(productId.toString()))
-                .andExpect(jsonPath("$.data.hubId").exists())
-                .andExpect(jsonPath("$.data.quantity").value(200))
                 .andReturn();
     }
 
