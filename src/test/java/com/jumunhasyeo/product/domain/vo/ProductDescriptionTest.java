@@ -20,6 +20,6 @@ class ProductDescriptionTest {
                 });
 
         // then
-        assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.MUST_NOT_NULL);
+        assertThat(businessException.getErrorCode()).isEqualTo(ErrorCode.PRODUCT_VALID_FAIL);
     }
 }
