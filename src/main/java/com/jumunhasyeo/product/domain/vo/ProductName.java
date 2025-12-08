@@ -18,7 +18,7 @@ public class ProductName {
 
     public ProductName(String name) {
         if (name == null || name.isEmpty()) {
-            throw new BusinessException(ErrorCode.MUST_NOT_NULL, "product name");
+            throw new BusinessException(ErrorCode.PRODUCT_VALID_FAIL);
         }
         this.name = name;
     }

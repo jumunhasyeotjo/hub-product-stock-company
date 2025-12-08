@@ -18,7 +18,7 @@ public class Price {
 
     public Price(int price) {
         if (price <= 0) {
-            throw new BusinessException(ErrorCode.PRODUCT_VALID);
+            throw new BusinessException(ErrorCode.PRODUCT_VALID_FAIL);
         }
         this.price = price;
     }
