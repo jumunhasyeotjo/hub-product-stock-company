@@ -1,8 +1,9 @@
-package com.jumunhasyeo.hub.hubRoute.infrastructure.event;
+package com.jumunhasyeo.hub.hubRoute.application;
 
 import com.jumunhasyeo.common.outbox.OutboxService;
 import com.jumunhasyeo.hub.hubRoute.domain.event.HubRouteCreatedEvent;
 import com.jumunhasyeo.hub.hubRoute.domain.event.HubRouteDeletedEvent;
+import com.jumunhasyeo.hub.hubRoute.infrastructure.event.KafkaHubRouteEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
