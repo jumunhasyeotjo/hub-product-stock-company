@@ -8,10 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+/**
+ * 25.12.8 / kafka 도입으로 deprecated 처리
+ */
+@Deprecated
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class SpringHubEventPublisher implements HubEventPublisher {
+public abstract class SpringHubEventPublisher implements HubEventPublisher {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override

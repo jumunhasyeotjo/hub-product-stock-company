@@ -1,21 +1,20 @@
-package com.jumunhasyeo.hub.hubRoute.application.listener;
+package com.jumunhasyeo.hub.hubRoute.infrastructure.event;
 
 import com.jumunhasyeo.hub.hub.domain.event.HubCreatedEvent;
 import com.jumunhasyeo.hub.hub.domain.event.HubDeletedEvent;
-import com.jumunhasyeo.hub.hubRoute.application.command.BuildRouteCommand;
-import com.jumunhasyeo.hub.hubRoute.application.service.HubRouteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+@Deprecated
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class HubEventListener {
+public class HubRouteEventListener {
 
-    private final HubRouteService hubRouteService;
+    private final HubRouteEventHandler hubRouteEventHandler;
 
     /**
      * Hub 생성 이벤트 처리
@@ -27,8 +26,7 @@ public class HubEventListener {
                 event.getName(),
                 event.getHubId());
 
-        BuildRouteCommand command = BuildRouteCommand.from(event);
-        hubRouteService.buildRoutesForNewHub(command);
+        hubRouteEventHandler.hubCreated(event);
     }
 
     /**
@@ -40,11 +38,10 @@ public class HubEventListener {
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleHubDeleted(HubDeletedEvent event) {
         log.info("Hub deleted event received: {} (ID: {})",
-                event.getHubName(),
+                event.getName(),
                 event.getHubId());
 
-        hubRouteService.deleteRoutesForHub(event.getHubId(), event.getDeletedBy());
-        
-        log.info("All routes for hub {} have been deleted", event.getHubName());
+        hubRouteEventHandler.hubDeleted(event);
+        log.info("All routes for hub {} have been deleted", event.getName());
     }
 }

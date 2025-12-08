@@ -1,7 +1,9 @@
 package com.jumunhasyeo.common.Idempotency.db.domain;
 
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +21,11 @@ public class DbIdempotentKey {
     @Column(name = "idempotent_status")
     private IdempotentStatus status;
 
+    @Type(JsonBinaryType.class)
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "JSONB")
+    private String payload = "{}";
+
     @Column(name = "error_message")
     private String errorMessage;
 
@@ -31,15 +38,17 @@ public class DbIdempotentKey {
     @Column(name = "expiresAt", nullable = false)
     private LocalDateTime expiresAt;
 
-    public static DbIdempotentKey create(String idempotencyKey, long ttlSeconds, IdempotentType type){
-            return new DbIdempotentKey(
-                    idempotencyKey,
-                    IdempotentStatus.PROCESSING,
-                    "",
-                    type,
-                    LocalDateTime.now(),
-                    LocalDateTime.now().plusSeconds(ttlSeconds));
-        }
+    public static DbIdempotentKey create(String idempotencyKey, long ttlSeconds, IdempotentType type, String payload) {
+        String errorMsg = "";
+        return new DbIdempotentKey(
+                idempotencyKey,
+                IdempotentStatus.PROCESSING,
+                payload,
+                errorMsg,
+                type,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusSeconds(ttlSeconds));
+    }
 
     public void updateStatus(IdempotentStatus status) {
         this.status = status;
@@ -48,6 +57,10 @@ public class DbIdempotentKey {
     public void applyError(String errorMessage) {
         this.status = IdempotentStatus.FAIL;
         this.errorMessage = errorMessage;
+    }
+
+    public String genCancelKey() {
+        return "CANCEL_" + this.idempotencyKey;
     }
 }
 

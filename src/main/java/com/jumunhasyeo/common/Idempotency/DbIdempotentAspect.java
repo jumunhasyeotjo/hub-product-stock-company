@@ -29,6 +29,11 @@ public class DbIdempotentAspect {
         Object[] args = joinPoint.getArgs();
         // 첫 번째 파라미터 = 멱등키
         String statusKey = (String) args[0];
+        // 두 번째 파라미터 = 페이로드
+        Object payload = "";
+        if(args.length >= 2){
+            payload = args[1];
+        }
         long ttlSeconds = getTtlSeconds(dbIdempotent);
         log.info("DbIdempotent request - key: {}, ttl: {} days", statusKey, dbIdempotent.ttlDays());
 
@@ -41,7 +46,7 @@ public class DbIdempotentAspect {
         }
 
         // 2-2. PROCESSING: SET NX (없을 때만 PROCESSING 설정)
-        Boolean acquired = idempotentService.setIfAbsent(statusKey, IdempotentStatus.PROCESSING, ttlSeconds);
+        Boolean acquired = idempotentService.setIfAbsent(statusKey, IdempotentStatus.PROCESSING, ttlSeconds, payload);
         if (isProcessing(acquired)){
             throw new BusinessException(PROCESSING_CONFLICT_EXCEPTION);
         }

@@ -9,6 +9,7 @@ import com.jumunhasyeo.hub.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.hub.domain.event.HubCreatedEvent;
 import com.jumunhasyeo.hub.hub.domain.event.HubDeletedEvent;
+import com.jumunhasyeo.hub.hub.domain.event.HubNameUpdateEvent;
 import com.jumunhasyeo.hub.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.hub.domain.repository.HubRepositoryCustom;
 import com.jumunhasyeo.hub.hub.domain.vo.Address;
@@ -48,9 +49,14 @@ public class HubServiceImpl implements HubService{
     @Transactional
     public HubRes update(UpdateHubCommand command) {
         Hub hub = getHub(command.hubId());
+        String preName = hub.getName();
         Coordinate coordinate = Coordinate.of(command.latitude(), command.longitude());
         Address address = Address.of(command.address(), coordinate);
         hub.update(command.name(), address);
+
+        if(!preName.equals(hub.getName())){
+            hubEventPublisher.publishEvent(HubNameUpdateEvent.of(hub));
+        }
         return HubRes.from(hub);
     }
 

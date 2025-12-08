@@ -1,14 +1,14 @@
-package com.jumunhasyeo.hub.hub.domain.event;
+package com.jumunhasyeo.hub.hubRoute.domain.event;
 
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-public abstract class HubDomainEvent {
+public class HubRouteDomainEvent {
     private final LocalDateTime occurredAt;
 
-    public HubDomainEvent() {
+    protected HubRouteDomainEvent() {
         this.occurredAt = LocalDateTime.now();
     }
 }

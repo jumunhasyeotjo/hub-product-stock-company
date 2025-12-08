@@ -84,6 +84,10 @@ dependencies {
     implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.1.0'
     // Caffeine Cache (L1 Cache)
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    //Hibernate가 String을 JSONB로 자동 변환
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.0'
 }
 
 dependencyManagement {

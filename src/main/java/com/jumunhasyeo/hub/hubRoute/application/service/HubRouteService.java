@@ -5,10 +5,13 @@ import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.hub.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.hub.domain.entity.HubType;
 import com.jumunhasyeo.hub.hub.domain.repository.HubRepository;
+import com.jumunhasyeo.hub.hubRoute.application.HubRouteEventPublisher;
+import com.jumunhasyeo.hub.hubRoute.application.command.BuildRouteCommand;
 import com.jumunhasyeo.hub.hubRoute.application.dto.response.HubRouteRes;
 import com.jumunhasyeo.hub.hubRoute.application.dto.response.RouteWeightRes;
-import com.jumunhasyeo.hub.hubRoute.application.command.BuildRouteCommand;
 import com.jumunhasyeo.hub.hubRoute.domain.entity.HubRoute;
+import com.jumunhasyeo.hub.hubRoute.domain.event.HubRouteCreatedEvent;
+import com.jumunhasyeo.hub.hubRoute.domain.event.HubRouteDeletedEvent;
 import com.jumunhasyeo.hub.hubRoute.domain.repository.HubRouteRepository;
 import com.jumunhasyeo.hub.hubRoute.domain.service.HubRouteDomainService;
 import com.jumunhasyeo.hub.hubRoute.domain.vo.RouteWeight;
@@ -17,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -30,23 +34,31 @@ public class HubRouteService {
     private final RouteWeightApiService routeWeightApi;
     private final HubRouteRepository hubRouteRepository;
     private final HubRouteDomainService hubRouteDomainService;
+    private final HubRouteEventPublisher hubRouteEventPublisher;
 
     /**
      * 새로운 Hub 생성 시 경로 자동 생성
      */
     @Transactional
     public void buildRoutesForNewHub(BuildRouteCommand command) {
+        Set<HubRoute> hubRoutes = new HashSet<>();
         HubType type = command.type();
         if (type == HubType.CENTER) {
-            buildForCenter(command);
+            hubRoutes.addAll(buildForCenter(command));
         } else if (type == HubType.BRANCH) {
-            buildForBranch(command);
+            hubRoutes.addAll(buildForBranch(command));
         }
+        //TODO outbox
+        List<HubRouteCreatedEvent> createEventList = hubRoutes.stream()
+                .map(HubRouteCreatedEvent::from)
+                .collect(Collectors.toList());
+        hubRouteEventPublisher.publishRouteCreatedEvent(createEventList);
     }
+
     /**
      * 중앙 허브에 대한 경로 생성
      */
-    private void buildForCenter(BuildRouteCommand command) {
+    private Set<HubRoute> buildForCenter(BuildRouteCommand command) {
         Hub newCenterHub = getHub(command.hubId());
         List<Hub> existingCenterHubs = hubRepository.findAllByHubType(HubType.CENTER);
         
@@ -58,12 +70,13 @@ public class HubRouteService {
         );
 
         hubRouteRepository.insertIgnore(routes);
+        return routes;
     }
 
     /**
      * 지점 허브에 대한 경로 생성
      */
-    private void buildForBranch(BuildRouteCommand command) {
+    private Set<HubRoute> buildForBranch(BuildRouteCommand command) {
         Hub branchHub = getHub(command.hubId());
         Hub centerHub = getHub(command.centerHubId());
         
@@ -74,6 +87,7 @@ public class HubRouteService {
         );
         
         hubRouteRepository.insertIgnore(routes);
+        return routes;
     }
 
     /**
@@ -110,6 +124,11 @@ public class HubRouteService {
         // 모든 경로 소프트 삭제
         routes.forEach(route -> route.markDeleted(deletedBy));
         hubRouteRepository.saveAll(routes);
+
+        List<HubRouteDeletedEvent> createEventList = routes.stream()
+                .map(HubRouteDeletedEvent::from)
+                .collect(Collectors.toList());
+        hubRouteEventPublisher.publishRouteDeletedEvent(createEventList);
     }
 
     public List<HubRouteRes> getALLRoute() {
