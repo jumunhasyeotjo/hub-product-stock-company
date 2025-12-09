@@ -73,6 +73,7 @@ public class StockInternalWebController {
         return ResponseEntity.ok(ApiRes.success(true));
     }
 
+
     @PostMapping("/store")
     public ResponseEntity<ApiRes<List<StockHistoryRes>>> store(
             @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
