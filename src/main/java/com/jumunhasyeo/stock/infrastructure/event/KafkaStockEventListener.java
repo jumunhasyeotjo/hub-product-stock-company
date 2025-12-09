@@ -17,8 +17,9 @@ import static com.jumunhasyeo.stock.infrastructure.event.ListenEventRegistry.ORD
 @Component
 @RequiredArgsConstructor
 public class KafkaStockEventListener {
-   private final OrderCompensateHandler orderCompensateHandler;
-   private final ObjectMapper objectMapper;
+    private final OrderCompensateHandler orderCompensateHandler;
+    private final ObjectMapper objectMapper;
+    private final OrderAclService orderAclService;
 
     @KafkaListener(
             topics = "${spring.kafka.topics.order}",
@@ -30,7 +31,7 @@ public class KafkaStockEventListener {
             @Header(name = "eventType", required = false) String fullTypeName
     ) {
         try {
-            String className = KafkaUtil.getClassName(fullTypeName);
+            String className = orderAclService.convert(fullTypeName);
             dispatch(payload, className);
         } catch (Exception e) {
             log.error("Failed to process OrderCancelEvent", e);
