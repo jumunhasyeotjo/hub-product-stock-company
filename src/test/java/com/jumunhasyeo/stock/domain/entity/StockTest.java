@@ -28,7 +28,7 @@ class StockTest {
     }
 
     @Test
-    @DisplayName("Stock을 Of로 생성할 때 stockId == null일 경우 예외 반환")
+    @DisplayName("Stock을 Of로 생성할 때 productId == null일 경우 예외 반환")
     public void of_productIdIsNull_ShouldThrowException() {
         // given
         UUID productid = null;

@@ -22,7 +22,7 @@ public class StockVariationServiceImpl implements StockVariationService {
 
     @Override
     public StockRes decrement(DecreaseStockCommand command) {
-        Stock stock = getStock(command.stockId());
+        Stock stock = getStock(command.productId());
         stock.decrease(command.amount());
         StockRes res = StockRes.from(stock);
         stockRepository.decreaseStock(stock.getStockId(), command.amount());
@@ -39,7 +39,7 @@ public class StockVariationServiceImpl implements StockVariationService {
     }
 
     private Stock getStock(UUID stockId) {
-        return stockRepository.findById(stockId)
+        return stockRepository.findByProductId(stockId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
     }
 }

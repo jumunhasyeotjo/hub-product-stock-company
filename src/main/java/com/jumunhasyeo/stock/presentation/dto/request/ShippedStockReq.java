@@ -12,7 +12,7 @@ public record ShippedStockReq (
     UUID hubId,
 
     @Schema(description = "상품 ID", example = "77777777-7777-7777-7777-777777777777", required = true)
-    @NotNull(message = "상품 ID(stockId) 는 필수 입니다.")
+    @NotNull(message = "상품 ID(productId) 는 필수 입니다.")
     UUID productId,
 
     @Schema(description = "증가량", example = "10", required = true)
