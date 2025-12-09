@@ -3,10 +3,12 @@ package com.jumunhasyeo.hub.hub.infrastructure.event;
 import com.jumunhasyeo.hub.hub.application.HubEventPublisher;
 import com.jumunhasyeo.hub.hub.domain.event.HubCreatedEvent;
 import com.jumunhasyeo.hub.hub.domain.event.HubDeletedEvent;
+import com.jumunhasyeo.hub.hub.domain.event.HubNameUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +25,12 @@ public class SpringHubEventPublisher implements HubEventPublisher {
     @Override
     public void publishEvent(HubDeletedEvent event) {
         log.info("[HubDeletedEvent] Publish - 허브가 삭제되었습니다.");
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    @Override
+    public void publishEvent(HubNameUpdatedEvent event) {
+        log.info("[HubNameUpdatedEvent] Publish - 허브이름이 갱신되었습니다.");
         applicationEventPublisher.publishEvent(event);
     }
 }

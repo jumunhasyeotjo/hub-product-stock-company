@@ -1,16 +1,18 @@
-package com.jumunhasyeo.hub.hub.domain.event;
+package com.jumunhasyeo.hub.hubRoute.domain.event;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-public abstract class HubDomainEvent {
+@AllArgsConstructor
+public class HubRouteDomainEvent {
     private final LocalDateTime occurredAt;
     private final String eventKey;
 
-    public HubDomainEvent() {
+    public HubRouteDomainEvent() {
         eventKey = UUID.randomUUID().toString();
         this.occurredAt = LocalDateTime.now();
     }

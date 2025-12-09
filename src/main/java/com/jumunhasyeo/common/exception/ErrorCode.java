@@ -53,7 +53,10 @@ public enum ErrorCode {
     MAP_API_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "EAM001", "지도 API 호출에 실패했습니다."),
 
     //Controller
-    CONTROLLER_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "ECI001", "지점 허브 생성 시 센터 허브 ID는 필수입니다.");
+    CONTROLLER_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "ECI001", "지점 허브 생성 시 센터 허브 ID는 필수입니다."),
+
+    //outbox
+    OUTBOX_EVENT_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "EO001", "Outbox 이벤트를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String code;
