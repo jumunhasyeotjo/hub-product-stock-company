@@ -30,7 +30,7 @@ public class HubRouteKafkaEventListener {
     )
     public void listen(
             @Payload String event,
-            @Header(name = "__TypeId__", required = false) String fullTypeName
+            @Header(name = "eventType", required = false) String fullTypeName
     ) {
         try {
             String simpleClassName = KafkaUtil.getClassName(fullTypeName);

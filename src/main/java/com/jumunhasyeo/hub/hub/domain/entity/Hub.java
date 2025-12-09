@@ -51,18 +51,22 @@ public class Hub extends BaseEntity {
      * this Hub의 CENTER
      */
     @OneToMany(mappedBy = "centerHub", cascade = CascadeType.PERSIST)
+    @Builder.Default
     private Set<HubRelation> centerHubRelations = new HashSet<>();
 
     /**
      * this Hub의 CENTER
      */
     @OneToMany(mappedBy = "branchHub", cascade = CascadeType.PERSIST)
+    @Builder.Default
     private Set<HubRelation> branchHubRelations = new HashSet<>();
 
     private Hub(String name, Address address, HubType hubType) {
         this.name = name;
         this.address = address;
         this.hubType = hubType;
+        this.centerHubRelations = new HashSet<>();
+        this.branchHubRelations = new HashSet<>();
     }
 
     public static Hub createBranchHub(String name, Address address) {

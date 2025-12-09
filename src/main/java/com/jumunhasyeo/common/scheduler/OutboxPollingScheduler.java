@@ -1,12 +1,11 @@
 package com.jumunhasyeo.common.scheduler;
 
-import com.jumunhasyeo.common.outbox.Outbox;
-import com.jumunhasyeo.common.outbox.OutboxRepository;
-import com.jumunhasyeo.common.outbox.OutboxStatus;
-import com.jumunhasyeo.hub.hub.application.HubEventPublisher;
+import com.jumunhasyeo.common.outbox.OutboxEvent;
+import com.jumunhasyeo.common.outbox.OutboxService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -20,31 +19,28 @@ import static com.jumunhasyeo.common.outbox.OutboxStatus.PENDING;
 @Slf4j
 public class OutboxPollingScheduler {
 
-    private final OutboxRepository outboxRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final OutboxService outboxService;
 
-    @Scheduled(fixedDelay = 5000) // 5초마다 Polling
+    @Async("schedulerExecutor")
+    @SchedulerLock(name = "outboxPolling", lockAtLeastFor = "5s")
+    @Scheduled(fixedDelay = 5000) // 2초마다 Polling
     public void pollOutbox() {
+        log.info("polling outbox events...");
         // 처리되지 않은 이벤트 조회
-        List<Outbox> events = outboxRepository.findTop100ByStatusOrderByIdAsc(PENDING);
-
-        for (Outbox event : events) {
-            try {
-                // Kafka 발행
-                kafkaTemplate.send(event.getEventName(), event.getPayload());
-                // 처리 완료 표시
-                event.markProcessed();
-            } catch (Exception e) {
-                log.error("Failed to dispatch event: {}", event.getId(), e);
-            }
+        List<OutboxEvent> events = outboxService.findTop100ByStatusOrderByIdAsc(PENDING);
+        for (OutboxEvent event : events) {
+            outboxService.outboxProcess(event);
         }
     }
 
+
+
+    @Async("schedulerExecutor")
+    @SchedulerLock(name = "outboxPollingCleanup")
     @Scheduled(cron = "0 0 3 * * *") // 매일 03:00 7일 지난 완료된 이벤트 정리
     public void cleanupOutbox() {
-        int deleted = outboxRepository.deleteByStatusAndCreatedAtBefore(
-                OutboxStatus.COMPLETE, LocalDateTime.now().minusDays(7)
-        );
-        log.info("Deleted {} completed outbox events", deleted);
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(7);
+        int deletedComplete = outboxService.cleanUp(cutoff);
+        log.info("Deleted {} completed outbox events", deletedComplete);
     }
 }

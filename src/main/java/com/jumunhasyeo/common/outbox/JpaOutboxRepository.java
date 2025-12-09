@@ -1,6 +1,8 @@
 package com.jumunhasyeo.common.outbox;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,9 +10,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-public interface JpaOutboxRepository extends JpaRepository<Outbox, UUID> {
+public interface JpaOutboxRepository extends JpaRepository<OutboxEvent, UUID> {
     // PENDING 상태인 이벤트 상위 100개 조회
-    List<Outbox> findTop100ByStatusOrderByIdAsc(OutboxStatus status);
+    List<OutboxEvent> findTop100ByStatusOrderByIdAsc(OutboxStatus status);
+
+    @Modifying
+    @Transactional
     int deleteByStatusAndCreatedAtBefore(OutboxStatus outboxStatus, LocalDateTime localDateTime);
-    Optional<Outbox> findByEventKey(String eventKey);
+
+    Optional<OutboxEvent> findByEventKey(String eventKey);
 }

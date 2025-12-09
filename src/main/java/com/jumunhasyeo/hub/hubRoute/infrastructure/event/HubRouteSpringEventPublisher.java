@@ -16,11 +16,15 @@ public class HubRouteSpringEventPublisher implements HubRouteEventPublisher {
 
     @Override
     public void publishRouteCreatedEvent(List<HubRouteCreatedEvent> eventList) {
-        applicationEventPublisher.publishEvent(eventList);
+        for (HubRouteCreatedEvent event : eventList) {
+            applicationEventPublisher.publishEvent(event);
+        }
     }
 
     @Override
     public void publishRouteDeletedEvent(List<HubRouteDeletedEvent> eventList) {
-        applicationEventPublisher.publishEvent(eventList);
+        for (HubRouteDeletedEvent event : eventList) {
+            applicationEventPublisher.publishEvent(event);
+        }
     }
 }

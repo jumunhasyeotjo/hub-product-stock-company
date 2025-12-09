@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jumunhasyeo.common.Idempotency.db.application.DbIdempotentService;
 import com.jumunhasyeo.common.Idempotency.db.domain.DbIdempotentKey;
 import com.jumunhasyeo.common.Idempotency.db.domain.IdempotentStatus;
-import com.jumunhasyeo.common.inbox.DbInboxService;
+import com.jumunhasyeo.common.inbox.InboxService;
 import com.jumunhasyeo.stock.application.StockService;
 import com.jumunhasyeo.stock.application.command.IncreaseStockCommand;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import static com.jumunhasyeo.common.Idempotency.db.domain.IdempotentStatus.SUCC
 public class OrderCompensateHandler {
     private final StockService stockService;
     private final DbIdempotentService dbIdempotentService;
-    private final DbInboxService dbInboxService;
+    private final InboxService inboxService;
     private final ObjectMapper objectMapper;
 
     @Transactional
@@ -33,7 +33,7 @@ public class OrderCompensateHandler {
         if(dbIdempotentKey != null) {
             IdempotentStatus status = dbIdempotentKey.getStatus();
             if(PROCESSING.equals(status)) {
-                dbInboxService.save(event);
+                inboxService.save(event);
             } else if(SUCCESS.equals(status)) {
                 List<IncreaseStockCommand> payload = getPayload(dbIdempotentKey);
                 stockService.increment(dbIdempotentKey.genCancelKey(), payload);
