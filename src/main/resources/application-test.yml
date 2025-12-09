@@ -1,0 +1,105 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ""
+      timeout: 3000ms
+      ssl:
+        enabled: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: testuser
+    password: testpass
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    defer-datasource-initialization: true
+    properties:
+      jakarta.persistence.lock.timeout: 2000
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    topics:
+      hub: hub
+      order: order
+    producer:
+      retries: 3
+    consumer:
+      group-id: hub-service-group
+
+eureka:
+  client:
+    enabled: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: false
+    fetch-registry: false
+    registry-fetch-interval-seconds: 10
+  instance:
+    prefer-ip-address: false
+    ip-address: localhost
+
+eas:
+  passport:
+    secretKey: test-secret-key-must-be-at-least-32-characters-long-for-hs256-algorithm
+    expiration: 604800
+    algorithm: HS256
+
+cache:
+  config:
+    hubService: true
+
+kakao:
+  mobility:
+    api-key: dummy-kakao-api-key-for-test
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{trace_id:-},%X{span_id:-}]"
+  level:
+    org.hibernate.orm.jdbc.bind: error
+    org.hibernate.type.descriptor.sql.BasicBinder: error
+    org.hibernate.SQL: error
+    org.springframework.orm.jpa: error
+    org.springframework.transaction: error
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: false
+  tracing:
+    sampling:
+      probability: 0.0
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

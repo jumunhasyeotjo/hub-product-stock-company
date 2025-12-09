@@ -28,9 +28,9 @@ out/
 
 ##yml
 **/application.yml
-**/application-test.yml
 **/application.properties
 *.env
+*.env-ops
 
 ### NetBeans ###
 /nbproject/private/
