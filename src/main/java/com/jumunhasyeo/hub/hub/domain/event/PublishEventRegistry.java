@@ -8,7 +8,7 @@ import lombok.Getter;
 public enum PublishEventRegistry {
     HUB_CREATED_EVENT("HubCreatedEvent"),
     HUB_DELETED_EVENT("HubDeletedEvent"),
-    HUB_NAME_UPDATED_EVNET("HubNameUpdatedEvent");
+    HUB_NAME_UPDATED_EVENT("HubNameUpdatedEvent");
 
     private final String eventName;
 
