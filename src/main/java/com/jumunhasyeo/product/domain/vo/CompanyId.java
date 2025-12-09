@@ -20,7 +20,7 @@ public class CompanyId {
 
     public CompanyId(UUID companyId) {
         if (companyId == null) {
-            throw new BusinessException(ErrorCode.MUST_NOT_NULL, "companyId");
+            throw new BusinessException(ErrorCode.PRODUCT_VALID_FAIL);
         }
 
         this.companyId = companyId;

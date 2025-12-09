@@ -67,7 +67,7 @@ public class Product extends BaseEntity {
 
     public void delete(Long userId) {
         if (userId == null)
-            throw new BusinessException(ErrorCode.MUST_NOT_NULL, "userId");
+            throw new BusinessException(ErrorCode.USER_MUST_NOT_NULL);
         markDeleted(userId);
     }
 }

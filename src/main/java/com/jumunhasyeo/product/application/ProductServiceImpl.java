@@ -53,14 +53,14 @@ public class ProductServiceImpl implements ProductService {
     // 업체 ID 검증
     private void validateCompanyId(UUID companyId) {
         if (!companyClient.existsCompany(companyId)) {
-            throw new BusinessException(ErrorCode.INVALID_INPUT);
+            throw new BusinessException(ErrorCode.COMPANY_NOT_FOUND);
         }
     }
 
     // 중복 상품명 검증
     private void validateCreateProductName(ProductName productName) {
         if (productRepository.existsByName(productName)) {
-            throw new BusinessException(ErrorCode.ALREADY_EXISTS, "상품명이 ");
+            throw new BusinessException(ErrorCode.NAME_ALREADY_EXISTS);
         }
     }
 
@@ -81,14 +81,14 @@ public class ProductServiceImpl implements ProductService {
     // 중복 상품명 검증
     private void validateUpdateProductName(UpdateProductCommand req) {
         if (productRepository.existsByNameAndIdNot(ProductName.of(req.name()), req.productId())) {
-            throw new BusinessException(ErrorCode.INVALID_INPUT);
+            throw new BusinessException(ErrorCode.NAME_ALREADY_EXISTS);
         }
     }
 
     // 상품 조회
     private Product getProduct(UUID productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "상품"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
     // 수정 가능한 CompanyManager 검증
