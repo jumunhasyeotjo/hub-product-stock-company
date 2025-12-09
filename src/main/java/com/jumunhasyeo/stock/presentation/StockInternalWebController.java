@@ -31,7 +31,7 @@ public class StockInternalWebController {
     //재고 증가 (TODO: HUB_MANAGER/MASTER, SYSTEM)
     @ApiDocIncrementStock
     @PostMapping("/increment")
-    public ResponseEntity<ApiRes<List<StockRes>>> increment(
+    public ResponseEntity<ApiRes<Boolean>> increment(
             @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @Parameter(description = "재고 증가 요청 정보", required = true)
@@ -43,13 +43,13 @@ public class StockInternalWebController {
                 .toList();
 
         List<StockRes> stockResList = stockService.increment(idempotencyKey, commandList);
-        return ResponseEntity.ok(ApiRes.success(stockResList));
+        return ResponseEntity.ok(ApiRes.success(true));
     }
 
     //재고 증가 (TODO: HUB_MANAGER/MASTER, SYSTEM)
     @ApiDocDecrementStock
     @PostMapping("/decrement")
-    public ResponseEntity<ApiRes<List<StockRes>>> decrement(
+    public ResponseEntity<ApiRes<Boolean>> decrement(
             @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @Parameter(description = "재고 감소 요청 정보", required = true)
@@ -62,7 +62,7 @@ public class StockInternalWebController {
                 .toList();
 
         List<StockRes> stockRes = stockService.decrement(idempotencyKey, commandList);
-        return ResponseEntity.ok(ApiRes.success(stockRes));
+        return ResponseEntity.ok(ApiRes.success(true));
     }
 
     @PostMapping("/store")
@@ -70,9 +70,9 @@ public class StockInternalWebController {
             @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @Parameter(description = "재고 입고 요청 정보", required = true)
-            @RequestBody @Valid StoreStockReqList reqList
+            @RequestBody @Valid List<StoreStockReq> productList
     ) {
-        List<StoreStockCommand> commandList = reqList.productList()
+        List<StoreStockCommand> commandList = productList
                 .stream()
                 .map(req -> new StoreStockCommand(req.hubId(), req.productId(), req.quantity()))
                 .toList();
