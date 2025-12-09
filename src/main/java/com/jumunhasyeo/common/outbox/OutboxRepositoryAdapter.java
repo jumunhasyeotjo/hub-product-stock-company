@@ -2,7 +2,6 @@ package com.jumunhasyeo.common.outbox;
 
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
-import com.jumunhasyeo.hub.hub.domain.event.HubNameUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,12 +14,12 @@ public class OutboxRepositoryAdapter implements OutboxRepository{
     private final JpaOutboxRepository jpaOutboxRepository;
 
     @Override
-    public Outbox save(Outbox outbox) {
-        return jpaOutboxRepository.save(outbox);
+    public OutboxEvent save(OutboxEvent outboxEvent) {
+        return jpaOutboxRepository.save(outboxEvent);
     }
 
     @Override
-    public List<Outbox> findTop100ByStatusOrderByIdAsc(OutboxStatus status) {
+    public List<OutboxEvent> findTop100ByStatusOrderByIdAsc(OutboxStatus status) {
         return jpaOutboxRepository.findTop100ByStatusOrderByIdAsc(status);
     }
 
@@ -30,7 +29,7 @@ public class OutboxRepositoryAdapter implements OutboxRepository{
     }
 
     @Override
-    public Outbox findByEventKey(String eventKey) {
+    public OutboxEvent findByEventKey(String eventKey) {
         return jpaOutboxRepository.findByEventKey(eventKey)
                 .orElseThrow(() -> new BusinessException(ErrorCode.OUTBOX_EVENT_NOT_FOUND));
     }
