@@ -26,7 +26,7 @@ import java.util.UUID;
 @Tag(name = "Product", description = "상품 관리 (등록, 수정, 삭제, 조회) API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/products")
+@RequestMapping("/api/v1/products")
 public class ProductController {
 
     private final ProductService productService;

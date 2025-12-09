@@ -53,7 +53,7 @@ public class ProductControllerTest {
         given(productService.createProduct(any())).willReturn(response);
 
         // when & then
-        mockMvc.perform(post("/v1/products")
+        mockMvc.perform(post("/api/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
@@ -70,7 +70,7 @@ public class ProductControllerTest {
         given(productService.updateProduct(any())).willReturn(response);
 
         // when & then
-        mockMvc.perform(put("/v1/products/{productId}", UUID.randomUUID())
+        mockMvc.perform(put("/api/v1/products/{productId}", UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
@@ -81,7 +81,7 @@ public class ProductControllerTest {
     @DisplayName("상품 삭제 API")
     void deleteProduct() throws Exception {
         // when & then
-        mockMvc.perform(delete("/v1/products/{productId}", UUID.randomUUID()))
+        mockMvc.perform(delete("/api/v1/products/{productId}", UUID.randomUUID()))
                 .andExpect(status().isOk());
     }
 
@@ -95,7 +95,7 @@ public class ProductControllerTest {
         given(productService.getProduct(any())).willReturn(response);
 
         // when & then
-        mockMvc.perform(get("/v1/products/{productId}", UUID.randomUUID()))
+        mockMvc.perform(get("/api/v1/products/{productId}", UUID.randomUUID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.name").value(product.getName().getName()));
     }
@@ -111,7 +111,7 @@ public class ProductControllerTest {
         given(productService.searchProduct(any())).willReturn(response);
 
         // when & then
-        mockMvc.perform(get("/v1/products", UUID.randomUUID())
+        mockMvc.perform(get("/api/v1/products", UUID.randomUUID())
                         .param("companyId", String.valueOf(UUID.randomUUID()))
                         .param("name", "상품")
                         .param("maxPrice", "100000")
