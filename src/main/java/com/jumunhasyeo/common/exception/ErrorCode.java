@@ -22,7 +22,11 @@ public enum ErrorCode {
     STOCK_VALID(HttpStatus.BAD_REQUEST, "ES001", "Stock 유효성 검사에 실패했습니다."),
 
     //product
-    PRODUCT_VALID(HttpStatus.BAD_REQUEST, "EP", "Product 유효성 검사에 실패했습니다"),
+    PRODUCT_VALID_FAIL(HttpStatus.BAD_REQUEST, "EP001", "Product 유효성 검사에 실패했습니다"),
+    COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND, "EP002", "존재하지 않는 업체입니다."),
+    USER_MUST_NOT_NULL(HttpStatus.BAD_REQUEST, "EP003", "사용자 ID는 필수 입력값 입니다"),
+    NAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "EP004", "중복된 상품명 입니다."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "EP005", "존재하지 않는 상품입니다"),
 
     //Hub
     SUCCESS_CONFLICT_EXCEPTION(HttpStatus.CONFLICT, "C002", "요청이 이미 완료되었습니다."),

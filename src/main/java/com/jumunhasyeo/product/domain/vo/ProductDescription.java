@@ -18,7 +18,7 @@ public class ProductDescription {
 
     public ProductDescription(String description) {
         if (description == null || description.isEmpty()) {
-            throw new BusinessException(ErrorCode.MUST_NOT_NULL, "description");
+            throw new BusinessException(ErrorCode.PRODUCT_VALID_FAIL);
         }
         this.description = description;
     }
