@@ -25,7 +25,7 @@ public interface JpaStockRepository extends JpaRepository<Stock, UUID> {
     @Modifying
     @Transactional
     @Query("UPDATE Stock s SET s.quantity = s.quantity - :amount WHERE s.quantity - :amount >= 0 AND s.stockId = :stockId")
-    int decreaseStock(@Param(value = "productId") UUID stockId, @Param(value = "amount") int amount);
+    int decreaseStock(UUID stockId, int amount);
 
     @Modifying
     @Transactional

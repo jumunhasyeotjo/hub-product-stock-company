@@ -31,15 +31,15 @@ public class StockVariationServiceImpl implements StockVariationService {
 
     @Override
     public StockRes increment(IncreaseStockCommand command) {
-        Stock stock = getStock(command.stockId());
+        Stock stock = getStock(command.productId());
         stock.increase(command.amount());
         StockRes res = StockRes.from(stock);
         stockRepository.increaseStock(stock.getStockId(), command.amount());
         return res;
     }
 
-    private Stock getStock(UUID stockId) {
-        return stockRepository.findByProductId(stockId)
+    private Stock getStock(UUID productId) {
+        return stockRepository.findByProductId(productId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
     }
 }

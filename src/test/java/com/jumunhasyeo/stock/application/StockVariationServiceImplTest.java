@@ -38,7 +38,7 @@ class StockVariationServiceImplTest {
         UUID productId = UUID.randomUUID();
         Stock stock = createStock(productId, 500);
         DecreaseStockCommand command = new DecreaseStockCommand(productId, 100);
-        when(stockRepository.findById(any(UUID.class))).thenReturn(Optional.of(stock));
+        when(stockRepository.findByProductId(any(UUID.class))).thenReturn(Optional.of(stock));
         when(stockRepository.decreaseStock(any(UUID.class), anyInt())).thenReturn(true);
         //when
         StockRes stockRes = stockService.decrement(command);
@@ -54,7 +54,7 @@ class StockVariationServiceImplTest {
         UUID productId = UUID.randomUUID();
         Stock stock = createStock(productId, 500);
         IncreaseStockCommand command = new IncreaseStockCommand(productId, 100);
-        when(stockRepository.findById(any(UUID.class))).thenReturn(Optional.of(stock));
+        when(stockRepository.findByProductId(any(UUID.class))).thenReturn(Optional.of(stock));
         when(stockRepository.increaseStock(any(UUID.class), anyInt())).thenReturn(true);
         //when
         StockRes stockRes = stockService.increment(command);

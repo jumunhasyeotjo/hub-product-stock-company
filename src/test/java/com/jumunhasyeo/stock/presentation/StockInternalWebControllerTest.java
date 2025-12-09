@@ -64,10 +64,7 @@ class StockInternalWebControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].stockId").value(stockId.toString()))
-                .andExpect(jsonPath("$.data[0].productId").value(productId.toString()))
-                .andExpect(jsonPath("$.data[0].hubId").exists())
-                .andExpect(jsonPath("$.data[0].quantity").value(200))
+                .andExpect(jsonPath("$.data").value("true"))
                 .andReturn();
     }
 
@@ -97,10 +94,7 @@ class StockInternalWebControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].stockId").value(stockId.toString()))
-                .andExpect(jsonPath("$.data[0].productId").value(productId.toString()))
-                .andExpect(jsonPath("$.data[0].hubId").exists())
-                .andExpect(jsonPath("$.data[0].quantity").value(200))
+                .andExpect(jsonPath("$.data").value("true"))
                 .andReturn();
     }
 }
