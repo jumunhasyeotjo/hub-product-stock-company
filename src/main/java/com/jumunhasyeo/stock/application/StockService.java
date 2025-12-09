@@ -3,14 +3,14 @@ package com.jumunhasyeo.stock.application;
 import com.jumunhasyeo.common.Idempotency.DbIdempotent;
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
-import com.jumunhasyeo.stock.application.command.CreateStockCommand;
-import com.jumunhasyeo.stock.application.command.DecreaseStockCommand;
-import com.jumunhasyeo.stock.application.command.DeleteStockCommand;
-import com.jumunhasyeo.stock.application.command.IncreaseStockCommand;
+import com.jumunhasyeo.stock.application.command.*;
+import com.jumunhasyeo.stock.application.dto.response.StockHistoryRes;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.application.service.HubClient;
 import com.jumunhasyeo.stock.application.service.ProductClient;
 import com.jumunhasyeo.stock.domain.entity.Stock;
+import com.jumunhasyeo.stock.domain.entity.StockHistory;
+import com.jumunhasyeo.stock.domain.repository.StockHistoryRepository;
 import com.jumunhasyeo.stock.domain.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -25,6 +26,7 @@ import java.util.UUID;
 public class StockService {
     private final StockVariationService stockVariationService;
     private final StockRepository stockRepository;
+    private final StockHistoryRepository stockHistoryRepository;
     private final HubClient hubClient;
     private final ProductClient productClient;
 
@@ -82,5 +84,41 @@ public class StockService {
 
     private boolean isExistHubAndProduct(CreateStockCommand command) {
         return hubClient.existHub(command.hubId()) && productClient.existProduct(command.productId());
+    }
+
+    @Transactional
+    public List<StockHistoryRes> store(String idempotencyKey, List<StoreStockCommand> commandList) {
+        List<StockHistory> histories = commandList.stream()
+                .map(command -> StockHistory.ofStore(
+                        command.hubId(),
+                        command.productId(),
+                        command.amount(),
+                        idempotencyKey
+                ))
+                .toList();
+
+        List<StockHistory> savedHistories = stockHistoryRepository.saveAll(histories);
+        
+        return savedHistories.stream()
+                .map(StockHistoryRes::from)
+                .toList();
+    }
+
+    @Transactional
+    public List<StockHistoryRes> shipped(String idempotencyKey, List<ShippedStockCommand> commandList) {
+        List<StockHistory> histories = commandList.stream()
+                .map(command -> StockHistory.ofShipped(
+                        command.hubId(),
+                        command.productId(),
+                        command.amount(),
+                        idempotencyKey
+                ))
+                .toList();
+
+        List<StockHistory> savedHistories = stockHistoryRepository.saveAll(histories);
+        
+        return savedHistories.stream()
+                .map(StockHistoryRes::from)
+                .toList();
     }
 }
