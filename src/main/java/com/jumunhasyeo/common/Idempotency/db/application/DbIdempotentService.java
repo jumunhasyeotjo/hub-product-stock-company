@@ -1,9 +1,13 @@
 package com.jumunhasyeo.common.Idempotency.db.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jumunhasyeo.common.Idempotency.db.domain.DbIdempotentKey;
 import com.jumunhasyeo.common.Idempotency.db.domain.IdempotentStatus;
 import com.jumunhasyeo.common.Idempotency.db.domain.IdempotentType;
 import com.jumunhasyeo.common.Idempotency.db.domain.repository.IdempotencyKeyRepository;
+import com.jumunhasyeo.common.exception.BusinessException;
+import com.jumunhasyeo.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,6 +21,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class DbIdempotentService implements IdempotentService {
     private final IdempotencyKeyRepository repository;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public IdempotentStatus getCurrentStatus(String key) {
@@ -26,16 +31,19 @@ public class DbIdempotentService implements IdempotentService {
     }
 
     @Transactional
-    public Boolean setIfAbsent(String key, IdempotentStatus status, long ttlSeconds) {
+    public Boolean setIfAbsent(String key, IdempotentStatus status, long ttlSeconds, Object payload){
         try {
-            DbIdempotentKey entity = DbIdempotentKey.create(key, ttlSeconds, IdempotentType.STOCK);
+            DbIdempotentKey entity = DbIdempotentKey.create(key, ttlSeconds, IdempotentType.STOCK, objectMapper.writeValueAsString(payload));
             repository.save(entity);
             return true;
         } catch (DataIntegrityViolationException e) {
             // Unique constraint 위반 - 이미 존재하는 경우
             log.info("Key already exists (race condition): {}", key);
             return false;
-        } catch (Exception e) {
+        } catch (JsonProcessingException e){
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "JsonProcessingException : "+e.getMessage());
+        }
+        catch (Exception e) {
             log.error("Unexpected error while setting key: {}", key, e);
             throw e;
         }
@@ -57,5 +65,11 @@ public class DbIdempotentService implements IdempotentService {
                     entity.applyError(errorMessage);
                     repository.save(entity);
                 });
+    }
+
+    @Override
+    public DbIdempotentKey get(String key) {
+        return repository.findByIdempotencyKeyAndNotExpired(key, LocalDateTime.now())
+                .orElse(null);
     }
 }

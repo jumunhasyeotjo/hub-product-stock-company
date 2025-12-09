@@ -42,6 +42,19 @@ spring:
     init:
       mode: always
 
+  kafka:
+    # 브로커 주소
+    bootstrap-servers: localhost:9092
+    # 토픽 설정 (커스텀)
+    topics:
+      hub: hub
+      order: order
+    producer:
+      retries: 3
+    consumer:
+      # 컨슈머 그룹
+      group-id: hub-service-group
+
 logging:
   level:
     org.hibernate.orm.jdbc.bind: TRACE      # 바인딩값 로그

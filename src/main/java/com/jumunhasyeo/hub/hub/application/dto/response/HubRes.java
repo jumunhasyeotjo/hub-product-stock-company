@@ -12,7 +12,6 @@ import java.util.UUID;
 @Schema(description = "허브 응답")
 @Builder
 public record HubRes(
-
         @Schema(description = "허브 ID", example = "550e8400-e29b-41d4-a716-446655440000")
         UUID id,
 

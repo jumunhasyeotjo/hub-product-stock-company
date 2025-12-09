@@ -39,6 +39,7 @@ class DbIdempotentAspectTest {
     private static final int TTL_DAYS = 7;
     private static final long TTL_SECONDS = TTL_DAYS * 24 * 3600L;
     private static final Object EXPECTED_RESULT = "test-result";
+    private static final String payload = "";
 
     @BeforeEach
     void setUp() {
@@ -60,7 +61,7 @@ class DbIdempotentAspectTest {
 
         // verify
         then(idempotentService).should().getCurrentStatus(TEST_KEY);
-        then(idempotentService).should(never()).setIfAbsent(anyString(), any(), anyLong());
+        then(idempotentService).should(never()).setIfAbsent(anyString(), any(), anyLong(),any());
         then(joinPoint).should(never()).proceed();
     }
 
@@ -70,7 +71,7 @@ class DbIdempotentAspectTest {
         // given
         IdempotentStatus processingStatus = IdempotentStatus.PROCESSING;
         given(idempotentService.getCurrentStatus(TEST_KEY)).willReturn(processingStatus);
-        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS))
+        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS, payload))
                 .willReturn(false); // SET NX 실패 (이미 존재)
 
         // when & then
@@ -80,7 +81,7 @@ class DbIdempotentAspectTest {
 
         // verify
         then(idempotentService).should().getCurrentStatus(TEST_KEY);
-        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS);
+        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS, payload);
         then(joinPoint).should(never()).proceed();
     }
 
@@ -90,7 +91,7 @@ class DbIdempotentAspectTest {
         // given
         IdempotentStatus failedStatus = IdempotentStatus.FAIL;
         given(idempotentService.getCurrentStatus(TEST_KEY)).willReturn(failedStatus);
-        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS))
+        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS, payload))
                 .willReturn(true); // SET NX 성공
         given(joinPoint.proceed()).willReturn(EXPECTED_RESULT);
 
@@ -102,7 +103,7 @@ class DbIdempotentAspectTest {
 
         // verify
         then(idempotentService).should().getCurrentStatus(TEST_KEY);
-        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS);
+        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS, payload);
         then(joinPoint).should().proceed();
         then(idempotentService).should().saveStatus(TEST_KEY, IdempotentStatus.SUCCESS, TTL_SECONDS);
         then(idempotentService).should(never()).saveError(anyString(), anyString(), anyLong());
@@ -114,7 +115,7 @@ class DbIdempotentAspectTest {
         // given
         IdempotentStatus noStatus = IdempotentStatus.NONE; // 또는 null 처리 방식에 따라
         given(idempotentService.getCurrentStatus(TEST_KEY)).willReturn(noStatus);
-        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS))
+        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS, payload))
                 .willReturn(true); // SET NX 성공
         given(joinPoint.proceed()).willReturn(EXPECTED_RESULT);
 
@@ -126,7 +127,7 @@ class DbIdempotentAspectTest {
 
         // verify
         then(idempotentService).should().getCurrentStatus(TEST_KEY);
-        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS);
+        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS, payload);
         then(joinPoint).should().proceed();
         then(idempotentService).should().saveStatus(TEST_KEY, IdempotentStatus.SUCCESS, TTL_SECONDS);
         then(idempotentService).should(never()).saveError(anyString(), anyString(), anyLong());
@@ -140,7 +141,7 @@ class DbIdempotentAspectTest {
         RuntimeException expectedException = new RuntimeException("Business logic error");
 
         given(idempotentService.getCurrentStatus(TEST_KEY)).willReturn(noStatus);
-        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS))
+        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS, payload))
                 .willReturn(true);
         given(joinPoint.proceed()).willThrow(expectedException);
 
@@ -151,7 +152,7 @@ class DbIdempotentAspectTest {
 
         // verify
         then(idempotentService).should().getCurrentStatus(TEST_KEY);
-        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS);
+        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS, payload);
         then(joinPoint).should().proceed();
         then(idempotentService).should().saveStatus(TEST_KEY, IdempotentStatus.FAIL, TTL_SECONDS);
         then(idempotentService).should().saveError(TEST_KEY, "Business logic error", TTL_SECONDS);
@@ -166,7 +167,7 @@ class DbIdempotentAspectTest {
         RuntimeException exceptionWithNullMessage = new RuntimeException();
 
         given(idempotentService.getCurrentStatus(TEST_KEY)).willReturn(noStatus);
-        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS))
+        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, TTL_SECONDS, payload))
                 .willReturn(true);
         given(joinPoint.proceed()).willThrow(exceptionWithNullMessage);
 
@@ -188,7 +189,7 @@ class DbIdempotentAspectTest {
 
         given(dbIdempotent.ttlDays()).willReturn(customTtlDays);
         given(idempotentService.getCurrentStatus(TEST_KEY)).willReturn(IdempotentStatus.NONE);
-        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, expectedTtlSeconds))
+        given(idempotentService.setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, expectedTtlSeconds, payload))
                 .willReturn(true);
         given(joinPoint.proceed()).willReturn(EXPECTED_RESULT);
 
@@ -196,7 +197,7 @@ class DbIdempotentAspectTest {
         dbIdempotentAspect.handleIdempotency(joinPoint, dbIdempotent);
 
         // then
-        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, expectedTtlSeconds);
+        then(idempotentService).should().setIfAbsent(TEST_KEY, IdempotentStatus.PROCESSING, expectedTtlSeconds, payload);
         then(idempotentService).should().saveStatus(TEST_KEY, IdempotentStatus.SUCCESS, expectedTtlSeconds);
     }
 

@@ -1,10 +1,12 @@
 package com.jumunhasyeo.common.Idempotency;
 
 
-import com.jumunhasyeo.common.Idempotency.db.domain.IdempotentStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jumunhasyeo.common.Idempotency.db.application.DbIdempotentService;
 import com.jumunhasyeo.common.Idempotency.db.domain.DbIdempotentKey;
+import com.jumunhasyeo.common.Idempotency.db.domain.IdempotentStatus;
 import com.jumunhasyeo.common.Idempotency.db.domain.repository.IdempotencyKeyRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
-
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -29,6 +31,14 @@ class DbIdempotentServiceTest {
 
     @InjectMocks
     private DbIdempotentService service;
+    private final String payload = "";
+
+    private ObjectMapper objectMapper;
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper();
+        service = new DbIdempotentService(repository, objectMapper);
+    }
 
     private static DbIdempotentKey createKey(String key, IdempotentStatus status) {
         return DbIdempotentKey.builder()
@@ -72,13 +82,12 @@ class DbIdempotentServiceTest {
 
     @Test
     @DisplayName("새로운 키로 setIfAbsent를 호출하면 true를 반환한다.")
-    public void setIfAbsent_newKey_success() {
+    public void setIfAbsent_newKey_success() throws JsonProcessingException {
         // given
         String key = "ORDER-111";
         when(repository.save(any(DbIdempotentKey.class))).thenReturn(createKey(key, IdempotentStatus.PROCESSING));
-
         // when
-        Boolean result = service.setIfAbsent(key, IdempotentStatus.PROCESSING, 86400);
+        Boolean result = service.setIfAbsent(key, IdempotentStatus.PROCESSING, 86400, payload);
 
         // then
         assertThat(result).isTrue();
@@ -87,14 +96,13 @@ class DbIdempotentServiceTest {
 
     @Test
     @DisplayName("이미 존재하는 키로 setIfAbsent를 호출하면 false를 반환한다.")
-    public void setIfAbsent_duplicateKey_shouldReturnFalse() {
+    public void setIfAbsent_duplicateKey_shouldReturnFalse() throws JsonProcessingException {
         // given
         String key = "ORDER-222";
         when(repository.save(any(DbIdempotentKey.class)))
                 .thenThrow(new DataIntegrityViolationException("Duplicate key"));
-
         // when
-        Boolean result = service.setIfAbsent(key, IdempotentStatus.PROCESSING, 86400);
+        Boolean result = service.setIfAbsent(key, IdempotentStatus.PROCESSING, 86400, payload);
 
         // then
         assertThat(result).isFalse();
