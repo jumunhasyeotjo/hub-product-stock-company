@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+import static com.jumunhasyeo.stock.infrastructure.event.ListenEventRegistry.ORDER_CANCEL_EVENT;
+
 @Service
 @RequiredArgsConstructor
 public class DbInboxService {
@@ -17,7 +19,7 @@ public class DbInboxService {
     public void save(OrderCompensationEvent event) throws JsonProcessingException {
         InboxEvent inboxEvent = InboxEvent.builder()
                 .eventKey(event.getKey())
-                .eventType(EventType.ORDER_CANCEL_EVENT)
+                .eventName(ORDER_CANCEL_EVENT.getEventName())
                 .payload(objectMapper.writeValueAsString(event))
                 .status(InboxStatus.RECEIVED)
                 .receivedAt(LocalDateTime.now())
