@@ -1,6 +1,7 @@
 package com.jumunhasyeo.common.outbox;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,11 @@ public class OutboxDispatcher {
     public void dispatch(OutboxEvent event) {
         if(event.getTopic().equals(hubTopic)) {
             try {
-                kafkaTemplate.send(hubTopic, event.getPayload()).get(); // 동기 대기
+                ProducerRecord<String, String> record = new ProducerRecord<>(hubTopic, event.getPayload());
+                record.headers().add("eventType", event.getClass().getSimpleName().getBytes());
+                record.headers().add("source", "hub-service".getBytes());
+
+                kafkaTemplate.send(record).get(); // 동기 대기
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }

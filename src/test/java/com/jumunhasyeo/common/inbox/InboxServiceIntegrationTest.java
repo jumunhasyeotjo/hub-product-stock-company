@@ -50,7 +50,7 @@ public class InboxServiceIntegrationTest extends CommonTestContainer {
     @DisplayName("OrderCancelEvent를 저장하고 조회할 수 있다.")
     void save_OrderCancelEvent_integration_success() throws Exception {
         //given
-        OrderCancelEvent event = new OrderCancelEvent("test-key", UUID.randomUUID(), LocalDateTime.now());
+        OrderCancelEvent event = new OrderCancelEvent(UUID.randomUUID(), LocalDateTime.now());
 
         //when
         inboxService.save(event);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jumunhasyeo.hub.hub.domain.event.HubDomainEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -26,7 +27,11 @@ public class KafkaHubEventPublisher {
 
     public CompletableFuture<SendResult<String, String>> publishEvent(HubDomainEvent event) {
         try {
-            return template.send(hubTopic,  objectMapper.writeValueAsString(event));
+            String json = objectMapper.writeValueAsString(event);
+            ProducerRecord<String, String> record = new ProducerRecord<>(hubTopic, json);
+            record.headers().add("eventType", event.getClass().getSimpleName().getBytes());
+            record.headers().add("source", "hub-service".getBytes());
+            return template.send(record);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

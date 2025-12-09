@@ -30,11 +30,12 @@ public class AdapterHubRouteRepository implements HubRouteRepository {
     @Override
     public void insertIgnore(Set<HubRoute> createAllRoute) {
         for (HubRoute hubRoute : createAllRoute) {
-            try {
-                repository.save(hubRoute);
-            }catch (DataIntegrityViolationException e) {
-                log.warn("Duplicate hub route detected, ignoring: {}", hubRoute);
-            }
+            repository.insertIgnore(
+                    hubRoute.getStartHub().getHubId(),
+                    hubRoute.getEndHub().getHubId(),
+                    hubRoute.getRouteWeight().getDistanceKm().doubleValue(),
+                    hubRoute.getRouteWeight().getDurationMinutes()
+            );
         }
     }
 

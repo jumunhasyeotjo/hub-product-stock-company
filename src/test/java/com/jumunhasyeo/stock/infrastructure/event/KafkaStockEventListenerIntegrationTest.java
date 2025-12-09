@@ -43,7 +43,7 @@ public class KafkaStockEventListenerIntegrationTest extends CommonTestContainer 
     @DisplayName("OrderCancelEvent를 수신하고 처리할 수 있다.")
     void dispatch_OrderCancelEvent_integration_success() throws Exception {
         //given
-        OrderCancelEvent event = new OrderCancelEvent("test-key", UUID.randomUUID(), LocalDateTime.now());
+        OrderCancelEvent event = new OrderCancelEvent(UUID.randomUUID(), LocalDateTime.now());
         String payload = objectMapper.writeValueAsString(event);
         String simpleClassName = "OrderCancelEvent";
 
@@ -58,7 +58,7 @@ public class KafkaStockEventListenerIntegrationTest extends CommonTestContainer 
     @DisplayName("OrderRolledBackEvent를 수신하고 처리할 수 있다.")
     void dispatch_OrderRolledBackEvent_integration_success() throws Exception {
         //given
-        OrderRolledBackEvent event = new OrderRolledBackEvent("test-key", UUID.randomUUID(), LocalDateTime.now());
+        OrderRolledBackEvent event = new OrderRolledBackEvent(UUID.randomUUID(), LocalDateTime.now());
         String payload = objectMapper.writeValueAsString(event);
         String simpleClassName = "OrderRolledBackEvent";
 

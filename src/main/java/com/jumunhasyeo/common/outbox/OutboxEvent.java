@@ -3,10 +3,7 @@ package com.jumunhasyeo.common.outbox;
 import com.jumunhasyeo.common.BaseEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 import java.util.UUID;
@@ -50,7 +47,7 @@ public class OutboxEvent extends BaseEntity {
     private Integer maxRetries = 3;
 
     @Column(columnDefinition = "TEXT")
-    private String errorMessage;
+    private String errorMessage = "";
 
     private OutboxEvent(String eventName, String payload, OutboxStatus status, String eventKey, String topic) {
         this.eventName = eventName;

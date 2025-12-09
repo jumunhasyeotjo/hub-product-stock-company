@@ -85,20 +85,22 @@ public class OutboxService {
     }
 
     @Transactional
-    public void outboxProcess(OutboxEvent event) {
+    public OutboxEvent outboxProcess(OutboxEvent event) {
         try {
             if (!event.canRetry()) {
                 event.markFailed("Max retry count exceeded");
                 outboxRepository.save(event);
-                return;
+                return event;
             }
 
             outboxDispatcher.dispatch(event);
             event.publishSuccess();
             outboxRepository.save(event);
+            return event;
         } catch (Exception e) {
             event.publishFail(e.getMessage());
             outboxRepository.save(event);
+            return event;
         }
     }
 

@@ -27,7 +27,7 @@ public class KafkaStockEventListener {
     )
     public void listen(
             @Payload String payload,
-            @Header(name = "__TypeId__", required = false) String fullTypeName
+            @Header(name = "eventType", required = false) String fullTypeName
     ) {
         try {
             String className = KafkaUtil.getClassName(fullTypeName);

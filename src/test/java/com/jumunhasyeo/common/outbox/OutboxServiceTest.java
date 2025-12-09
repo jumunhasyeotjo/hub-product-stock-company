@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class OutboxServiceTest {
@@ -43,6 +44,9 @@ public class OutboxServiceTest {
 
     @Mock
     private ObjectMapper objectMapper;
+
+    @Mock
+    private OutboxDispatcher outboxDispatcher;
 
     @InjectMocks
     private OutboxService outboxService;
@@ -111,16 +115,14 @@ public class OutboxServiceTest {
     void outboxProcess_WhenCanRetry_success() throws Exception {
         //given
         OutboxEvent event = createOutboxEvent();
-        CompletableFuture<SendResult<String, String>> future = CompletableFuture.completedFuture(null);
-        given(kafkaTemplate.send(event.getEventName(), event.getPayload())).willReturn(future);
+        doNothing().when(outboxDispatcher).dispatch(event);
 
         //when
-        outboxService.outboxProcess(event);
+        OutboxEvent outboxEvent = outboxService.outboxProcess(event);
 
         //then
-        then(kafkaTemplate).should().send(event.getEventName(), event.getPayload());
-        assertThat(event.getStatus()).isEqualTo(OutboxStatus.COMPLETE);
-        assertThat(event.getRetryCount()).isEqualTo(1);
+        assertThat(outboxEvent.getStatus()).isEqualTo(OutboxStatus.COMPLETE);
+        assertThat(outboxEvent.getRetryCount()).isEqualTo(1);
     }
 
     @Test
@@ -146,18 +148,15 @@ public class OutboxServiceTest {
     void outboxProcess_WhenKafkaFails_publishFail() {
         //given
         OutboxEvent event = createOutboxEvent();
-        CompletableFuture<SendResult<String, String>> future = CompletableFuture.failedFuture(
-                new RuntimeException("Kafka error")
-        );
-        given(kafkaTemplate.send(event.getEventName(), event.getPayload())).willReturn(future);
+        doThrow(new RuntimeException("에러")).when(outboxDispatcher).dispatch(event);
 
         //when
-        outboxService.outboxProcess(event);
+        OutboxEvent outboxEvent = outboxService.outboxProcess(event);
 
         //then
         then(outboxRepository).should().save(event);
-        assertThat(event.getRetryCount()).isEqualTo(1);
-        assertThat(event.getErrorMessage()).isNotNull();
+        assertThat(outboxEvent.getRetryCount()).isEqualTo(1);
+        assertThat(outboxEvent.getErrorMessage()).isEqualTo("에러");
     }
 
     @Test

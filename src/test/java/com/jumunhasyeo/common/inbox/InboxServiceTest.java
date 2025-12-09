@@ -39,7 +39,7 @@ public class InboxServiceTest {
     @DisplayName("OrderCancelEvent를 저장할 수 있다.")
     void save_OrderCancelEvent_success() throws Exception {
         //given
-        OrderCancelEvent event = new OrderCancelEvent("test-key", UUID.randomUUID(), LocalDateTime.now());
+        OrderCancelEvent event = new OrderCancelEvent(UUID.randomUUID(), LocalDateTime.now());
         String expectedJson = "{\"key\":\"test-key\"}";
         given(objectMapper.writeValueAsString(event)).willReturn(expectedJson);
 
