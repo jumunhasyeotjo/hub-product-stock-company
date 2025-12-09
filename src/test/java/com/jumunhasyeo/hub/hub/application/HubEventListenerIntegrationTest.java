@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Import;
 import java.util.List;
 import java.util.UUID;
 
+import static com.jumunhasyeo.hub.hubRoute.infrastructure.event.ListenEventRegistry.HUB_CREATED_EVENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -56,7 +57,7 @@ public class HubEventListenerIntegrationTest extends CommonTestContainer {
         //then
         List<OutboxEvent> outboxEvents = jpaOutboxRepository.findAll();
         assertThat(outboxEvents).hasSize(1);
-        assertThat(outboxEvents.get(0).getEventName()).isEqualTo("hubCreatedEvent");
+        assertThat(outboxEvents.get(0).getEventName()).isEqualTo(HUB_CREATED_EVENT.getEventName());
         assertThat(outboxEvents.get(0).getStatus()).isEqualTo(OutboxStatus.PENDING);
     }
 

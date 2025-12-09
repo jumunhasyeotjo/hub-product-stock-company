@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static com.jumunhasyeo.hub.hubRoute.infrastructure.event.ListenEventRegistry.HUB_CREATED_EVENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,7 +69,7 @@ public class OutboxServiceTest {
         then(outboxRepository).should().save(captor.capture());
 
         OutboxEvent savedEvent = captor.getValue();
-        assertThat(savedEvent.getEventName()).isEqualTo("hubCreatedEvent");
+        assertThat(savedEvent.getEventName()).isEqualTo(HUB_CREATED_EVENT.getEventName());
         assertThat(savedEvent.getPayload()).isEqualTo(expectedJson);
         assertThat(savedEvent.getEventKey()).isEqualTo(event.getEventKey());
         assertThat(savedEvent.getStatus()).isEqualTo(OutboxStatus.PENDING);

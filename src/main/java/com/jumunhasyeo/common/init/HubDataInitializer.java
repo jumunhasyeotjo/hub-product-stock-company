@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-@Profile(value = {"dev","local"})
+@Profile("local")
 @RequiredArgsConstructor
 public class HubDataInitializer implements ApplicationRunner {
 
@@ -44,7 +44,7 @@ public class HubDataInitializer implements ApplicationRunner {
 
         log.info("Starting hub data initialization...");
         HubInitialData hubInitialData = loadHubData();
-        
+
         // Center Hub과 Branch Hub의 ID를 매핑하기 위한 Map
         Map<String, UUID> hubNameToIdMap = new HashMap<>();
 
@@ -61,7 +61,7 @@ public class HubDataInitializer implements ApplicationRunner {
             if (centerHubId == null) {
                 continue;
             }
-            
+
             UUID hubId = createBranchHub(hubData, centerHubId);
             hubNameToIdMap.put(hubData.getName(), hubId);
         }

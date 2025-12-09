@@ -19,7 +19,7 @@ public class OutboxDispatcher {
         if(event.getTopic().equals(hubTopic)) {
             try {
                 ProducerRecord<String, String> record = new ProducerRecord<>(hubTopic, event.getPayload());
-                record.headers().add("eventType", event.getClass().getSimpleName().getBytes());
+                record.headers().add("eventType", event.getEventName().getBytes());
                 record.headers().add("source", "hub-service".getBytes());
 
                 kafkaTemplate.send(record).get(); // 동기 대기

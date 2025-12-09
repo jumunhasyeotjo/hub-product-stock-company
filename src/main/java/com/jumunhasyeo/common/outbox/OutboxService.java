@@ -18,6 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.jumunhasyeo.hub.hubRoute.domain.event.PublishEventRegistry.HUB_ROUTE_CREATED_EVENT;
+import static com.jumunhasyeo.hub.hubRoute.domain.event.PublishEventRegistry.HUB_ROUTE_DELETED_EVENT;
+import static com.jumunhasyeo.hub.hubRoute.infrastructure.event.ListenEventRegistry.HUB_CREATED_EVENT;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -51,7 +55,7 @@ public class OutboxService {
     @Transactional
     public void save(HubCreatedEvent event) {
         try {
-            OutboxEvent outboxEvent = OutboxEvent.of("hubCreatedEvent", objectMapper.writeValueAsString(event), event.getEventKey(), hubTopic);
+            OutboxEvent outboxEvent = OutboxEvent.of(HUB_CREATED_EVENT.getEventName(), objectMapper.writeValueAsString(event), event.getEventKey(), hubTopic);
             outboxRepository.save(outboxEvent);
         } catch (JsonProcessingException e) {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to serialize event payload");
@@ -61,7 +65,7 @@ public class OutboxService {
     @Transactional
     public void save(HubRouteCreatedEvent event) {
         try {
-            OutboxEvent outboxEvent = OutboxEvent.of("HubRouteCreatedEvent", objectMapper.writeValueAsString(event), event.getEventKey(), hubTopic);
+            OutboxEvent outboxEvent = OutboxEvent.of(HUB_ROUTE_CREATED_EVENT.getEventName(), objectMapper.writeValueAsString(event), event.getEventKey(), hubTopic);
             outboxRepository.save(outboxEvent);
         } catch (JsonProcessingException e) {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to serialize event payload");
@@ -71,7 +75,7 @@ public class OutboxService {
     @Transactional
     public void save(HubRouteDeletedEvent event) {
         try {
-            OutboxEvent outboxEvent = OutboxEvent.of("HubRouteDeletedEvent", objectMapper.writeValueAsString(event), event.getEventKey(), hubTopic);
+            OutboxEvent outboxEvent = OutboxEvent.of(HUB_ROUTE_DELETED_EVENT.getEventName(), objectMapper.writeValueAsString(event), event.getEventKey(), hubTopic);
             outboxRepository.save(outboxEvent);
         } catch (JsonProcessingException e) {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to serialize event payload");

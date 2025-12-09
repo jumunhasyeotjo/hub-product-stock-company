@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.jumunhasyeo.hub.hubRoute.infrastructure.event.ListenEventRegistry.HUB_CREATED_EVENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -64,7 +65,7 @@ public class OutboxServiceIntegrationTest extends CommonTestContainer {
         //then
         List<OutboxEvent> events = jpaOutboxRepository.findAll();
         assertThat(events).hasSize(1);
-        assertThat(events.get(0).getEventName()).isEqualTo("hubCreatedEvent");
+        assertThat(events.get(0).getEventName()).isEqualTo(HUB_CREATED_EVENT.getEventName());
         assertThat(events.get(0).getStatus()).isEqualTo(OutboxStatus.PENDING);
     }
 
