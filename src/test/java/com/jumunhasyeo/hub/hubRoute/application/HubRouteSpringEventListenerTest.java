@@ -42,71 +42,62 @@ public class HubRouteSpringEventListenerTest {
     private HubRouteSpringEventListener hubRouteSpringEventListener;
 
     @Test
-    @DisplayName("HubRouteCreatedEvent 리스트를 Outbox에 저장할 수 있다.")
+    @DisplayName("HubRouteCreatedEvent를 Outbox에 저장할 수 있다.")
     void handleHubRouteCreated_success() {
         //given
-        List<HubRouteCreatedEvent> eventList = List.of(
-                createHubRouteCreatedEvent(),
-                createHubRouteCreatedEvent()
-        );
+        HubRouteCreatedEvent event = createHubRouteCreatedEvent();
 
         //when
-        hubRouteSpringEventListener.handleHubRouteCreated(eventList);
+        hubRouteSpringEventListener.handleHubRouteCreated(event);
 
         //then
-        then(outboxService).should(times(2)).save(any(HubRouteCreatedEvent.class));
+        then(outboxService).should(times(1)).save(any(HubRouteCreatedEvent.class));
     }
 
     @Test
     @DisplayName("HubRouteDeletedEvent 리스트를 Outbox에 저장할 수 있다.")
     void handleHubRouteDeleted_success() {
         //given
-        List<HubRouteDeletedEvent> eventList = List.of(
-                createHubRouteDeletedEvent(),
-                createHubRouteDeletedEvent()
-        );
+        HubRouteDeletedEvent event = createHubRouteDeletedEvent();
 
         //when
-        hubRouteSpringEventListener.handleHubRouteDeleted(eventList);
+        hubRouteSpringEventListener.handleHubRouteDeleted(event);
 
         //then
-        then(outboxService).should(times(2)).save(any(HubRouteDeletedEvent.class));
+        then(outboxService).should(times(1)).save(any(HubRouteDeletedEvent.class));
     }
 
     @Test
-    @DisplayName("HubRouteCreatedEvent 리스트를 Kafka로 발행하고 성공 시 Outbox를 완료 처리한다.")
+    @DisplayName("HubRouteCreatedEvent를 Kafka로 발행하고 성공 시 Outbox를 완료 처리한다.")
     void asyncHandleHubRouteCreated_success() {
         //given
-        List<HubRouteCreatedEvent> eventList = List.of(
-                createHubRouteCreatedEvent(),
-                createHubRouteCreatedEvent()
-        );
+        HubRouteCreatedEvent event = createHubRouteCreatedEvent();
         CompletableFuture<SendResult<String, String>> future = CompletableFuture.completedFuture(null);
-        given(kafkaHubRouteEventPublisher.publish(eventList)).willReturn(future);
+        given(kafkaHubRouteEventPublisher.publish(event)).willReturn(future);
 
         //when
-        hubRouteSpringEventListener.asyncHandleHubRouteCreated(eventList);
+        hubRouteSpringEventListener.asyncHandleHubRouteCreated(event);
 
         //then
-        then(kafkaHubRouteEventPublisher).should().publish(eventList);
-        then(outboxService).should(times(2)).markAsProcessed(any());
+        then(kafkaHubRouteEventPublisher).should().publish(event);
+        then(outboxService).should(times(1)).markAsProcessed(any());
     }
 
     @Test
     @DisplayName("HubRouteCreatedEvent Kafka 발행 실패 시 Outbox를 완료 처리하지 않는다.")
     void asyncHandleHubRouteCreated_WhenKafkaFails_doesNotMarkAsProcessed() {
         //given
-        List<HubRouteCreatedEvent> eventList = List.of(createHubRouteCreatedEvent());
+        HubRouteCreatedEvent event = createHubRouteCreatedEvent();
         CompletableFuture<SendResult<String, String>> future = CompletableFuture.failedFuture(
                 new RuntimeException("Kafka error")
         );
-        given(kafkaHubRouteEventPublisher.publish(eventList)).willReturn(future);
+        given(kafkaHubRouteEventPublisher.publish(event)).willReturn(future);
 
         //when
-        hubRouteSpringEventListener.asyncHandleHubRouteCreated(eventList);
+        hubRouteSpringEventListener.asyncHandleHubRouteCreated(event);
 
         //then
-        then(kafkaHubRouteEventPublisher).should().publish(eventList);
+        then(kafkaHubRouteEventPublisher).should().publish(event);
         then(outboxService).should(never()).markAsProcessed(any());
     }
 
@@ -114,36 +105,33 @@ public class HubRouteSpringEventListenerTest {
     @DisplayName("HubRouteDeletedEvent 리스트를 Kafka로 발행하고 성공 시 Outbox를 완료 처리한다.")
     void asyncHandleHubRouteDeleted_success() {
         //given
-        List<HubRouteDeletedEvent> eventList = List.of(
-                createHubRouteDeletedEvent(),
-                createHubRouteDeletedEvent()
-        );
+        HubRouteDeletedEvent event = createHubRouteDeletedEvent();
         CompletableFuture<SendResult<String, String>> future = CompletableFuture.completedFuture(null);
-        given(kafkaHubRouteEventPublisher.publish(eventList)).willReturn(future);
+        given(kafkaHubRouteEventPublisher.publish(event)).willReturn(future);
 
         //when
-        hubRouteSpringEventListener.asyncHandleHubRouteDeleted(eventList);
+        hubRouteSpringEventListener.asyncHandleHubRouteDeleted(event);
 
         //then
-        then(kafkaHubRouteEventPublisher).should().publish(eventList);
-        then(outboxService).should(times(2)).markAsProcessed(any());
+        then(kafkaHubRouteEventPublisher).should().publish(event);
+        then(outboxService).should(times(1)).markAsProcessed(any());
     }
 
     @Test
     @DisplayName("HubRouteDeletedEvent Kafka 발행 실패 시 Outbox를 완료 처리하지 않는다.")
     void asyncHandleHubRouteDeleted_WhenKafkaFails_doesNotMarkAsProcessed() {
         //given
-        List<HubRouteDeletedEvent> eventList = List.of(createHubRouteDeletedEvent());
+        HubRouteDeletedEvent event = createHubRouteDeletedEvent();
         CompletableFuture<SendResult<String, String>> future = CompletableFuture.failedFuture(
                 new RuntimeException("Kafka error")
         );
-        given(kafkaHubRouteEventPublisher.publish(eventList)).willReturn(future);
+        given(kafkaHubRouteEventPublisher.publish(event)).willReturn(future);
 
         //when
-        hubRouteSpringEventListener.asyncHandleHubRouteDeleted(eventList);
+        hubRouteSpringEventListener.asyncHandleHubRouteDeleted(event);
 
         //then
-        then(kafkaHubRouteEventPublisher).should().publish(eventList);
+        then(kafkaHubRouteEventPublisher).should().publish(event);
         then(outboxService).should(never()).markAsProcessed(any());
     }
 

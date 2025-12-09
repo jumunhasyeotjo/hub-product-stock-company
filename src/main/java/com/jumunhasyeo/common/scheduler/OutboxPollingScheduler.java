@@ -22,8 +22,8 @@ public class OutboxPollingScheduler {
     private final OutboxService outboxService;
 
     @Async("schedulerExecutor")
-    @SchedulerLock(name = "outboxPolling", lockAtLeastFor = "2s")
-    @Scheduled(fixedDelay = 2000) // 2초마다 Polling
+    @SchedulerLock(name = "outboxPolling", lockAtLeastFor = "5s")
+    @Scheduled(fixedDelay = 5000) // 2초마다 Polling
     public void pollOutbox() {
         log.info("polling outbox events...");
         // 처리되지 않은 이벤트 조회

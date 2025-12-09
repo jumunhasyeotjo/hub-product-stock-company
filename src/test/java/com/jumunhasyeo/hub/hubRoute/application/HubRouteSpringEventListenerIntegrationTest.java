@@ -46,43 +46,35 @@ public class HubRouteSpringEventListenerIntegrationTest extends CommonTestContai
     }
 
     @Test
-    @DisplayName("HubRouteCreatedEvent 리스트를 수신하면 Outbox에 저장된다.")
+    @DisplayName("HubRouteCreatedEvent를 수신하면 Outbox에 저장된다.")
     void handleHubRouteCreated_integration_success() {
         //given
         HubRoute route1 = createHubRoute();
-        HubRoute route2 = createHubRoute();
-        List<HubRouteCreatedEvent> eventList = List.of(
-                HubRouteCreatedEvent.from(route1),
-                HubRouteCreatedEvent.from(route2)
-        );
+        HubRouteCreatedEvent event = HubRouteCreatedEvent.from(route1);
 
         //when
-        hubRouteSpringEventListener.handleHubRouteCreated(eventList);
+        hubRouteSpringEventListener.handleHubRouteCreated(event);
 
         //then
         List<OutboxEvent> outboxEvents = jpaOutboxRepository.findAll();
-        assertThat(outboxEvents).hasSize(2);
+        assertThat(outboxEvents).hasSize(1);
         assertThat(outboxEvents.get(0).getEventName()).isEqualTo("HubRouteCreatedEvent");
         assertThat(outboxEvents.get(0).getStatus()).isEqualTo(OutboxStatus.PENDING);
     }
 
     @Test
-    @DisplayName("HubRouteDeletedEvent 리스트를 수신하면 Outbox에 저장된다.")
+    @DisplayName("HubRouteDeletedEvent를 수신하면 Outbox에 저장된다.")
     void handleHubRouteDeleted_integration_success() {
         //given
         HubRoute route1 = createHubRoute();
-        HubRoute route2 = createHubRoute();
-        List<HubRouteDeletedEvent> eventList = List.of(
-                HubRouteDeletedEvent.from(route1),
-                HubRouteDeletedEvent.from(route2)
-        );
+        HubRouteDeletedEvent event = HubRouteDeletedEvent.from(route1);
 
         //when
-        hubRouteSpringEventListener.handleHubRouteDeleted(eventList);
+        hubRouteSpringEventListener.handleHubRouteDeleted(event);
 
         //then
         List<OutboxEvent> outboxEvents = jpaOutboxRepository.findAll();
-        assertThat(outboxEvents).hasSize(2);
+        assertThat(outboxEvents).hasSize(1);
         assertThat(outboxEvents.get(0).getEventName()).isEqualTo("HubRouteDeletedEvent");
         assertThat(outboxEvents.get(0).getStatus()).isEqualTo(OutboxStatus.PENDING);
     }

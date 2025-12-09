@@ -11,4 +11,13 @@ public enum PublishEventRegistry {
     HUB_NAME_UPDATED_EVNET("HubNameUpdatedEvent");
 
     private final String eventName;
+
+    public static String of(String simpleName) {
+        for (PublishEventRegistry registry : values()) {
+            if (registry.getEventName().equals(simpleName)) {
+                return registry.getEventName();
+            }
+        }
+        throw new IllegalArgumentException("No matching event found for simple name: " + simpleName);
+    }
 }
