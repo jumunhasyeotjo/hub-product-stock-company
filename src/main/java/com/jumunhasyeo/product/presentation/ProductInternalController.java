@@ -17,7 +17,7 @@ import java.util.UUID;
 @Tag(name = "Internal-Product", description = "내부 서비스 간 통신용 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/products/internal")
+@RequestMapping("/api/v1/products/internal")
 public class ProductInternalController {
 
     private final ProductService productService;
