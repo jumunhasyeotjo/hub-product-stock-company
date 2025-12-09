@@ -210,7 +210,8 @@ public class OutboxServiceTest {
         return OutboxEvent.of(
                 "HubCreatedEvent",
                 "{\"hubId\":\"123\"}",
-                "test-key"
+                "test-key",
+                "hub"
         );
     }
 

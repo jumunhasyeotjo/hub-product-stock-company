@@ -33,6 +33,9 @@ public class OutboxEvent extends BaseEntity {
     @Column(nullable = false)
     private String eventKey;
 
+    @Column(nullable = false)
+    private String topic;
+
     @Type(JsonBinaryType.class)
     @Column(nullable = false, columnDefinition = "JSONB")
     private String payload;
@@ -49,17 +52,18 @@ public class OutboxEvent extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String errorMessage;
 
-    private OutboxEvent(String eventName, String payload, OutboxStatus status, String eventKey) {
+    private OutboxEvent(String eventName, String payload, OutboxStatus status, String eventKey, String topic) {
         this.eventName = eventName;
         this.payload = payload;
         this.status = status;
         this.eventKey = eventKey;
         this.retryCount = 0;
         this.maxRetries = 3;
+        this.topic = topic;
     }
 
-    public static OutboxEvent of(String eventName, String payload, String eventKey) {
-        return new OutboxEvent(eventName, payload, OutboxStatus.PENDING, eventKey);
+    public static OutboxEvent of(String eventName, String payload, String eventKey, String topic) {
+        return new OutboxEvent(eventName, payload, OutboxStatus.PENDING, eventKey, topic);
     }
 
     public void markProcessed() {
@@ -90,6 +94,6 @@ public class OutboxEvent extends BaseEntity {
 
     public void publishFail(String errMessage) {
         incrementRetryCount();
-        setErrorMessage(errMessage);
+        markFailed(errMessage);
     }
 }

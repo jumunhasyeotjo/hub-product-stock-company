@@ -152,7 +152,8 @@ class JpaOutboxRepositoryTest extends CommonTestContainer {
         return OutboxEvent.of(
                 "HubCreatedEvent",
                 "{\"hubId\":\"123\"}",
-                eventKey
+                eventKey,
+                "hub"
         );
     }
 }

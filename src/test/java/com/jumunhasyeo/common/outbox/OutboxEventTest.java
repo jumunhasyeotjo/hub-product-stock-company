@@ -16,7 +16,7 @@ public class OutboxEventTest {
         String eventKey = "test-key";
 
         //when
-        OutboxEvent event = OutboxEvent.of(eventName, payload, eventKey);
+        OutboxEvent event = OutboxEvent.of(eventName, payload, eventKey, "hub");
 
         //then
         assertThat(event.getEventName()).isEqualTo(eventName);
@@ -147,7 +147,8 @@ public class OutboxEventTest {
         return OutboxEvent.of(
                 "HubCreatedEvent",
                 "{\"hubId\":\"123\"}",
-                "test-key"
+                "test-key",
+                "hub"
         );
     }
 }

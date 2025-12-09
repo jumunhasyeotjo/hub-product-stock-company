@@ -6,6 +6,7 @@ import com.jumunhasyeo.stock.infrastructure.event.OrderCompensationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,16 +36,17 @@ public class InboxService {
         return inboxRepository.findByStatusAndModifiedAtBefore(inboxStatus, threshold);
     }
 
+    @Transactional
     public void inboxProcess(InboxEvent event) {
         try {
             if (!event.canRetry()) {
                 event.markFailed("Max retry count exceeded");
+                inboxRepository.save(event);
                 return;
             }
             inboxDispatcher.dispatch(event);
-
-            // 처리 성공
             event.dispatchSuccess();
+            inboxRepository.save(event);
 
         } catch (Exception e) {
             event.dispatchFail(e.getMessage());
