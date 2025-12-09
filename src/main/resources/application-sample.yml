@@ -167,6 +167,16 @@ kakao:
     api-key: dummy-kakao-api-key-for-test  # 테스트용 더미 값
 
 ---
+# local profile
+spring:
+  config:
+    activate:
+      on-profile: local
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+---
 spring:
   config:
     activate:

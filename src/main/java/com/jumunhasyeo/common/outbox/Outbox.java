@@ -13,6 +13,11 @@ import java.util.UUID;
 
 @Entity
 @Getter
+@Table(name = "p_outbox_events",
+       indexes = {
+           @Index(name = "idx_outbox_event_event_key", columnList = "eventKey")
+       }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Outbox extends BaseEntity {
