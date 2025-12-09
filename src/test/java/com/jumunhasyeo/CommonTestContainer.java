@@ -3,6 +3,7 @@ package com.jumunhasyeo;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -12,6 +13,7 @@ public abstract class CommonTestContainer {
 
     private static final PostgreSQLContainer<?> POSTGRES_CONTAINER;
     private static final GenericContainer<?> REDIS_CONTAINER;
+    private static final KafkaContainer KAFKA_CONTAINER;
 
     static {
         POSTGRES_CONTAINER = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"))
@@ -25,6 +27,9 @@ public abstract class CommonTestContainer {
                 .withExposedPorts(6379)
                 .withReuse(true);
 
+        KAFKA_CONTAINER = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.0"))
+                .withReuse(true);
+
         System.out.println("Starting PostgreSQL container...");
         POSTGRES_CONTAINER.start();
         System.out.println("PostgreSQL container started: " + POSTGRES_CONTAINER.getJdbcUrl());
@@ -32,6 +37,10 @@ public abstract class CommonTestContainer {
         System.out.println("Starting Redis container...");
         REDIS_CONTAINER.start();
         System.out.println("Redis container started at: " + REDIS_CONTAINER.getHost() + ":" + REDIS_CONTAINER.getMappedPort(6379));
+
+        System.out.println("Starting Kafka container...");
+        KAFKA_CONTAINER.start();
+        System.out.println("Kafka container started at: " + KAFKA_CONTAINER.getBootstrapServers());
     }
 
     @DynamicPropertySource
@@ -51,5 +60,10 @@ public abstract class CommonTestContainer {
         registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
         registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
         registry.add("spring.data.redis.ssl.enabled", () -> "true");
+
+        // Kafka 설정
+        registry.add("spring.kafka.bootstrap-servers", KAFKA_CONTAINER::getBootstrapServers);
+        registry.add("spring.kafka.consumer.auto-offset-reset", () -> "earliest");
+        registry.add("spring.kafka.consumer.group-id", () -> "test-group");
     }
 }

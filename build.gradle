@@ -87,6 +87,7 @@ dependencies {
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
     // kafka
     implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.testcontainers:kafka:1.19.3'
     //Hibernate가 String을 JSONB로 자동 변환
     implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.0'
     //Eureka
