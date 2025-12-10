@@ -34,7 +34,7 @@ public class KafkaStockEventListenerTest {
         //given
         String payload = "{\"orderId\":\"123\"}";
         String simpleClassName = "OrderCancelEvent";
-        OrderCancelEvent event = new OrderCancelEvent(UUID.randomUUID(), LocalDateTime.now());
+        OrderCancelEvent event = new OrderCancelEvent(UUID.randomUUID(), "", LocalDateTime.now());
         given(objectMapper.readValue(payload, OrderCancelEvent.class)).willReturn(event);
 
         //when
@@ -50,7 +50,7 @@ public class KafkaStockEventListenerTest {
         //given
         String payload = "{\"orderId\":\"123\"}";
         String simpleClassName = "OrderRolledBackEvent";
-        OrderRolledBackEvent event = new OrderRolledBackEvent(UUID.randomUUID(), LocalDateTime.now());
+        OrderRolledBackEvent event = new OrderRolledBackEvent(UUID.randomUUID(), "", LocalDateTime.now());
         given(objectMapper.readValue(payload, OrderRolledBackEvent.class)).willReturn(event);
 
         //when
