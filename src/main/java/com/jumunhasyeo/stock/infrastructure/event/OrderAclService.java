@@ -12,7 +12,7 @@ public class OrderAclService {
 
     public String convert(String fullTypeName) {
         return switch (fullTypeName) {
-            case "ORDER_ROLLED_BACK" -> ORDER_ROLLED_BACK_EVENT.getEventName();
+            case "ORDER_ROLLEDBACK" -> ORDER_ROLLED_BACK_EVENT.getEventName();
             case "ORDER_CANCEL" -> ORDER_CANCEL_EVENT.getEventName();
             default -> throw new IllegalArgumentException();
         };
