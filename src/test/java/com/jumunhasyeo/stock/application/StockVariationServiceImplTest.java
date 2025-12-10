@@ -8,6 +8,7 @@ import com.jumunhasyeo.stock.application.command.IncreaseStockCommand;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.domain.entity.Stock;
 import com.jumunhasyeo.stock.domain.repository.StockRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,8 @@ class StockVariationServiceImplTest {
 
     @Mock
     private StockRepository stockRepository;
+    @Mock
+    private EntityManager entityManager;
     @InjectMocks
     private StockVariationServiceImpl stockService;
 

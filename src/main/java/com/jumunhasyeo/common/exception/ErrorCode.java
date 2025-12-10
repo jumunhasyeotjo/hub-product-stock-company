@@ -20,6 +20,8 @@ public enum ErrorCode {
     PROCESSING_CONFLICT_EXCEPTION(HttpStatus.CONFLICT, "C001", "요청이 진행중입니다."),
     //Stock
     STOCK_VALID(HttpStatus.BAD_REQUEST, "ES001", "Stock 유효성 검사에 실패했습니다."),
+    STOCK_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "ES002", "재고가 부족합니다."),
+    STOCK_MAX_EXCEEDED(HttpStatus.BAD_REQUEST, "ES003", "재고가 최대치를 초과했습니다."),
 
     //product
     PRODUCT_VALID_FAIL(HttpStatus.BAD_REQUEST, "EP001", "Product 유효성 검사에 실패했습니다"),
