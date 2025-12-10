@@ -53,10 +53,10 @@ public class StockInternalWebController {
             @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @Parameter(description = "재고 감소 요청 정보", required = true)
-            @RequestBody @Valid DecreaseStockReqList req
+            @RequestBody @Valid List<DecreaseStockReq> productList
     ) {
 
-        List<DecreaseStockCommand> commandList = req.productList()
+        List<DecreaseStockCommand> commandList = productList
                 .stream()
                 .map(descStockReq -> new DecreaseStockCommand(descStockReq.productId(), descStockReq.quantity()))
                 .toList();

@@ -56,12 +56,13 @@ spring:
       group-id: hub-service-group
 
 logging:
-  level:
-    org.hibernate.orm.jdbc.bind: TRACE      # 바인딩값 로그
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.orm.jpa: DEBUG
-    org.springframework.transaction: DEBUG
+#  level:
+#    org.hibernate.orm.jdbc.bind: TRACE      # 바인딩값 로그
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#    org.springframework.orm.jpa: DEBUG
+#    org.springframework.transaction: DEBUG
+
 
 cache:
   config:
@@ -80,6 +81,7 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
+
 
 resilience4j:
   circuitbreaker:
@@ -138,13 +140,13 @@ spring:
       ssl:
         enabled: false  # Testcontainers Redis는 SSL 미지원
 
+  # Testcontainers가 실제 값으로 오버라이드하지만, placeholder 에러 방지용 더미 값
   datasource:
     url: jdbc:postgresql://localhost:5432/testdb
     username: testuser
     password: testpass
     hikari:
-      maximum-pool-size: 10
-
+      maximum-pool-size: 30
   kafka:
     # 브로커 주소
     bootstrap-servers: localhost:9092
@@ -157,7 +159,6 @@ spring:
     consumer:
       # 컨슈머 그룹
       group-id: hub-service-group
-
 cache:
   config:
     hubService: true  # 테스트에서 캐시 기능 테스트
