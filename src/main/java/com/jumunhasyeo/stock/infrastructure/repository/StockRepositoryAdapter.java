@@ -2,6 +2,7 @@ package com.jumunhasyeo.stock.infrastructure.repository;
 
 import com.jumunhasyeo.common.exception.BusinessException;
 import com.jumunhasyeo.common.exception.ErrorCode;
+import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.domain.entity.Stock;
 import com.jumunhasyeo.stock.domain.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class StockRepositoryAdapter implements StockRepository {
     public boolean decreaseStock(UUID stockId, int amount) {
         boolean isSuccess = jpaStockRepository.decreaseStock(stockId, amount) == 1;
         if (!isSuccess)
-            throw new BusinessException(ErrorCode.STOCK_VALID, "재고가 부족합니다.");
+            throw new BusinessException(ErrorCode.STOCK_NOT_ENOUGH);
         return isSuccess;
     }
 
@@ -37,7 +38,7 @@ public class StockRepositoryAdapter implements StockRepository {
     public boolean increaseStock(UUID stockId, int amount) {
         boolean isSuccess = jpaStockRepository.increaseStock(stockId, amount) == 1;
         if (!isSuccess)
-            throw new BusinessException(ErrorCode.STOCK_VALID, "최대 재고값을 넘었습니다.");
+            throw new BusinessException(ErrorCode.STOCK_MAX_EXCEEDED);
         return isSuccess;
     }
 

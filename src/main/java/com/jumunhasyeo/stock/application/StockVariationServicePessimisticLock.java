@@ -22,7 +22,7 @@ public class StockVariationServicePessimisticLock implements StockVariationServi
     @Override
     @Transactional
     public StockRes decrement(DecreaseStockCommand command) {
-        Stock stock = getStockByPessimisticLock(command.stockId());
+        Stock stock = getStockByPessimisticLock(command.productId());
         stock.decrease(command.amount());
         return StockRes.from(stock);
     }
@@ -30,7 +30,7 @@ public class StockVariationServicePessimisticLock implements StockVariationServi
     @Override
     @Transactional
     public StockRes increment(IncreaseStockCommand command) {
-        Stock stock = getStockByPessimisticLock(command.stockId());
+        Stock stock = getStockByPessimisticLock(command.productId());
         stock.increase(command.amount());
         return StockRes.from(stock);
     }

@@ -58,7 +58,7 @@ public class StockVariationServiceImplIntegrationTest extends CommonTestContaine
         Stock stock = transactionTemplate.execute(status -> {
             return createSaveStock(productId, 500);
         });
-        DecreaseStockCommand command = new DecreaseStockCommand(stock.getStockId(), 100);
+        DecreaseStockCommand command = new DecreaseStockCommand(stock.getProductId(), 100);
 
         // 쿼리 발생 횟수 검증을 위한 Hibernate Statistics 초기화
         Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class)
@@ -86,7 +86,7 @@ public class StockVariationServiceImplIntegrationTest extends CommonTestContaine
         Stock stock = transactionTemplate.execute(status -> {
             return createSaveStock(productId, 500);
         });
-        IncreaseStockCommand command = new IncreaseStockCommand(stock.getStockId(), 100);
+        IncreaseStockCommand command = new IncreaseStockCommand(stock.getProductId(), 100);
 
         // 쿼리 발생 횟수 검증을 위한 Hibernate Statistics 초기화
         Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class)

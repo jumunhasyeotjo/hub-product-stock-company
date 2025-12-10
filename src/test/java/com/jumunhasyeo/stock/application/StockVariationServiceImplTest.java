@@ -8,6 +8,7 @@ import com.jumunhasyeo.stock.application.command.IncreaseStockCommand;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.domain.entity.Stock;
 import com.jumunhasyeo.stock.domain.repository.StockRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,8 @@ class StockVariationServiceImplTest {
 
     @Mock
     private StockRepository stockRepository;
+    @Mock
+    private EntityManager entityManager;
     @InjectMocks
     private StockVariationServiceImpl stockService;
 
@@ -38,7 +41,7 @@ class StockVariationServiceImplTest {
         UUID productId = UUID.randomUUID();
         Stock stock = createStock(productId, 500);
         DecreaseStockCommand command = new DecreaseStockCommand(productId, 100);
-        when(stockRepository.findById(any(UUID.class))).thenReturn(Optional.of(stock));
+        when(stockRepository.findByProductId(any(UUID.class))).thenReturn(Optional.of(stock));
         when(stockRepository.decreaseStock(any(UUID.class), anyInt())).thenReturn(true);
         //when
         StockRes stockRes = stockService.decrement(command);
@@ -54,7 +57,7 @@ class StockVariationServiceImplTest {
         UUID productId = UUID.randomUUID();
         Stock stock = createStock(productId, 500);
         IncreaseStockCommand command = new IncreaseStockCommand(productId, 100);
-        when(stockRepository.findById(any(UUID.class))).thenReturn(Optional.of(stock));
+        when(stockRepository.findByProductId(any(UUID.class))).thenReturn(Optional.of(stock));
         when(stockRepository.increaseStock(any(UUID.class), anyInt())).thenReturn(true);
         //when
         StockRes stockRes = stockService.increment(command);

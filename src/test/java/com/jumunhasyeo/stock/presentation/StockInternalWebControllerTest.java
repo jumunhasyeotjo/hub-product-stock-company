@@ -48,7 +48,6 @@ class StockInternalWebControllerTest {
         for (int i = 0; i < 3; i++) {
             reqs.add(new DecreaseStockReq(stockId, 100));
         }
-        DecreaseStockReqList request = new DecreaseStockReqList(reqs);
         StockRes stockRes = StockRes.builder()
                 .stockId(stockId)
                 .hubId(UUID.randomUUID())
@@ -62,12 +61,9 @@ class StockInternalWebControllerTest {
         mockMvc.perform(post("/internal/api/v1/stocks/decrement")
                         .header("Idempotency-Key", UUID.randomUUID().toString())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(reqs)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].stockId").value(stockId.toString()))
-                .andExpect(jsonPath("$.data[0].productId").value(productId.toString()))
-                .andExpect(jsonPath("$.data[0].hubId").exists())
-                .andExpect(jsonPath("$.data[0].quantity").value(200))
+                .andExpect(jsonPath("$.data").value("true"))
                 .andReturn();
     }
 
@@ -97,10 +93,7 @@ class StockInternalWebControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].stockId").value(stockId.toString()))
-                .andExpect(jsonPath("$.data[0].productId").value(productId.toString()))
-                .andExpect(jsonPath("$.data[0].hubId").exists())
-                .andExpect(jsonPath("$.data[0].quantity").value(200))
+                .andExpect(jsonPath("$.data").value("true"))
                 .andReturn();
     }
 }

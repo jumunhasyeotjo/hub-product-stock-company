@@ -1,5 +1,6 @@
 package com.jumunhasyeo.stock.infrastructure.repository;
 
+import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.domain.entity.Stock;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,7 +25,7 @@ public interface JpaStockRepository extends JpaRepository<Stock, UUID> {
     @Modifying
     @Transactional
     @Query("UPDATE Stock s SET s.quantity = s.quantity - :amount WHERE s.quantity - :amount >= 0 AND s.stockId = :stockId")
-    int decreaseStock(@Param(value = "stockId") UUID stockId, @Param(value = "amount") int amount);
+    int decreaseStock(UUID stockId, int amount);
 
     @Modifying
     @Transactional
@@ -36,5 +37,4 @@ public interface JpaStockRepository extends JpaRepository<Stock, UUID> {
             "WHERE s.productId = :productId " +
             "AND s.isDeleted = false")
     Optional<Stock> findStockByProductIdWithLock(UUID productId);
-
 }
