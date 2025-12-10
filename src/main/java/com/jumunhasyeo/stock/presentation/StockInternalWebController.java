@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/internal/api/v1/stocks")
+@Slf4j
 public class StockInternalWebController {
 
     private final StockService stockService;
@@ -55,6 +57,9 @@ public class StockInternalWebController {
             @Parameter(description = "재고 감소 요청 정보", required = true)
             @RequestBody @Valid List<DecreaseStockReq> productList
     ) {
+        for (DecreaseStockReq decreaseStockReq : productList) {
+            log.info(String.valueOf(decreaseStockReq.productId()));
+        }
 
         List<DecreaseStockCommand> commandList = productList
                 .stream()
