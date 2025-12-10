@@ -2,7 +2,7 @@ package com.jumunhasyeo.stock.infrastructure.event;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jumunhasyeo.common.util.KafkaUtil;
+import com.jumunhasyeo.common.deadletter.DeadLetterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -28,10 +28,10 @@ public class KafkaStockEventListener {
     )
     public void listen(
             @Payload String payload,
-            @Header(name = "eventType", required = false) String fullTypeName
+            @Header(name = "eventType", required = false) String eventType
     ) {
         try {
-            String className = orderAclService.convert(fullTypeName);
+            String className = orderAclService.convert(eventType);
             dispatch(payload, className);
         } catch (Exception e) {
             log.error("Failed to process OrderCancelEvent", e);

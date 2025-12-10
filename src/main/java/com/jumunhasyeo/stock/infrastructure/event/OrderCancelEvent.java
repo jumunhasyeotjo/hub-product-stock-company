@@ -10,6 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OrderCancelEvent implements OrderCompensationEvent {
     private final UUID orderId;
+    private final String cancelReason;
     private final LocalDateTime occurredAt;
 
     @Override

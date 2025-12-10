@@ -10,6 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OrderRolledBackEvent implements OrderCompensationEvent {
     private final UUID orderId;
+    private final String status;
     private final LocalDateTime occurredAt;
 
     @Override
