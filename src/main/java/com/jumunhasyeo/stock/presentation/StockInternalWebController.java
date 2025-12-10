@@ -58,7 +58,7 @@ public class StockInternalWebController {
             @RequestBody @Valid List<DecreaseStockReq> productList
     ) {
         for (DecreaseStockReq decreaseStockReq : productList) {
-            log.info(String.valueOf(decreaseStockReq.productId()));
+            log.info("decrement INPUT -------------------- {}",String.valueOf(decreaseStockReq.productId()));
         }
 
         List<DecreaseStockCommand> commandList = productList
@@ -67,6 +67,9 @@ public class StockInternalWebController {
                 .toList();
 
         List<StockRes> stockRes = stockService.decrement(idempotencyKey, commandList);
+        for (StockRes stock : stockRes) {
+            log.info("decrement OUTPUT -------------------- PID: {}, QUNTITY : {}",stock.productId(),stock.quantity());
+        }
         return ResponseEntity.ok(ApiRes.success(true));
     }
 
@@ -75,9 +78,9 @@ public class StockInternalWebController {
             @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @Parameter(description = "재고 입고 요청 정보", required = true)
-            @RequestBody @Valid List<StoreStockReq> productList
+            @RequestBody @Valid StoreStockReqList reqList
     ) {
-        List<StoreStockCommand> commandList = productList
+        List<StoreStockCommand> commandList = reqList.productList()
                 .stream()
                 .map(req -> new StoreStockCommand(req.hubId(), req.productId(), req.quantity()))
                 .toList();
