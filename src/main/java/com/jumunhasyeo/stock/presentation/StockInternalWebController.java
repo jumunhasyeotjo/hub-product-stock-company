@@ -46,7 +46,7 @@ public class StockInternalWebController {
         return ResponseEntity.ok(ApiRes.success(true));
     }
 
-    //재고 증가 (TODO: HUB_MANAGER/MASTER, SYSTEM)
+    //재고 감소(TODO: HUB_MANAGER/MASTER, SYSTEM)
     @ApiDocDecrementStock
     @PostMapping("/decrement")
     public ResponseEntity<ApiRes<Boolean>> decrement(
