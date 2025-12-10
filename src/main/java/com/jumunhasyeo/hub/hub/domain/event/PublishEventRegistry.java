@@ -6,9 +6,9 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum PublishEventRegistry {
-    HUB_CREATED_EVENT("HubCreatedEvent"),
-    HUB_DELETED_EVENT("HubDeletedEvent"),
-    HUB_NAME_UPDATED_EVENT("HubNameUpdatedEvent");
+    HUB_CREATED_EVENT(HubCreatedEvent.class.getSimpleName()),
+    HUB_DELETED_EVENT(HubDeletedEvent.class.getSimpleName()),
+    HUB_NAME_UPDATED_EVENT(HubNameUpdatedEvent.class.getSimpleName());
 
     private final String eventName;
 

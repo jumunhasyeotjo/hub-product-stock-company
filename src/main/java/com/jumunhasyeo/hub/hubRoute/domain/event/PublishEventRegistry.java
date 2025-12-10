@@ -6,8 +6,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum PublishEventRegistry {
-    HUB_ROUTE_CREATED_EVENT("HubRouteCreatedEvent"),
-    HUB_ROUTE_DELETED_EVENT("HubRouteDeletedEvent");
+    HUB_ROUTE_CREATED_EVENT(HubRouteCreatedEvent.class.getSimpleName()),
+    HUB_ROUTE_DELETED_EVENT(HubRouteDeletedEvent.class.getSimpleName());
 
     private final String eventName;
 
