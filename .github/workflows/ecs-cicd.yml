@@ -97,6 +97,7 @@ jobs:
   # ==========================================================================
   build-push-image:
     name: Build and Push Docker Image
+    environment: hub-aws
     runs-on: ubuntu-latest
     needs: build-test
 #    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')

@@ -167,6 +167,16 @@ kakao:
   mobility:
     api-key: dummy-kakao-api-key-for-test  # 테스트용 더미 값
 
+logging:
+  level:
+    # Hibernate binding 로그
+    org.hibernate.orm.jdbc.bind: error
+    org.hibernate.type.descriptor.sql.BasicBinder: error
+    # Hibernate SQL
+    org.hibernate.SQL: error
+    org.springframework.orm.jpa: error
+    org.springframework.transaction: error
+
 ---
 # local profile
 spring:
