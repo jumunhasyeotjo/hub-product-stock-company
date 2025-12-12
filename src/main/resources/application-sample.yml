@@ -16,7 +16,7 @@ spring:
       password: ${REDIS_PASSWORD:}
       timeout: 3000ms
       ssl:
-        enabled: true  # TLS 활성화
+        enabled: false  # TLS 활성화
 
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -77,7 +77,7 @@ kakao:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_HOST}/eureka/
     register-with-eureka: true
     fetch-registry: true
   instance:
