@@ -2,7 +2,8 @@
 #WORKDIR /app
 #COPY . .
 #RUN ./gradlew clean build -x test
-
 FROM eclipse-temurin:21-jre-jammy
-COPY --from=builder /app/build/libs/*.jar app.jar
+WORKDIR /app
+# JAR 파일 복사
+COPY build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
