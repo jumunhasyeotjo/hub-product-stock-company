@@ -61,13 +61,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew clean build -x test
-
       - name: Create application.yml from sample
         run: |
           cp src/main/resources/application-sample.yml src/main/resources/application.yml
           echo "application.yml created from sample"
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
 
       # ⚠️⚠️⚠️ 필수 수정 사항 - 각 리포지토리마다 다름 테스트를 위한 환경변수 ⚠️⚠️⚠️
       - name: Run tests
