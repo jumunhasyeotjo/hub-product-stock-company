@@ -40,11 +40,6 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
 
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -64,6 +59,10 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test
+        env:
+          # Testcontainers 설정
+          TESTCONTAINERS_RYUK_DISABLED: false
+          TESTCONTAINERS_CHECKS_DISABLE: false
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
