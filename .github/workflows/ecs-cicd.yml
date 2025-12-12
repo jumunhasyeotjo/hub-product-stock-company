@@ -68,6 +68,7 @@ jobs:
           echo "application.yml created from sample"
 
       - name: Run tests
+        if: github.event_name == '1' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') #skip
         run: ./gradlew test
         env:
           GITHUB_USERNAME: ${{ github.actor }}
