@@ -184,6 +184,10 @@ spring:
     activate:
       on-profile: dev
 
+eureka:
+  client:
+    enabled: false
+
 management:
   endpoints:
     web:
