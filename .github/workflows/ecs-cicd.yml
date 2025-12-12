@@ -20,7 +20,8 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-
+  GITHUB_USERNAME: ${{ github.actor }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # ⚠️⚠️⚠️ 필수 수정 사항 - 각 리포지토리마다 다름 ⚠️⚠️⚠️
   SERVICE_NAME: hub                                    # ← hub, order, user, gateway, eureka
   PARAMETER_PATH: /jumunhasyeo/dev/hub/               # ← 서비스 이름 변경
