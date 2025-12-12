@@ -44,7 +44,7 @@ spring:
 
   kafka:
     # 브로커 주소
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS} # localhost:9092
     # 토픽 설정 (커스텀)
     topics:
       hub: hub
@@ -53,13 +53,15 @@ spring:
       retries: 3
     consumer:
       # 컨슈머 그룹
-      group-id: hub-service-group
+      group-id: ${KAFKA_CONSUMER_GROUP} #hub-service-group
 
 logging:
 #  level:
-#    org.hibernate.orm.jdbc.bind: TRACE      # 바인딩값 로그
+#    # Hibernate binding 로그
+#    org.hibernate.orm.jdbc.bind: DEBUG
+#    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
+#    # Hibernate SQL
 #    org.hibernate.SQL: DEBUG
-#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 #    org.springframework.orm.jpa: DEBUG
 #    org.springframework.transaction: DEBUG
 
@@ -176,7 +178,6 @@ logging:
     org.hibernate.SQL: error
     org.springframework.orm.jpa: error
     org.springframework.transaction: error
-
 ---
 # local profile
 spring:
@@ -185,18 +186,18 @@ spring:
       on-profile: local
 eureka:
   client:
-    enabled: false
-    register-with-eureka: false
-    fetch-registry: false
+    service-url:
+      defaultZone: http://192.168.1.115:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
 ---
 spring:
   config:
     activate:
       on-profile: dev
-
-eureka:
-  client:
-    enabled: false
 
 management:
   endpoints:

@@ -39,6 +39,8 @@ jobs:
   build-test:
     name: Build and Test
     runs-on: ubuntu-latest
+    # ⚠️⚠️⚠️ 필수 수정 사항 - 각 리포지토리마다 다름 ⚠️⚠️⚠
+    environment: hub-cicd
 
     services:
       docker:
@@ -67,6 +69,7 @@ jobs:
           cp src/main/resources/application-sample.yml src/main/resources/application.yml
           echo "application.yml created from sample"
 
+      # ⚠️⚠️⚠️ 필수 수정 사항 - 각 리포지토리마다 다름 테스트를 위한 환경변수 ⚠️⚠️⚠️
       - name: Run tests
         if: github.event_name == '1' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') #skip
         run: ./gradlew test
