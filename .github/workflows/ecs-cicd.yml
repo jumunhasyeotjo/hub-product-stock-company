@@ -153,6 +153,8 @@ jobs:
         run: |
           docker build \
             --build-arg JAR_FILE=build/libs/*.jar \
+            --build-arg GITHUB_USERNAME=$GITHUB_USERNAME \
+            --build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
             .
