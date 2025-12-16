@@ -77,12 +77,13 @@ kakao:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_HOST}/eureka/
+      defaultZone: ${EUREKA_SERVER}
     register-with-eureka: true
     fetch-registry: true
+    registry-fetch-interval-seconds: 10
   instance:
     prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
+    ip-address: ${ECS_INSTANCE_IP_ADDRESS}
 
 
 resilience4j:
