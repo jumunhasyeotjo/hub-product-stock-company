@@ -42,11 +42,6 @@ jobs:
     # ⚠️⚠️⚠️ 필수 수정 사항 - 각 리포지토리마다 다름 ⚠️⚠️⚠
     environment: hub-cicd
 
-    services:
-      docker:
-        image: docker:dind
-        options: --privileged
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,6 +52,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: 'gradle'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
