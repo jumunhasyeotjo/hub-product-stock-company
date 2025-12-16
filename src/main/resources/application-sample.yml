@@ -77,7 +77,7 @@ kakao:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER}/eureka/
+      defaultZone: ${EUREKA_HOST}/eureka/
     register-with-eureka: true
     fetch-registry: true
     registry-fetch-interval-seconds: 10
