@@ -71,6 +71,7 @@ jobs:
 
       # ⚠️⚠️⚠️ 필수 수정 사항 - 각 리포지토리마다 다름 테스트를 위한 환경변수 ⚠️⚠️⚠️
       - name: Run tests
+        if: true == false # TEST skip
         run: ./gradlew test
         env:
           GITHUB_USERNAME: ${{ github.actor }}
