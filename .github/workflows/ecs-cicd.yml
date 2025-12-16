@@ -75,7 +75,7 @@ jobs:
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean test
 
   # ==========================================================================
   # CD: Job 1: Build
@@ -119,10 +119,10 @@ jobs:
           retention-days: 1
 
   # ==========================================================================
-  # CD: Job 2: Build and Push Docker Image
+  # CD: Job 2:  Push Docker Image
   # ==========================================================================
   build-push-image:
-    name: CD:Build and Push Docker Image
+    name: CD:Push Docker Image
     environment: hub-aws
     runs-on: ubuntu-latest
     needs: build-test
