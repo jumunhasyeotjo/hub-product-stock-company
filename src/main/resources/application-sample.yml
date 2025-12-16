@@ -149,7 +149,7 @@ spring:
     username: testuser
     password: testpass
     hikari:
-      maximum-pool-size: 30
+      maximum-pool-size: 10
   kafka:
     # 브로커 주소
     bootstrap-servers: localhost:9092
