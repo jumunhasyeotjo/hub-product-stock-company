@@ -65,16 +65,22 @@ jobs:
 
       - name: Build with Gradle (including Testcontainers tests)
         env:
-          GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
           POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          DB_CONNECTION_TIMEOUT: ${{ secrets.DB_CONNECTION_TIMEOUT }}
+          DB_LOCK_TIME_OUT: ${{ secrets.DB_LOCK_TIME_OUT }}
+          DB_POOL_SIZE: ${{ secrets.DB_POOL_SIZE }}
+          HUB_SERVICE_CACHEABLE: ${{ secrets.HUB_SERVICE_CACHEABLE }}
+          KAKAO_MOBILITY_API_KEY: ${{ secrets.KAKAO_MOBILITY_API_KEY }}
+          PASSPORT_ALGO: ${{ secrets.PASSPORT_ALGO }}
+          PASSPORT_EXPIRATION: ${{ secrets.PASSPORT_EXPIRATION }}
+          PASSPORT_SECRET: ${{ secrets.PASSPORT_SECRET }}
         run: ./gradlew clean test
 
   # ==========================================================================
