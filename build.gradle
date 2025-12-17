@@ -69,6 +69,7 @@ dependencies {
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     //actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
     //shedlock
     implementation 'net.javacrumbs.shedlock:shedlock-spring:5.9.0'
     implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.9.0'
