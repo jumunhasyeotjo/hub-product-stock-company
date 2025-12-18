@@ -16,30 +16,31 @@
 
     <!-- Loki Appender (test 프로파일에서는 완전 제외) -->
     <springProfile name="!test">
-        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
-            <http>
-                <url>http://${MONITORING_URL:localhost}:3100/loki/api/v1/push</url>
-            </http>
-            <format>
-                <label>
-                    <pattern>application=${springAppName},host=${HOSTNAME},level=%level</pattern>
-                </label>
-                <message>
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp>
+                        <timeZone>Asia/Seoul</timeZone>
+                    </timestamp>
                     <pattern>
-                        {
-                        "timestamp": "%date{ISO8601}",
-                        "level": "%level",
-                        "thread": "%thread",
-                        "logger": "%logger{36}",
-                        "message": "%message",
-                        "trace_id": "%mdc{trace_id:-}",
-                        "span_id": "%mdc{span_id:-}"
-                        }
+                        <pattern>
+                            {
+                            "timestamp": "%date{ISO8601}",
+                            "level": "%level",
+                            "logger": "%logger",
+                            "thread": "%thread",
+                            "service": "${SERVICE_NAME}",
+                            "env": "${ACTIVE_PROFILE}",
+                            "traceId": "%X{traceId:-}",
+                            "spanId": "%X{spanId:-}",
+                            "message": "%message",
+                            "exception": "%exception{5}"
+                            }
+                        </pattern>
                     </pattern>
-                </message>
-            </format>
-            <batchSize>100</batchSize>
-            <batchTimeoutMs>10000</batchTimeoutMs>
+                    <arguments/>
+                </providers>
+            </encoder>
         </appender>
     </springProfile>
 
@@ -58,10 +59,7 @@
     <springProfile name="!test">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="LOKI"/>
         </root>
-        <logger name="org.hibernate.orm.jdbc.bind" level="DEBUG"/>
-        <logger name="org.hibernate.SQL" level="DEBUG"/>
     </springProfile>
 
 </configuration>
