@@ -107,6 +107,23 @@ dependencies {
     implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.0'
     //Eureka
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    // 모니터링 의존성 추가
+    // 1. Actuator & Prometheus (메트릭 수집)
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'io.micrometer:micrometer-tracing'
+
+    // 2. Distributed Tracing (Tempo 연동 - OTLP)
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+
+    // 3. Loki Appender (로그 전송)
+    implementation 'com.github.loki4j:loki-logback-appender:1.6.0'
+
+    // 4. json 로그 형식 파싱
+    implementation 'ch.qos.logback:logback-classic'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 }
 
 dependencyManagement {
