@@ -111,5 +111,62 @@ jobs:
           cluster: ${{ inputs.ecs-cluster }}
           wait-for-service-stability: true
 
+      - name: 배포 성공 검증
+        run: |
+          EXPECTED_TASK_DEF=$(cat ${{ steps.task-def.outputs.task-definition }} | jq -r '.taskDefinitionArn')
+          echo "📌 Expected Task Definition: $EXPECTED_TASK_DEF"
+          
+          for i in {1..12}; do
+            sleep 5
+            echo ""
+            echo "⏱️  Check $i/12..."
+          
+            SERVICE=$(aws ecs describe-services \
+              --cluster ${{ inputs.ecs-cluster }} \
+              --services ${{ inputs.ecs-service }} \
+              --output json)
+          
+            # 실제 배포되어 있는 Task Definition
+            DEPLOYED_TASK_DEF=$(echo $SERVICE | jq -r '.services[0].taskDefinition')
+          
+            # PRIMARY 배포의 상태
+            DEPLOYMENT_STATUS=$(echo $SERVICE | jq -r '.services[0].deployments[] | select(.status=="PRIMARY") | .rolloutState // "IN_PROGRESS"')
+          
+            echo "  Expected:   $EXPECTED_TASK_DEF"
+            echo "  Deployed:   $DEPLOYED_TASK_DEF"
+            echo "  Status:     $DEPLOYMENT_STATUS"
+          
+            # 롤백 체크: 배포되어 있는 게 생성한 것과 다르면
+            if [ "$DEPLOYED_TASK_DEF" != "$EXPECTED_TASK_DEF" ]; then
+              echo ""
+              echo "❌ ROLLBACK DETECTED!"
+              echo "   Expected: $EXPECTED_TASK_DEF"
+              echo "   Deployed: $DEPLOYED_TASK_DEF"
+              exit 1
+            fi
+          
+            # 실패 체크
+            if [ "$DEPLOYMENT_STATUS" == "FAILED" ]; then
+              echo ""
+              echo "❌ DEPLOYMENT FAILED!"
+              exit 1
+            fi
+          
+            # 성공 체크: 생성한 Task가 배포되어 있고 상태가 COMPLETED
+            if [ "$DEPLOYMENT_STATUS" == "COMPLETED" ]; then
+              echo ""
+              echo "✅ DEPLOYMENT COMPLETED!"
+              echo "   Task Definition: $DEPLOYED_TASK_DEF"
+              echo "   Status: $DEPLOYMENT_STATUS"
+              exit 0
+            fi
+          
+            echo "  → Deployment in progress..."
+          done
+          
+          echo ""
+          echo "⏱️  TIMEOUT: Deployment did not complete in 60 seconds"
+          exit 1
+
       - name: Verify
         run: echo "✅ Deployed successfully!"
