@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-
-    <springProperty name="SERVICE_NAME" source="spring.application.name"/>
+    <springProperty name="SERVICE_NAME" source="spring.application.name" defaultValue="hub-service"/>
     <springProperty name="ACTIVE_PROFILE" source="spring.profiles.active" defaultValue="dev"/>
 
     <!-- Loki Appender (test 프로파일에서는 완전 제외) -->
@@ -50,6 +48,7 @@
     <springProfile name="!test">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="LOKI"/>
         </root>
     </springProfile>
 
