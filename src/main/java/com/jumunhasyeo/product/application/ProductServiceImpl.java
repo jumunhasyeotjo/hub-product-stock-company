@@ -120,6 +120,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     @Cacheable(value = CACHE_NAME, key = "#req.productId()", unless = "#result == null")
     public ProductRes getProduct(GetProductCommand req) {
+        log.debug("[Product Cache Miss] productId={}", req.productId());
         Product product = getProduct(req.productId());
         return ProductRes.of(product);
     }

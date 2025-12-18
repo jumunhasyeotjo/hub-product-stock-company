@@ -25,7 +25,6 @@ public class OutboxPollingScheduler {
     @SchedulerLock(name = "outboxPolling", lockAtLeastFor = "5s")
     @Scheduled(fixedDelay = 5000) // 2초마다 Polling
     public void pollOutbox() {
-        log.info("polling outbox events...");
         // 처리되지 않은 이벤트 조회
         List<OutboxEvent> events = outboxService.findTop100ByStatusOrderByIdAsc(PENDING);
         for (OutboxEvent event : events) {

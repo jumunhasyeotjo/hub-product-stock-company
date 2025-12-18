@@ -2,12 +2,18 @@ spring:
   config:
     activate:
       on-profile: test
+
+  application:
+    name: hub-product-stock-company-test
+
+  main:
+    banner-mode: off
+    log-startup-info: false
+
   data:
     redis:
       host: localhost
       port: 6379
-      password: ""
-      timeout: 3000ms
       ssl:
         enabled: false
 
@@ -17,8 +23,9 @@ spring:
     password: testpass
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
-      connection-timeout: 3000
+      maximum-pool-size: 5
+      connection-timeout: 2000
+      minimum-idle: 2
 
   jpa:
     hibernate:
@@ -26,9 +33,11 @@ spring:
     show-sql: false
     defer-datasource-initialization: true
     properties:
-      jakarta.persistence.lock.timeout: 2000
+      jakarta.persistence.lock.timeout: 1000
       hibernate:
-        format_sql: true
+        format_sql: false
+        use_sql_comments: false
+        generate_statistics: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
@@ -39,65 +48,88 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     topics:
-      hub: hub
-      order: order
+      hub: hub-test
+      order: order-test
     producer:
-      retries: 3
+      retries: 0
+      acks: 0
     consumer:
-      group-id: hub-service-group
+      group-id: test-hub-service-group
+      enable-auto-commit: false
 
+# Eureka 완전 비활성화
 eureka:
   client:
     enabled: false
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
     register-with-eureka: false
     fetch-registry: false
-    registry-fetch-interval-seconds: 10
-  instance:
-    prefer-ip-address: false
-    ip-address: localhost
 
+# 인증 설정
 eas:
   passport:
     secretKey: test-secret-key-must-be-at-least-32-characters-long-for-hs256-algorithm
     expiration: 604800
     algorithm: HS256
 
+# 캐시 설정
 cache:
   config:
-    hubService: true
+    hubService: true  # 테스트에서도 캐시 빈 생성  # 테스트에서는 캐시 비활성화 권장
 
+# 외부 API 설정
 kakao:
   mobility:
     api-key: dummy-kakao-api-key-for-test
 
-logging:
-  pattern:
-    level: "%5p [${spring.application.name:},%X{trace_id:-},%X{span_id:-}]"
-  level:
-    org.hibernate.orm.jdbc.bind: error
-    org.hibernate.type.descriptor.sql.BasicBinder: error
-    org.hibernate.SQL: error
-    org.springframework.orm.jpa: error
-    org.springframework.transaction: error
+# Resilience4j 비활성화
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: false
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 10
+        failureRateThreshold: 100  # 항상 닫힌 상태 유지
+  retry:
+    configs:
+      default:
+        maxAttempts: 1  # 재시도 비활성화
 
+# 로깅 설정 (logback-spring.xml이 우선하지만 명시)
+logging:
+  level:
+    root: WARN
+    com.sparta: INFO  # 본인 패키지명으로 변경
+    org.hibernate: ERROR
+    org.springframework: WARN
+    org.apache.kafka: ERROR
+    com.github.loki4j: OFF  # Loki 로그 완전 차단
+
+# 모니터링 완전 비활성화
 management:
   endpoints:
     web:
       exposure:
-        include: health, info
+        include: health
   metrics:
-    distribution:
-      percentiles-histogram:
-        http.server.requests: false
+    enabled: false
+    export:
+      prometheus:
+        enabled: false
   tracing:
+    enabled: false
     sampling:
       probability: 0.0
+  health:
+    circuitbreakers:
+      enabled: false
+    diskspace:
+      enabled: false
   otlp:
     tracing:
-      endpoint: http://localhost:4318/v1/traces
+      endpoint: http://localhost:4318/v1/traces  # 비활성화되었지만 값은 필요
 
+# Swagger 비활성화
 springdoc:
   api-docs:
     enabled: false

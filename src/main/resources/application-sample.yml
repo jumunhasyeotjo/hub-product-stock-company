@@ -150,6 +150,10 @@ management:
   tracing:
     sampling:
       probability: 1.0 # 개발환경이므로 모든(100%) 트래픽 추적
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 springdoc:
   api-docs:
