@@ -1,0 +1,54 @@
+package com.jumunhasyeo.stock.infrastructure.event;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
+
+import static com.jumunhasyeo.stock.infrastructure.event.ListenEventRegistry.ORDER_CANCEL_EVENT;
+import static com.jumunhasyeo.stock.infrastructure.event.ListenEventRegistry.ORDER_ROLLED_BACK_EVENT;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class KafkaStockEventListener {
+    private final OrderCompensateHandler orderCompensateHandler;
+    private final ObjectMapper objectMapper;
+    private final OrderAclService orderAclService;
+
+    @KafkaListener(
+            topics = "${spring.kafka.topics.order}",
+            groupId = "${spring.kafka.consumer.group-id}",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
+    public void listen(
+            @Payload String payload,
+            @Header(name = "eventType", required = false) String eventType
+    ) {
+        try {
+            log.info("Received event. EventType: {}, Payload: {}", eventType, payload);
+            String className = orderAclService.convert(eventType);
+            dispatch(payload, className);
+        }catch (Exception e){
+            log.error("Error processing event. EventType: {}, Payload: {}, Error: {}", eventType, payload, e.getMessage());
+        }
+    }
+
+    public void dispatch(String payload, String simpleClassName) throws JsonProcessingException {
+        if (simpleClassName.equals(ORDER_CANCEL_EVENT.getEventName())) {
+            OrderCancelEvent orderCancelEvent = objectMapper.readValue(payload, OrderCancelEvent.class);
+            orderCompensateHandler.compensate(orderCancelEvent);
+
+        } else if (simpleClassName.equals(ORDER_ROLLED_BACK_EVENT.getEventName())) {
+            OrderRolledBackEvent orderRolledBackEvent = objectMapper.readValue(payload, OrderRolledBackEvent.class);
+            orderCompensateHandler.compensate(orderRolledBackEvent);
+
+        } else {
+            log.warn("Unhandled event type: {}", simpleClassName);
+        }
+    }
+}

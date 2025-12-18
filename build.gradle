@@ -2,6 +2,9 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.7'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
+    id 'com.google.protobuf' version '0.9.4'
+    id 'org.springdoc.openapi-gradle-plugin' version '1.8.0'
 }
 
 group = 'com.jumunhasyeo'
@@ -22,24 +25,88 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/jumunhasyeotjo/passport")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 ext {
     set('springCloudVersion', "2025.0.0")
-
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'io.rest-assured:rest-assured'
+    //testcontainers
+    testImplementation 'org.testcontainers:testcontainers' // Testcontainers Core 라이브러리
+    testImplementation 'org.testcontainers:junit-jupiter:' // JUnit 5와의 통합
+    testImplementation 'org.testcontainers:postgresql' // postgresql 컨테이너
+    //swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5' // Swagger (springdoc-openapi)
+
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    // dotenv
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+    //actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // 1. Actuator & Prometheus (메트릭 수집)
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'io.micrometer:micrometer-tracing'
+
+    // 2. Distributed Tracing (Tempo 연동 - OTLP)
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+
+    // 3. Loki Appender (로그 전송)
+    implementation 'com.github.loki4j:loki-logback-appender:1.6.0'
+
+    // 4. json 로그 형식 파싱
+    implementation 'ch.qos.logback:logback-classic'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+    //shedlock
+    implementation 'net.javacrumbs.shedlock:shedlock-spring:5.9.0'
+    implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.9.0'
+    // passport 의존성 추가
+    implementation 'com.library:passport:1.0.3'
+    implementation 'com.google.protobuf:protobuf-java:3.21.12'
+    // Spring Cloud OpenFeign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // YAML parsing
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+    // Resilience4j
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.1.0'
+    // Caffeine Cache (L1 Cache)
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.testcontainers:kafka:1.19.3'
+    //Hibernate가 String을 JSONB로 자동 변환
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.0'
+    //Eureka
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 }
 
 dependencyManagement {
@@ -50,4 +117,66 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+    environment 'SPRING_PROFILES_ACTIVE', 'test'
+}
+
+// Q클래스 생성 경로 설정
+def generated = 'src/main/generated'
+sourceSets {
+    main.java.srcDirs += [generated]
+}
+
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+clean {
+    delete file(generated)
+}
+
+jacoco {
+    toolVersion = '0.8.12'
+}
+
+tasks.named('jar') {
+    enabled = false   // 일반 jar 비활성화
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required = true
+        xml.required = true
+    }
+
+    // QueryDSL QDomain 제외시키기
+    def QDomains = []
+
+    for (qPattern in '**/QA'..'**/QZ') {
+        QDomains.add(qPattern + '*')
+    }
+    afterEvaluate {
+        classDirectories.setFrom(
+                // 그 외의 매칭되는 클래스도 제외 대상
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            "com.jumunhasyeo.hub.domain.**.**",
+                            "**/*Application*",
+                            "**/*Config*",
+                            "**/*Dto*",
+                            "**/*Request*",
+                            "**/*Response*",
+                            "**/*Interceptor*",
+                            "**/*Exception*"
+                    ] + QDomains)
+                })
+        )
+    }
+}
+
+openApi {
+    apiDocsUrl.set("http://localhost:8088/v3/api-docs")
+    outputDir.set(file("$projectDir/src/main/resources")) // 저장 위치
+    outputFileName.set("openapi.json")                    // 파일명
+    waitTimeInSeconds.set(30)                             // 대기 시간
 }
