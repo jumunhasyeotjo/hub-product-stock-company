@@ -111,6 +111,18 @@ jobs:
           cluster: ${{ inputs.ecs-cluster }}
           wait-for-service-stability: true
 
+      - name: Get 배포 시도한 테스크 정의
+        id: deployed-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs describe-services \
+            --cluster ${{ inputs.ecs-cluster }} \
+            --services ${{ inputs.ecs-service }} \
+            --query 'services[0].deployments[0].taskDefinition' \
+            --output text)
+          
+          echo "task-def-arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+          echo "📌 Deployed Task Definition: $TASK_DEF_ARN"
+
       - name: 배포 성공 검증
         run: |
           EXPECTED_TASK_DEF="${{ steps.deployed-task-def.outputs.task-def-arn }}"
