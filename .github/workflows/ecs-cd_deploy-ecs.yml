@@ -113,7 +113,7 @@ jobs:
 
       - name: 배포 성공 검증
         run: |
-          EXPECTED_TASK_DEF=$(cat ${{ steps.task-def.outputs.task-definition }} | jq -r '.taskDefinitionArn')
+          EXPECTED_TASK_DEF="${{ steps.deployed-task-def.outputs.task-def-arn }}"
           echo "📌 Expected Task Definition: $EXPECTED_TASK_DEF"
           
           for i in {1..12}; do
