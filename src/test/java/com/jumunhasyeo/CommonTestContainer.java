@@ -59,7 +59,7 @@ public abstract class CommonTestContainer {
         // Redis 설정
         registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
         registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
-        registry.add("spring.data.redis.ssl.enabled", () -> "true");
+        registry.add("spring.data.redis.ssl.enabled", () -> "false");
 
         // Kafka 설정
         registry.add("spring.kafka.bootstrap-servers", KAFKA_CONTAINER::getBootstrapServers);

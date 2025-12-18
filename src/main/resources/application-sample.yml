@@ -11,28 +11,28 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD:}
       timeout: 3000ms
       ssl:
-        enabled: true  # TLS 활성화
+        enabled: false  # TLS 활성화
 
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_POR}/${POSTGRES_DB}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: ${DB_POOL_SIZE:10}
-      connection-timeout: ${DB_CONNECTION_TIMEOUT:3000}
+      maximum-pool-size: ${DB_POOL_SIZE}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
     defer-datasource-initialization: true
     properties:
-      jakarta.persistence.lock.timeout: ${DB_LOCK_TIME_OUT:2000}
+      jakarta.persistence.lock.timeout: ${DB_LOCK_TIME_OUT}
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -41,10 +41,9 @@ spring:
   sql:
     init:
       mode: always
-
   kafka:
     # 브로커 주소
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS} # localhost:9092
     # 토픽 설정 (커스텀)
     topics:
       hub: hub
@@ -53,15 +52,20 @@ spring:
       retries: 3
     consumer:
       # 컨슈머 그룹
-      group-id: hub-service-group
+      group-id: ${KAFKA_CONSUMER_GROUP} #hub-service-group
 
+# 로깅 설정 (Loki로 전송하기 위해 logback-spring.xml 사용 권장하지만, 간단 설정은 아래 참조)
 logging:
-#  level:
-#    org.hibernate.orm.jdbc.bind: TRACE      # 바인딩값 로그
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-#    org.springframework.orm.jpa: DEBUG
-#    org.springframework.transaction: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{trace_id:-},%X{span_id:-}]"
+  level:
+    # Hibernate binding 로그
+    org.hibernate.orm.jdbc.bind: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
+    # Hibernate SQL
+    org.hibernate.SQL: DEBUG
+    org.springframework.orm.jpa: DEBUG
+    org.springframework.transaction: DEBUG
 
 
 cache:
@@ -75,12 +79,13 @@ kakao:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_HOST}/eureka/
     register-with-eureka: true
     fetch-registry: true
+    registry-fetch-interval-seconds: 10
   instance:
     prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
+    ip-address: ${ECS_INSTANCE_IP_ADDRESS}
 
 
 resilience4j:
@@ -127,68 +132,24 @@ resilience4j:
 eas:
   passport:
     secretKey: ${PASSPORT_SECRET}
-    expiration: ${PASSPORT_EXPIRATION:604800}
+    expiration: ${PASSPORT_EXPIRATION}
     algorithm: ${PASSPORT_ALGO}
----
-# test profile
-spring:
-  config:
-    activate:
-      on-profile: test
-  data:
-    redis:
-      ssl:
-        enabled: false  # Testcontainers Redis는 SSL 미지원
-
-  # Testcontainers가 실제 값으로 오버라이드하지만, placeholder 에러 방지용 더미 값
-  datasource:
-    url: jdbc:postgresql://localhost:5432/testdb
-    username: testuser
-    password: testpass
-    hikari:
-      maximum-pool-size: 30
-  kafka:
-    # 브로커 주소
-    bootstrap-servers: localhost:9092
-    # 토픽 설정 (커스텀)
-    topics:
-      hub: hub
-      order: order
-    producer:
-      retries: 3
-    consumer:
-      # 컨슈머 그룹
-      group-id: hub-service-group
-cache:
-  config:
-    hubService: true  # 테스트에서 캐시 기능 테스트
-
-kakao:
-  mobility:
-    api-key: dummy-kakao-api-key-for-test  # 테스트용 더미 값
-
----
-# local profile
-spring:
-  config:
-    activate:
-      on-profile: local
-eureka:
-  client:
-    enabled: false
-    register-with-eureka: false
-    fetch-registry: false
----
-spring:
-  config:
-    activate:
-      on-profile: dev
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health, info, metrics, prometheus # Prometheus가 긁어갈 수 있게 노출
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true # P95, P99 등 히스토그램 데이터 수집
+  otlp:
+    tracing:
+      endpoint: http://${MONITORING_URL}:4318/v1/traces # 로컬 Docker의 Tempo로 전송
+  tracing:
+    sampling:
+      probability: 1.0 # 개발환경이므로 모든(100%) 트래픽 추적
 
 springdoc:
   api-docs:
