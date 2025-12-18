@@ -1,70 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <springProperty name="SERVICE_NAME" source="spring.application.name" defaultValue="unknown-service"/>
-    <springProperty name="ACTIVE_PROFILE" source="spring.profiles.active" defaultValue="local"/>
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
 
+    <!-- Console Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp>
-                    <timeZone>Asia/Seoul</timeZone>
-                </timestamp>
-                <pattern>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdc>true</includeMdc>
+            <includeContext>true</includeContext>
+            <includeCallerData>false</includeCallerData>
+            <timestampPattern>yyyy-MM-dd'T'HH:mm:ss.SSS</timestampPattern>
+        </encoder>
+    </appender>
+
+    <!-- Loki Appender (test 프로파일에서는 완전 제외) -->
+    <springProfile name="!test">
+        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+            <http>
+                <url>http://${MONITORING_URL:localhost}:3100/loki/api/v1/push</url>
+            </http>
+            <format>
+                <label>
+                    <pattern>application=${springAppName},host=${HOSTNAME},level=%level</pattern>
+                </label>
+                <message>
                     <pattern>
                         {
                         "timestamp": "%date{ISO8601}",
                         "level": "%level",
-                        "logger": "%logger",
                         "thread": "%thread",
-                        "service": "${SERVICE_NAME}",
-                        "env": "${ACTIVE_PROFILE}",
-                        "traceId": "%X{traceId:-}",
-                        "spanId": "%X{spanId:-}",
+                        "logger": "%logger{36}",
                         "message": "%message",
-                        "exception": "%exception{5}"
+                        "trace_id": "%mdc{trace_id:-}",
+                        "span_id": "%mdc{span_id:-}"
                         }
                     </pattern>
-                </pattern>
-                <arguments/>
-            </providers>
-        </encoder>
-    </appender>
+                </message>
+            </format>
+            <batchSize>100</batchSize>
+            <batchTimeoutMs>10000</batchTimeoutMs>
+        </appender>
+    </springProfile>
 
-    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
-        <http>
-            <url>http://localhost:3100/loki/api/v1/push</url>
-        </http>
+    <!-- Test Profile -->
+    <springProfile name="test">
+        <root level="WARN">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="com.jumunhasyeo" level="INFO"/>
+        <logger name="org.hibernate" level="ERROR"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="com.github.loki4j" level="OFF"/>
+    </springProfile>
 
-        <batchTimeoutMs>1000</batchTimeoutMs>
-        <maxBatchSize>100</maxBatchSize>
+    <!-- Production Profile -->
+    <springProfile name="!test">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="LOKI"/>
+        </root>
+        <logger name="org.hibernate.orm.jdbc.bind" level="DEBUG"/>
+        <logger name="org.hibernate.SQL" level="DEBUG"/>
+    </springProfile>
 
-        <format>
-            <label>
-                <pattern>app=${SERVICE_NAME},host=${HOSTNAME},env=${ACTIVE_PROFILE},level=%level</pattern>
-            </label>
-
-            <message>
-                <pattern>
-                    {
-                    "timestamp": "%date{ISO8601}",
-                    "level": "%level",
-                    "logger": "%logger",
-                    "thread": "%thread",
-                    "service": "${SERVICE_NAME}",
-                    "env": "${ACTIVE_PROFILE}",
-                    "traceId": "%X{traceId:-}",
-                    "spanId": "%X{spanId:-}",
-                    "message": "%message",
-                    "exception": "%exception{5}"
-                    }
-                </pattern>
-            </message>
-        </format>
-    </appender>
-
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOKI"/>
-    </root>
 </configuration>
