@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-@Profile("dev")
+@Profile("!test")
 @RequiredArgsConstructor
 public class HubDataInitializer implements ApplicationRunner {
 

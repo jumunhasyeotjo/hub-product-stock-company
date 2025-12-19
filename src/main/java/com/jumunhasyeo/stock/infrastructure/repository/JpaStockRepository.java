@@ -1,6 +1,5 @@
 package com.jumunhasyeo.stock.infrastructure.repository;
 
-import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.domain.entity.Stock;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
