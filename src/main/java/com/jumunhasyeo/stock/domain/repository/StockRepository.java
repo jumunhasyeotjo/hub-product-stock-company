@@ -1,6 +1,5 @@
 package com.jumunhasyeo.stock.domain.repository;
 
-import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.domain.entity.Stock;
 
 import java.util.Optional;

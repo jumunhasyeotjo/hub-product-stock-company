@@ -1,7 +1,7 @@
 package com.jumunhasyeo.common.scheduler;
 
-import com.jumunhasyeo.common.inbox.InboxService;
 import com.jumunhasyeo.common.inbox.InboxEvent;
+import com.jumunhasyeo.common.inbox.InboxService;
 import com.jumunhasyeo.common.inbox.InboxStatus;
 import com.jumunhasyeo.common.inbox.JpaInboxRepository;
 import lombok.RequiredArgsConstructor;
