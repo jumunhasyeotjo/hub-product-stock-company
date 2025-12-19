@@ -48,15 +48,12 @@
 
     <!-- test Profile -->
     <springProfile name="test">
-        <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-        
         <root level="WARN">
             <appender-ref ref="CONSOLE"/>
         </root>
-        <logger name="com.jumunhasyeo" level="INFO"/>
+        <logger name="com.jumunhasyeo" level="ERROR"/>
         <logger name="org.hibernate" level="ERROR"/>
-        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.springframework" level="ERROR"/>
         <logger name="com.github.loki4j" level="OFF"/>
     </springProfile>
 
