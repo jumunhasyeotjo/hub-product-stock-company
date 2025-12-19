@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Test Profile에서만 Spring Boot defaults 포함 -->
-    <springProfile name="test">
+    <!-- local Profile에서는 Spring Boot 순정 설정 사용 -->
+    <springProfile name="local">
         <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
     </springProfile>
 
     <springProperty name="SERVICE_NAME" source="spring.application.name" defaultValue="hub-service"/>
     <springProperty name="ACTIVE_PROFILE" source="spring.profiles.active" defaultValue="dev"/>
 
-    <!-- Loki Appender (test 프로파일에서는 완전 제외) -->
-    <springProfile name="!test">
+    <!-- dev Profile - JSON 포맷 -->
+    <springProfile name="dev">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
                 <providers>
@@ -36,24 +40,21 @@
                 </providers>
             </encoder>
         </appender>
+        
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
     </springProfile>
 
-    <!-- Test Profile -->
+    <!-- test Profile -->
     <springProfile name="test">
         <root level="WARN">
             <appender-ref ref="CONSOLE"/>
         </root>
-        <logger name="com.jumunhasyeo" level="INFO"/>
+        <logger name="com.jumunhasyeo" level="ERROR"/>
         <logger name="org.hibernate" level="ERROR"/>
-        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.springframework" level="ERROR"/>
         <logger name="com.github.loki4j" level="OFF"/>
-    </springProfile>
-
-    <!-- Production Profile -->
-    <springProfile name="!test">
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-        </root>
     </springProfile>
 
 </configuration>

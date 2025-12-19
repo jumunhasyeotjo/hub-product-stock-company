@@ -47,10 +47,19 @@ public class HubRoute extends BaseEntity {
                 .build();
     }
 
+    public static HubRoute ofSelfId(UUID routeId, Hub startHub, Hub endHub, RouteWeight weight) {
+        return HubRoute.builder()
+                .routeId(routeId)
+                .startHub(startHub)
+                .endHub(endHub)
+                .routeWeight(weight)
+                .build();
+    }
+
     public static HashSet<HubRoute> createTwoWay(Hub from, Hub to, RouteWeight routeWeight) {
         HashSet<HubRoute> hubRoutes = new HashSet<>();
-        hubRoutes.add(of(from, to, routeWeight));
-        hubRoutes.add(of(to, from, routeWeight));
+        hubRoutes.add(ofSelfId(UUID.randomUUID(), from, to, routeWeight));
+        hubRoutes.add(ofSelfId(UUID.randomUUID(), to, from, routeWeight));
         return hubRoutes;
     }
 }
