@@ -1,60 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- local Profile에서만 Spring Boot defaults 포함 -->
-
+    <!-- local Profile에서는 Spring Boot 순정 설정 사용 -->
     <springProfile name="local">
-        <conversionRule conversionWord="clr" class="org.springframework.boot.logging.logback.ColorConverter"/>
-
-        <!-- 일반 로그 -->
-        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>%clr(%d{HH:mm:ss.SSS}){faint} %clr(%5p){highlight} %clr(%30.30logger{29}){cyan} : %m%n</pattern>
-            </encoder>
-        </appender>
-
-        <!-- SQL만 -->
-        <appender name="SQL-CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>%clr(SQL){green,bold} %clr(>){faint} %clr(%m){blue}%n</pattern>
-            </encoder>
-        </appender>
-
-        <!-- 바인딩 파라미터  -->
-        <appender name="BIND-CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>%clr(  ↳){faint} %clr(%m){yellow}%n</pattern>
-            </encoder>
-        </appender>
-
+        <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>
-
-        <!-- 내 애플리케이션 -->
-        <logger name="com.jumunhasyeo" level="INFO"/>
-
-        <!-- SQL 쿼리 -->
-        <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
-            <appender-ref ref="SQL-CONSOLE"/>
-        </logger>
-
-        <!-- 바인딩 파라미터 -->
-        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false">
-            <appender-ref ref="BIND-CONSOLE"/>
-        </logger>
-
-        <!-- 시끄러운 로그 끄기 -->
-        <logger name="org.springframework" level="WARN"/>
-        <logger name="org.hibernate" level="WARN"/>
-        <logger name="com.zaxxer.hikari" level="WARN"/>
-        <logger name="com.netflix" level="WARN"/>
-        <logger name="org.apache" level="WARN"/>
     </springProfile>
 
     <springProperty name="SERVICE_NAME" source="spring.application.name" defaultValue="hub-service"/>
     <springProperty name="ACTIVE_PROFILE" source="spring.profiles.active" defaultValue="dev"/>
 
-    <!-- Loki Appender (test 프로파일에서는 완전 제외) -->
+    <!-- dev Profile - JSON 포맷 -->
     <springProfile name="dev">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -82,10 +40,17 @@
                 </providers>
             </encoder>
         </appender>
+        
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
     </springProfile>
 
-    <!-- Test Profile -->
+    <!-- test Profile -->
     <springProfile name="test">
+        <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        
         <root level="WARN">
             <appender-ref ref="CONSOLE"/>
         </root>
@@ -93,13 +58,6 @@
         <logger name="org.hibernate" level="ERROR"/>
         <logger name="org.springframework" level="WARN"/>
         <logger name="com.github.loki4j" level="OFF"/>
-    </springProfile>
-
-    <!-- Production Profile -->
-    <springProfile name="dev">
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-        </root>
     </springProfile>
 
 </configuration>
