@@ -3,7 +3,10 @@ package com.jumunhasyeo.common.outbox;
 import com.jumunhasyeo.common.BaseEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import java.util.UUID;
