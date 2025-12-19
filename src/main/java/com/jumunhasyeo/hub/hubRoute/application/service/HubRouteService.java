@@ -46,7 +46,6 @@ public class HubRouteService {
             hubRoutes.addAll(buildForBranch(command));
         }
 
-        hubRouteRepository.saveAll(new ArrayList<>(hubRoutes));
         List<HubRouteCreatedEvent> createEventList = hubRoutes.stream()
                 .map(HubRouteCreatedEvent::from)
                 .collect(Collectors.toList());
@@ -58,7 +57,10 @@ public class HubRouteService {
      */
     private Set<HubRoute> buildForCenter(BuildRouteCommand command) {
         Hub newCenterHub = getHub(command.hubId());
-        List<Hub> existingCenterHubs = hubRepository.findAllByHubType(HubType.CENTER);
+        List<Hub> existingCenterHubs = hubRepository.findAllByHubType(HubType.CENTER)
+                .stream()
+                .filter(hub -> !hub.getHubId().equals(newCenterHub.getHubId()))  // 자기 자신 제외
+                .collect(Collectors.toList());
         
         // Domain Service에 Route 생성 로직 위임
         Set<HubRoute> routes = hubRouteDomainService.buildRoutesForNewCenterHub(
@@ -83,7 +85,7 @@ public class HubRouteService {
             centerHub,
             this::calculateRouteWeight
         );
-        
+
         hubRouteRepository.insertIgnore(routes);
         return routes;
     }

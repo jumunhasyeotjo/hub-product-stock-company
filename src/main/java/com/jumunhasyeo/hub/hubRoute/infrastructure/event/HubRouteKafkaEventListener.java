@@ -50,7 +50,8 @@ public class HubRouteKafkaEventListener {
             hubRouteEventHandler.hubDeleted(hubDeletedEvent);
 
         } else {
-            log.warn("Unhandled event type: {}", simpleClassName);
+            log.info("Unhandled event type: {}", simpleClassName);
+            log.info("Unhandled event payload: {}", payload);
         }
     }
 }
