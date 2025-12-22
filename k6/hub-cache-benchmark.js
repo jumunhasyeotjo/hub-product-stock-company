@@ -17,6 +17,7 @@ const CACHE_TYPE = __ENV.CACHE_TYPE || 'UNKNOWN';
 
 // 테스트용 Hub ID (실제 존재하는 ID로 변경 필요)
 const TEST_HUB_ID = __ENV.HUB_ID || 'a73979b2-518d-495e-84be-de3c026acc94';
+const hubUpdateSeq = new Counter('hub_update_seq');
 
 // ==================== 커스텀 메트릭 ====================
 const readLatency = new Trend('hub_read_latency', true);
@@ -34,7 +35,7 @@ export const options = {
         // 시나리오 1: 읽기 집중 (캐시 효과 측정)
         read_heavy: {
             executor: 'constant-vus',
-            vus: 10,
+            vus: 500,
             duration: '30s',
             exec: 'readHeavyScenario',
             tags: { scenario: 'read_heavy' },
@@ -43,7 +44,7 @@ export const options = {
         // 시나리오 2: 쓰기 후 읽기 (캐시 무효화 측정)
         write_then_read: {
             executor: 'constant-vus',
-            vus: 5,
+            vus: 250,
             duration: '30s',
             startTime: '35s',
             exec: 'writeThenReadScenario',
@@ -55,9 +56,9 @@ export const options = {
             executor: 'ramping-vus',
             startVUs: 1,
             stages: [
-                { duration: '10s', target: 10 },
-                { duration: '20s', target: 20 },
-                { duration: '10s', target: 10 },
+                { duration: '10s', target: 500 },
+                { duration: '20s', target: 1000 },
+                { duration: '10s', target: 500 },
                 { duration: '10s', target: 0 },
             ],
             startTime: '70s',
@@ -73,9 +74,9 @@ export const options = {
             preAllocatedVUs: 50,
             maxVUs: 100,
             stages: [
-                { duration: '10s', target: 50 },
-                { duration: '20s', target: 100 },
-                { duration: '10s', target: 50 },
+                { duration: '10s', target: 2500 },
+                { duration: '20s', target: 5000 },
+                { duration: '10s', target: 2500 },
                 { duration: '10s', target: 0 },
             ],
             startTime: '130s',
@@ -114,7 +115,7 @@ function checkResponse(res, name) {
 // 단건 조회 (캐시 히트 측정)
 function getHubById(hubId) {
     const start = Date.now();
-    const res = http.get(`${BASE_URL}/api/v1/hubs/${hubId}`, { headers, tags: { name: 'GetHubById' } });
+    const res = http.get(`${BASE_URL}/internal/api/v1/hubs/${hubId}`, { headers, tags: { name: 'GetHubById' } });
     readLatency.add(Date.now() - start);
     
     if (!checkResponse(res, 'GetHubById')) {
@@ -126,7 +127,7 @@ function getHubById(hubId) {
 // 전체 조회 (캐시 효과 큼)
 function getAllHubs() {
     const start = Date.now();
-    const res = http.get(`${BASE_URL}/api/v1/hubs`, { headers, tags: { name: 'GetAllHubs' } });
+    const res = http.get(`${BASE_URL}/internal/api/v1/hubs`, { headers, tags: { name: 'GetAllHubs' } });
     getAllLatency.add(Date.now() - start);
     
     checkResponse(res, 'GetAllHubs');
@@ -136,7 +137,7 @@ function getAllHubs() {
 // 검색 (캐시 미적용)
 function searchHubs(name) {
     const start = Date.now();
-    const res = http.get(`${BASE_URL}/api/v1/hubs/search?name=${name}`, { headers, tags: { name: 'SearchHubs' } });
+    const res = http.get(`${BASE_URL}/api/v1/hubs/search?name=${encodeURIComponent(name)}`, { headers, tags: { name: 'SearchHubs' } });
     searchLatency.add(Date.now() - start);
     
     checkResponse(res, 'SearchHubs');
@@ -146,9 +147,10 @@ function searchHubs(name) {
 // 수정 (캐시 무효화)
 function updateHub(hubId) {
     const start = Date.now();
+    const seq = hubUpdateSeq.add(1); // 원자적 증가
     const payload = JSON.stringify({
         hubId: hubId,
-        name: `TestHub-${Date.now()}`,
+        name: `TestHub-${seq}`,
         address: '서울시 강남구 테스트로 123',
         latitude: 37.5665 + (Math.random() * 0.01),
         longitude: 126.9780 + (Math.random() * 0.01),
@@ -210,7 +212,7 @@ export function mixedWorkloadScenario() {
             getAllHubs();
         } else if (rand < 0.95) {
             // 10% 검색
-            searchHubs('서울');
+            searchHubs('경기 남부 센터');
         } else {
             // 5% 수정
             updateHub(TEST_HUB_ID);

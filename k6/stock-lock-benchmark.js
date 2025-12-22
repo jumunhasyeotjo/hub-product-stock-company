@@ -1,6 +1,7 @@
 import http from 'k6/http';
 import { check, sleep, group } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
+import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 
 /**
  * StockVariationService 락 전략 벤치마크
@@ -30,13 +31,14 @@ const decrementErrors = new Counter('stock_decrement_errors');
 const lockConflicts = new Counter('stock_lock_conflicts');
 const successRate = new Rate('stock_success_rate');
 
+
 // ==================== 테스트 시나리오 ====================
 export const options = {
     scenarios: {
         // 시나리오 1: 동시 증가 (동시성 테스트)
         concurrent_increment: {
             executor: 'constant-vus',
-            vus: 20,
+            vus: 60,
             duration: '30s',
             exec: 'concurrentIncrementScenario',
             tags: { scenario: 'concurrent_increment' },
@@ -45,7 +47,7 @@ export const options = {
         // 시나리오 2: 동시 감소 (재고 차감 경쟁)
         concurrent_decrement: {
             executor: 'constant-vus',
-            vus: 20,
+            vus: 60,
             duration: '30s',
             startTime: '35s',
             exec: 'concurrentDecrementScenario',
@@ -55,7 +57,7 @@ export const options = {
         // 시나리오 3: 혼합 (증가/감소 동시)
         mixed_operations: {
             executor: 'constant-vus',
-            vus: 20,
+            vus: 60,
             duration: '30s',
             startTime: '70s',
             exec: 'mixedOperationsScenario',
@@ -65,11 +67,11 @@ export const options = {
         // 시나리오 4: 고부하 동시성 (락 경합 최대화)
         high_contention: {
             executor: 'ramping-vus',
-            startVUs: 10,
+            startVUs: 60,
             stages: [
-                { duration: '10s', target: 30 },
-                { duration: '20s', target: 50 },
-                { duration: '10s', target: 30 },
+                { duration: '10s', target: 50 },
+                { duration: '20s', target: 200 },
+                { duration: '10s', target: 50 },
                 { duration: '10s', target: 0 },
             ],
             startTime: '105s',
@@ -112,17 +114,23 @@ function checkResponse(res, name) {
 // ==================== API 호출 함수 ====================
 
 // 재고 증가
-function incrementStock(productId, amount) {
+function incrementStock(productId, quantity) {
     const start = Date.now();
-    const payload = JSON.stringify({
+    const payload = JSON.stringify([{
         productId: productId,
-        amount: amount || 1,
-    });
-    
+        quantity: quantity || 1,
+    }]);
+
+    const idempotencyKey = uuidv4();
+
     const res = http.post(
         `${BASE_URL}/api/v1/stocks/increment`,
         payload,
-        { headers, tags: { name: 'IncrementStock' } }
+        { headers: {
+                ...headers, // 기존 헤더 유지
+                'Idempotency-Key': idempotencyKey,
+            }
+            , tags: { name: 'IncrementStock' } }
     );
     
     incrementLatency.add(Date.now() - start);
@@ -134,17 +142,23 @@ function incrementStock(productId, amount) {
 }
 
 // 재고 감소
-function decrementStock(productId, amount) {
+function decrementStock(productId, quantity) {
     const start = Date.now();
-    const payload = JSON.stringify({
+    const payload = JSON.stringify([{
         productId: productId,
-        amount: amount || 1,
-    });
-    
+        quantity: quantity || 1,
+    }]);
+
+    const idempotencyKey = uuidv4();
+
     const res = http.post(
         `${BASE_URL}/api/v1/stocks/decrement`,
         payload,
-        { headers, tags: { name: 'DecrementStock' } }
+        { headers: {
+                ...headers, // 기존 헤더 유지
+                'Idempotency-Key': idempotencyKey,
+            }
+            , tags: { name: 'DecrementStock' } }
     );
     
     decrementLatency.add(Date.now() - start);

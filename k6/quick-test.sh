@@ -21,23 +21,23 @@ read -p "Choice: " choice
 case $choice in
     1)
         curl -s -X PUT "$BASE_URL/internal/api/v1/dynamic/hub?type=CAFFEINE" | jq .
-        k6 run --env BASE_URL="$BASE_URL" --env CACHE_TYPE=CAFFEINE --env HUB_ID="$HUB_ID" --duration 10s --vus 5 hub-cache-benchmark.js
+        k6 run --env BASE_URL="$BASE_URL" --env CACHE_TYPE=CAFFEINE --env HUB_ID="$HUB_ID"  hub-cache-benchmark.js
         ;;
     2)
         curl -s -X PUT "$BASE_URL/internal/api/v1/dynamic/hub?type=REDIS" | jq .
-        k6 run --env BASE_URL="$BASE_URL" --env CACHE_TYPE=REDIS --env HUB_ID="$HUB_ID" --duration 10s --vus 5 hub-cache-benchmark.js
+        k6 run --env BASE_URL="$BASE_URL" --env CACHE_TYPE=REDIS --env HUB_ID="$HUB_ID"  hub-cache-benchmark.js
         ;;
     3)
         curl -s -X PUT "$BASE_URL/internal/api/v1/dynamic/hub?type=NONE" | jq .
-        k6 run --env BASE_URL="$BASE_URL" --env CACHE_TYPE=NONE --env HUB_ID="$HUB_ID" --duration 10s --vus 5 hub-cache-benchmark.js
+        k6 run --env BASE_URL="$BASE_URL" --env CACHE_TYPE=NONE --env HUB_ID="$HUB_ID"  hub-cache-benchmark.js
         ;;
     4)
         curl -s -X PUT "$BASE_URL/internal/api/v1/dynamic/stock?type=DEFAULT" | jq .
-        k6 run --env BASE_URL="$BASE_URL" --env LOCK_TYPE=DEFAULT --env PRODUCT_ID="$PRODUCT_ID" --duration 10s --vus 5 stock-lock-benchmark.js
+        k6 run --env BASE_URL="$BASE_URL" --env LOCK_TYPE=DEFAULT --env PRODUCT_ID="$PRODUCT_ID"  stock-lock-benchmark.js
         ;;
     5)
         curl -s -X PUT "$BASE_URL/internal/api/v1/dynamic/stock?type=PESSIMISTIC_LOCK" | jq .
-        k6 run --env BASE_URL="$BASE_URL" --env LOCK_TYPE=PESSIMISTIC_LOCK --env PRODUCT_ID="$PRODUCT_ID" --duration 10s --vus 5 stock-lock-benchmark.js
+        k6 run --env BASE_URL="$BASE_URL" --env LOCK_TYPE=PESSIMISTIC_LOCK --env PRODUCT_ID="$PRODUCT_ID"  stock-lock-benchmark.js
         ;;
     *)
         echo "Invalid choice"
