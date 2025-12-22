@@ -1,6 +1,6 @@
 package com.jumunhasyeo.common.config;
 
-import com.jumunhasyeo.hub.hub.application.HubCachedDecoratorService;
+import com.jumunhasyeo.hub.hub.application.HubCaffeineCachedDecoratorService;
 import com.jumunhasyeo.hub.hub.application.HubEventPublisher;
 import com.jumunhasyeo.hub.hub.application.HubService;
 import com.jumunhasyeo.hub.hub.application.HubServiceImpl;
@@ -37,7 +37,7 @@ public class HubServiceConfig {
                 hubEventPublisher
         );
 
-        return new HubCachedDecoratorService(impl);
+        return new HubCaffeineCachedDecoratorService(impl);
     }
 
     /**
@@ -81,6 +81,6 @@ public class HubServiceConfig {
                 hubEventPublisher
         );
 
-        return new HubCachedDecoratorService(impl);
+        return new HubCaffeineCachedDecoratorService(impl);
     }
 }

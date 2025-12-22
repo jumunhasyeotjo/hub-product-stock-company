@@ -19,14 +19,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-public class HubCachedDecoratorService implements HubService {
+public class HubCaffeineCachedDecoratorService implements HubService {
 
     private static final String CACHE_NAME = "hub";
     private static final String CACHE_MANAGER_NAME = "caffeineCacheManager";
 
     private final HubService hubService;
 
-    public HubCachedDecoratorService(@Qualifier("hubServiceImpl") HubService hubService) {
+    public HubCaffeineCachedDecoratorService(@Qualifier("hubServiceImpl") HubService hubService) {
         this.hubService = hubService;
     }
 

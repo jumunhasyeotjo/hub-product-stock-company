@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
 @Import(InternalIntegrationTestConfig.class)
-class HubCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
+class HubCaffeineCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
 
     @Autowired
     @Qualifier("hubServiceCached")
