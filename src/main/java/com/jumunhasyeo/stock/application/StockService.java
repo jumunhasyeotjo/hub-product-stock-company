@@ -78,7 +78,7 @@ public class StockService {
 
     private Stock getStock(UUID stockId){
         return stockRepository.findById(stockId)
-                .orElseThrow(()-> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(()-> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "stock(id="+ stockId +") 조회에 실패 했습니다."));
     }
 
     private boolean isExistHubAndProduct(CreateStockCommand command) {

@@ -76,6 +76,6 @@ public class CompanyServiceImpl implements CompanyService {
 
     private Company getCompany(UUID companyId) {
         return companyRepository.findById(companyId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "companyId = "+companyId));
     }
 }

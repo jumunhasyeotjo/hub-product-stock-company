@@ -44,6 +44,6 @@ public class StockVariationServiceImpl implements StockVariationService {
 
     private Stock getStock(UUID productId) {
         return stockRepository.findByProductId(productId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "productId = "+productId));
     }
 }
