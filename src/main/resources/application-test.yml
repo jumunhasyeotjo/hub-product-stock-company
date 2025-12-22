@@ -54,8 +54,11 @@ spring:
       retries: 0
       acks: 0
     consumer:
-      group-id: test-hub-service-group
-      enable-auto-commit: false
+      hub: hub
+      hub-route: hub-route
+      product: product
+      stock: stock
+      company: company
 
 # Eureka 완전 비활성화
 eureka:

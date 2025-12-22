@@ -50,7 +50,11 @@ spring:
       retries: 3
     consumer:
       # 컨슈머 그룹
-      group-id: ${KAFKA_CONSUMER_GROUP} #hub-service-group
+      hub: ${KAFKA_CONSUMER_GROUP_HUB_DOMAIN}
+      hub-route: ${KAFKA_CONSUMER_GROUP_HUB-ROUTE_DOMAIN}
+      product: ${KAFKA_CONSUMER_GROUP_PRODUCT_DOMAIN}
+      stock: ${KAFKA_CONSUMER_GROUP_STOCK_DOMAIN}
+      company: ${KAFKA_CONSUMER_GROUP_COMPANY_DOMAIN}
 
 logging:
   level:

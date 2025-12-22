@@ -18,11 +18,11 @@ public class DynamicConfig {
      * HubService 캐시 타입
      * CAFFEINE | REDIS | NONE
      */
-    private String hubCache = "CAFFEINE";
+    private String hubCache = HubServiceCacheType.CAFFEINE.name();
     
     /**
      * StockVariationService 구현체 타입
      * DEFAULT | PESSIMISTIC_LOCK
      */
-    private String stockLock = "DEFAULT";
+    private String stockLock = StockLockType.DEFAULT.name();
 }

@@ -95,5 +95,4 @@ public class HubCaffeineCachedDecoratorService implements HubService {
     public List<HubRes> getAll() {
         return hubService.getAll();
     }
-
 }
