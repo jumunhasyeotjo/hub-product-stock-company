@@ -9,12 +9,14 @@ import com.jumunhasyeo.stock.domain.entity.Stock;
 import com.jumunhasyeo.stock.domain.repository.StockRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Primary
 public class StockVariationServiceImpl implements StockVariationService {
 
     private final StockRepository stockRepository;
