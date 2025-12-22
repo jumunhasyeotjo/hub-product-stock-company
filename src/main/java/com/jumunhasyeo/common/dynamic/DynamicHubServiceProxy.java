@@ -1,4 +1,4 @@
-package com.jumunhasyeo.common.cache;
+package com.jumunhasyeo.common.dynamic;
 
 import com.jumunhasyeo.hub.hub.application.HubService;
 import com.jumunhasyeo.hub.hub.application.command.CreateHubCommand;
@@ -19,27 +19,25 @@ import java.util.UUID;
 
 /**
  * 동적 캐시 스위칭용 HubService 프록시
- * 
- * 런타임에 cache.active 값에 따라 구현체 전환
  */
 @Slf4j
 @Service
 @Primary
-@ConditionalOnProperty(name = "cache.dynamic", havingValue = "true")
+@ConditionalOnProperty(name = "dynamic.enabled", havingValue = "true")
 public class DynamicHubServiceProxy implements HubService {
     
-    private final DynamicCacheConfig cacheConfig;
+    private final DynamicConfig config;
     private final Map<String, HubService> implementations;
     
     public DynamicHubServiceProxy(
-            DynamicCacheConfig cacheConfig,
+            DynamicConfig config,
             List<HubService> hubServices
     ) {
-        this.cacheConfig = cacheConfig;
+        this.config = config;
         this.implementations = new java.util.HashMap<>();
         
         for (HubService service : hubServices) {
-            if (service == this) continue; // 자기 자신 제외
+            if (service == this) continue;
             
             String className = service.getClass().getSimpleName();
             if (className.contains("Caffeine")) {
@@ -51,26 +49,20 @@ public class DynamicHubServiceProxy implements HubService {
             }
         }
         
-        log.info("[DynamicCache] Proxy initialized: {}", implementations.keySet());
+        log.info("[Dynamic] HubService Proxy initialized: {}", implementations.keySet());
     }
     
     private HubService resolve() {
-        String active = cacheConfig.getActive().toUpperCase();
+        String active = config.getHubCache().toUpperCase();
         HubService impl = implementations.get(active);
         
         if (impl == null) {
-            log.warn("[DynamicCache] Unknown type '{}', fallback to CAFFEINE", active);
+            log.warn("[Dynamic] Unknown type '{}', fallback to CAFFEINE", active);
             impl = implementations.get("CAFFEINE");
         }
         
         return impl;
     }
-    
-    public String getCurrentType() {
-        return cacheConfig.getActive();
-    }
-    
-    // ==================== HubService 위임 ====================
     
     @Override
     public HubRes create(CreateHubCommand command) {
