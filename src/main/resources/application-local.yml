@@ -140,12 +140,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
-  metrics:
-    enabled: false
-    export:
-      prometheus:
-        enabled: false
+        include: "*"
   tracing:
     enabled: false
     sampling:
