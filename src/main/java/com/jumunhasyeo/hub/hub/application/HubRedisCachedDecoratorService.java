@@ -6,7 +6,6 @@ import com.jumunhasyeo.hub.hub.application.command.UpdateHubCommand;
 import com.jumunhasyeo.hub.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.hub.presentation.dto.HubSearchCondition;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,7 +24,7 @@ public class HubRedisCachedDecoratorService implements HubService {
 
     private final HubService hubService;
 
-    public HubRedisCachedDecoratorService(@Qualifier("hubServiceImpl") HubService hubService) {
+    public HubRedisCachedDecoratorService(HubService hubService) {
         this.hubService = hubService;
     }
 

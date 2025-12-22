@@ -9,99 +9,61 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * HubService 빈 설정 (고정 모드)
+ * 
+ * cache.dynamic=false 일 때만 동작
+ * cache.config.hubService 값에 따라 단일 구현체 등록
+ */
 @Configuration
 @Slf4j
+@ConditionalOnProperty(name = "cache.dynamic", havingValue = "false", matchIfMissing = true)
 public class HubServiceConfig {
 
-    /**
-     * 1순위: 캐시 명시적 활성화
-     */
     @Bean
-    @ConditionalOnProperty(
-            name = "cache.config.hubService",
-            havingValue = "CAFFEINE"
-    )
-    public HubService hubServiceCaffeineCached(
+    @ConditionalOnProperty(name = "cache.config.hubService", havingValue = "CAFFEINE")
+    public HubService hubServiceCaffeine(
             HubRepository hubRepository,
             HubRepositoryCustom hubRepositoryCustom,
             HubEventPublisher hubEventPublisher
     ) {
-        log.info("[1] Creating HubService WITH Caffeine Cache");
-
-        HubServiceImpl impl = new HubServiceImpl(
-                hubRepository,
-                hubRepositoryCustom,
-                hubEventPublisher
-        );
-
+        log.info("[FixedCache] Creating HubService with Caffeine");
+        HubServiceImpl impl = new HubServiceImpl(hubRepository, hubRepositoryCustom, hubEventPublisher);
         return new HubCaffeineCachedDecoratorService(impl);
     }
 
-    /**
-     * 1순위: 캐시 명시적 활성화
-     */
     @Bean
-    @ConditionalOnProperty(
-            name = "cache.config.hubService",
-            havingValue = "REDIS"
-    )
-    public HubService hubServiceRedisCached(
+    @ConditionalOnProperty(name = "cache.config.hubService", havingValue = "REDIS")
+    public HubService hubServiceRedis(
             HubRepository hubRepository,
             HubRepositoryCustom hubRepositoryCustom,
             HubEventPublisher hubEventPublisher
     ) {
-        log.info("2] Creating HubService WITH Redis Cache");
-
-        HubServiceImpl impl = new HubServiceImpl(
-                hubRepository,
-                hubRepositoryCustom,
-                hubEventPublisher
-        );
-
+        log.info("[FixedCache] Creating HubService with Redis");
+        HubServiceImpl impl = new HubServiceImpl(hubRepository, hubRepositoryCustom, hubEventPublisher);
         return new HubRedisCachedDecoratorService(impl);
     }
 
-    /**
-     * 2순위: 캐시 명시적 비활성화
-     */
     @Bean
-    @ConditionalOnProperty(
-            name = "cache.config.hubService",
-            havingValue = "NONE"
-    )
-    public HubService hubServiceNonCached(
+    @ConditionalOnProperty(name = "cache.config.hubService", havingValue = "NONE")
+    public HubService hubServiceNone(
             HubRepository hubRepository,
             HubRepositoryCustom hubRepositoryCustom,
             HubEventPublisher hubEventPublisher
     ) {
-        log.info("[2] Creating HubService WITHOUT Cache");
-
-        return new HubServiceImpl(
-                hubRepository,
-                hubRepositoryCustom,
-                hubEventPublisher
-        );
+        log.info("[FixedCache] Creating HubService without cache");
+        return new HubServiceImpl(hubRepository, hubRepositoryCustom, hubEventPublisher);
     }
 
-    /**
-     * 3순위: 폴백 (설정이 없거나 이상한 값일 때)
-     * 위 두 Bean이 없으면 자동으로 생성
-     */
     @Bean
-    @ConditionalOnMissingBean(HubService.class)  // HubService Bean이 없을 때만
+    @ConditionalOnMissingBean(HubService.class)
     public HubService hubServiceDefault(
             HubRepository hubRepository,
             HubRepositoryCustom hubRepositoryCustom,
             HubEventPublisher hubEventPublisher
     ) {
-        log.warn("[3] No cache config found, creating DEFAULT HubService WITH Caffeine Cache");
-
-        HubServiceImpl impl = new HubServiceImpl(
-                hubRepository,
-                hubRepositoryCustom,
-                hubEventPublisher
-        );
-
+        log.warn("[FixedCache] Fallback - Creating HubService with Caffeine");
+        HubServiceImpl impl = new HubServiceImpl(hubRepository, hubRepositoryCustom, hubEventPublisher);
         return new HubCaffeineCachedDecoratorService(impl);
     }
 }
