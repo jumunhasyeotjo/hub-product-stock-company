@@ -12,10 +12,20 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
-      ssl:
-        enabled: false
+      cache:
+        host: localhost
+        port: 6379
+        password:
+        timeout: 3000ms
+        ssl:
+          enabled: false  # TLS 활성화
+      black-friday:
+        host: localhost
+        port: 63799
+        password:
+        timeout: 3000ms
+        ssl:
+          enabled: false  # TLS 활성화
 
   datasource:
     url: jdbc:postgresql://localhost:5432/testdb

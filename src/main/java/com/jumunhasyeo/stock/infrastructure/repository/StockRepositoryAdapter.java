@@ -7,6 +7,7 @@ import com.jumunhasyeo.stock.domain.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,5 +50,10 @@ public class StockRepositoryAdapter implements StockRepository {
     @Override
     public Stock save(Stock stock) {
         return jpaStockRepository.save(stock);
+    }
+
+    @Override
+    public List<Stock> findAll() {
+        return jpaStockRepository.findAll();
     }
 }
