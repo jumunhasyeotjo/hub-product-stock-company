@@ -2,6 +2,8 @@ package com.jumunhasyeo.stock.infrastructure.repository;
 
 import com.jumunhasyeo.stock.domain.entity.Stock;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,4 +38,6 @@ public interface JpaStockRepository extends JpaRepository<Stock, UUID> {
             "WHERE s.productId = :productId " +
             "AND s.isDeleted = false")
     Optional<Stock> findStockByProductIdWithLock(UUID productId);
+
+    Page<Stock> findAll(Pageable pageable);
 }

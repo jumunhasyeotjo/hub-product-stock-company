@@ -11,12 +11,20 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD:}
-      timeout: 3000ms
-      ssl:
-        enabled: false  # TLS 활성화
+      cache:
+        host: ${REDIS_HOST}
+        port: ${REDIS_PORT}
+        password: ${REDIS_PASSWORD:}
+        timeout: 3000ms
+        ssl:
+          enabled: false  # TLS 활성화
+      black-friday:
+        host: ${BF_REDIS_HOST}
+        port: ${BF_REDIS_PORT}
+        password: ${BF_REDIS_PASSWORD:}
+        timeout: 3000ms
+        ssl:
+          enabled: false  # TLS 활성화
 
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
