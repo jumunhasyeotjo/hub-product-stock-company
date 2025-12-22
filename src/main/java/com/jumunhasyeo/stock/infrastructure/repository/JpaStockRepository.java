@@ -31,7 +31,7 @@ public interface JpaStockRepository extends JpaRepository<Stock, UUID> {
     @Query("UPDATE Stock s SET s.quantity = s.quantity + :amount WHERE s.stockId = :stockId AND s.quantity + :amount <= 2147483647")
     int increaseStock(UUID stockId, int amount);
 
-    @Lock(LockModeType.PESSIMISTIC_READ)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM Stock s " +
             "WHERE s.productId = :productId " +
             "AND s.isDeleted = false")
