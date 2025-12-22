@@ -59,6 +59,14 @@ services:
     depends_on:
       - kafka
 
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: delivery-redis-insight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+
 volumes:
   postgres_data:
   redis_data:

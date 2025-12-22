@@ -1,9 +1,6 @@
 package com.jumunhasyeo.common.config;
 
-import com.jumunhasyeo.hub.hub.application.HubCaffeineCachedDecoratorService;
-import com.jumunhasyeo.hub.hub.application.HubEventPublisher;
-import com.jumunhasyeo.hub.hub.application.HubService;
-import com.jumunhasyeo.hub.hub.application.HubServiceImpl;
+import com.jumunhasyeo.hub.hub.application.*;
 import com.jumunhasyeo.hub.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.hub.domain.repository.HubRepositoryCustom;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +19,14 @@ public class HubServiceConfig {
     @Bean
     @ConditionalOnProperty(
             name = "cache.config.hubService",
-            havingValue = "true"
+            havingValue = "CAFFEINE"
     )
-    public HubService hubServiceCached(
+    public HubService hubServiceCaffeineCached(
             HubRepository hubRepository,
             HubRepositoryCustom hubRepositoryCustom,
             HubEventPublisher hubEventPublisher
     ) {
-        log.info("[1] Creating HubService WITH Cache");
+        log.info("[1] Creating HubService WITH Caffeine Cache");
 
         HubServiceImpl impl = new HubServiceImpl(
                 hubRepository,
@@ -41,12 +38,36 @@ public class HubServiceConfig {
     }
 
     /**
+     * 1순위: 캐시 명시적 활성화
+     */
+    @Bean
+    @ConditionalOnProperty(
+            name = "cache.config.hubService",
+            havingValue = "REDIS"
+    )
+    public HubService hubServiceRedisCached(
+            HubRepository hubRepository,
+            HubRepositoryCustom hubRepositoryCustom,
+            HubEventPublisher hubEventPublisher
+    ) {
+        log.info("2] Creating HubService WITH Redis Cache");
+
+        HubServiceImpl impl = new HubServiceImpl(
+                hubRepository,
+                hubRepositoryCustom,
+                hubEventPublisher
+        );
+
+        return new HubRedisCachedDecoratorService(impl);
+    }
+
+    /**
      * 2순위: 캐시 명시적 비활성화
      */
     @Bean
     @ConditionalOnProperty(
             name = "cache.config.hubService",
-            havingValue = "false"
+            havingValue = "NONE"
     )
     public HubService hubServiceNonCached(
             HubRepository hubRepository,
@@ -73,7 +94,7 @@ public class HubServiceConfig {
             HubRepositoryCustom hubRepositoryCustom,
             HubEventPublisher hubEventPublisher
     ) {
-        log.warn("[3] No cache config found, creating DEFAULT HubService WITH Cache");
+        log.warn("[3] No cache config found, creating DEFAULT HubService WITH Caffeine Cache");
 
         HubServiceImpl impl = new HubServiceImpl(
                 hubRepository,
