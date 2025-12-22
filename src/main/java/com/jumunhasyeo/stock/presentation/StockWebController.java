@@ -5,12 +5,14 @@ import com.jumunhasyeo.stock.application.StockService;
 import com.jumunhasyeo.stock.application.command.CreateStockCommand;
 import com.jumunhasyeo.stock.application.command.DecreaseStockCommand;
 import com.jumunhasyeo.stock.application.command.DeleteStockCommand;
+import com.jumunhasyeo.stock.application.command.IncreaseStockCommand;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.presentation.docs.ApiDocDeleteStock;
 import com.jumunhasyeo.stock.presentation.docs.ApiDocGetStock;
 import com.jumunhasyeo.stock.presentation.dto.request.CreateStockReq;
 import com.jumunhasyeo.stock.presentation.dto.request.DecreaseStockReq;
 import com.jumunhasyeo.stock.presentation.dto.request.DeleteStockReq;
+import com.jumunhasyeo.stock.presentation.dto.request.IncrementStockReq;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -48,6 +50,22 @@ public class StockWebController {
     ) {
         StockRes stockRes = stockService.get(stockId);
         return ResponseEntity.ok(ApiRes.success(stockRes));
+    }
+
+    @PostMapping("/increment")
+    public ResponseEntity<ApiRes<Boolean>> increment(
+            @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
+            @Parameter(description = "재고 증가 요청 정보", required = true)
+            @RequestBody @Valid List<IncrementStockReq> productList
+    ) {
+        List<IncreaseStockCommand> commandList = productList
+                .stream()
+                .map(incrStockReq -> new IncreaseStockCommand(incrStockReq.productId(), incrStockReq.quantity()))
+                .toList();
+
+        List<StockRes> stockResList = stockService.increment(idempotencyKey, commandList);
+        return ResponseEntity.ok(ApiRes.success(true));
     }
 
     @PostMapping("/decrement")
