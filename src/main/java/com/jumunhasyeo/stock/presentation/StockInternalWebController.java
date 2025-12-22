@@ -10,10 +10,7 @@ import com.jumunhasyeo.stock.application.dto.response.StockHistoryRes;
 import com.jumunhasyeo.stock.application.dto.response.StockRes;
 import com.jumunhasyeo.stock.presentation.docs.ApiDocDecrementStock;
 import com.jumunhasyeo.stock.presentation.docs.ApiDocIncrementStock;
-import com.jumunhasyeo.stock.presentation.dto.request.DecreaseStockReq;
-import com.jumunhasyeo.stock.presentation.dto.request.IncrementStockReqList;
-import com.jumunhasyeo.stock.presentation.dto.request.ShippedStockReqList;
-import com.jumunhasyeo.stock.presentation.dto.request.StoreStockReqList;
+import com.jumunhasyeo.stock.presentation.dto.request.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -40,9 +37,9 @@ public class StockInternalWebController {
             @Parameter(description = "멱등키 (중복 요청 방지)", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
             @Parameter(description = "재고 증가 요청 정보", required = true)
-            @RequestBody @Valid IncrementStockReqList req
+            @RequestBody @Valid List<IncrementStockReq> productList
     ) {
-        List<IncreaseStockCommand> commandList = req.productList()
+        List<IncreaseStockCommand> commandList = productList
                 .stream()
                 .map(incrStockReq -> new IncreaseStockCommand(incrStockReq.productId(), incrStockReq.quantity()))
                 .toList();
