@@ -35,7 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HubCaffeineCachedDecoratorServiceIntegrationTest extends CommonTestContainer {
 
     @Autowired
-    @Qualifier("hubServiceCaffeine")
     private HubService hubService;
 
     @Autowired

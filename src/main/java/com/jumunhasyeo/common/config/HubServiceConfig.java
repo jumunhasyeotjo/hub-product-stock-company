@@ -10,14 +10,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * HubService 빈 설정 (고정 모드)
- * 
- * cache.dynamic=false 일 때만 동작
- * cache.config.hubService 값에 따라 단일 구현체 등록
+ * HubService 빈 설정
  */
 @Configuration
 @Slf4j
-@ConditionalOnProperty(name = "cache.dynamic", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = "dynamic.enabled", havingValue = "false", matchIfMissing = true)
 public class HubServiceConfig {
 
     @Bean
