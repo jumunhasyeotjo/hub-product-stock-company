@@ -115,7 +115,7 @@ function checkResponse(res, name) {
 // 단건 조회 (캐시 히트 측정)
 function getHubById(hubId) {
     const start = Date.now();
-    const res = http.get(`${BASE_URL}/internal/api/v1/hubs/${hubId}`, { headers, tags: { name: 'GetHubById' } });
+    const res = http.get(`${BASE_URL}/api/v1/hubs/${hubId}`, { headers, tags: { name: 'GetHubById' } });
     readLatency.add(Date.now() - start);
     
     if (!checkResponse(res, 'GetHubById')) {
@@ -127,7 +127,7 @@ function getHubById(hubId) {
 // 전체 조회 (캐시 효과 큼)
 function getAllHubs() {
     const start = Date.now();
-    const res = http.get(`${BASE_URL}/internal/api/v1/hubs`, { headers, tags: { name: 'GetAllHubs' } });
+    const res = http.get(`${BASE_URL}/api/v1/hubs`, { headers, tags: { name: 'GetAllHubs' } });
     getAllLatency.add(Date.now() - start);
     
     checkResponse(res, 'GetAllHubs');
@@ -238,7 +238,7 @@ export function setup() {
     console.log(`========================================\n`);
     
     // 현재 캐시 타입 확인
-    const res = http.get(`${BASE_URL}/internal/api/v1/dynamic`);
+    const res = http.get(`${BASE_URL}/api/v1/dynamic`);
     if (res.status === 200) {
         console.log(`Current config: ${res.body}`);
     }
