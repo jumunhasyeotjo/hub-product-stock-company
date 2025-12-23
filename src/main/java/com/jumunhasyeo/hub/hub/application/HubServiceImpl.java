@@ -10,6 +10,7 @@ import com.jumunhasyeo.hub.hub.domain.entity.Hub;
 import com.jumunhasyeo.hub.hub.domain.event.HubCreatedEvent;
 import com.jumunhasyeo.hub.hub.domain.event.HubDeletedEvent;
 import com.jumunhasyeo.hub.hub.domain.event.HubNameUpdatedEvent;
+import com.jumunhasyeo.hub.hub.domain.event.HubUpdatedEvent;
 import com.jumunhasyeo.hub.hub.domain.repository.HubRepository;
 import com.jumunhasyeo.hub.hub.domain.repository.HubRepositoryCustom;
 import com.jumunhasyeo.hub.hub.domain.vo.Address;
@@ -57,6 +58,7 @@ public class HubServiceImpl implements HubService{
         if(isChangedName(preName, hub)){
             hubEventPublisher.publishEvent(HubNameUpdatedEvent.of(hub));
         }
+        hubEventPublisher.publishEvent(HubUpdatedEvent.of(hub));
         return HubRes.from(hub);
     }
 

@@ -16,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +57,11 @@ public class StockService {
     @Transactional
     public List<StockRes> decrement(String idempotencyKey, List<DecreaseStockCommand> commandList){
         List<StockRes> result = new ArrayList<>();
+
+        commandList.sort(
+                Comparator.comparing(DecreaseStockCommand::productId)
+        );
+
         for (DecreaseStockCommand command : commandList) {
             result.add(stockVariationService.decrement(command));
         }
@@ -70,6 +73,11 @@ public class StockService {
     @Transactional
     public List<StockRes> increment(String idempotencyKey, List<IncreaseStockCommand> commandList){
         List<StockRes> result = new ArrayList<>();
+
+        commandList.sort(
+                Comparator.comparing(IncreaseStockCommand::productId)
+        );
+
         for (IncreaseStockCommand command : commandList) {
             result.add(stockVariationService.increment(command));
         }

@@ -10,12 +10,20 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD:}
-      timeout: 3000ms
-      ssl:
-        enabled: false  # TLS 활성화
+      cache:
+        host: ${REDIS_HOST}
+        port: ${REDIS_PORT}
+        password: ${REDIS_PASSWORD:}
+        timeout: 3000ms
+        ssl:
+          enabled: false  # TLS 활성화
+      black-friday:
+        host: ${BF_REDIS_HOST}
+        port: ${BF_REDIS_PORT}
+        password: ${BF_REDIS_PASSWORD:}
+        timeout: 3000ms
+        ssl:
+          enabled: false  # TLS 활성화
 
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -50,7 +58,11 @@ spring:
       retries: 3
     consumer:
       # 컨슈머 그룹
-      group-id: ${KAFKA_CONSUMER_GROUP} #hub-service-group
+      hub: ${KAFKA_CONSUMER_GROUP_HUB_DOMAIN}
+      hub-route: ${KAFKA_CONSUMER_GROUP_HUB-ROUTE_DOMAIN}
+      product: ${KAFKA_CONSUMER_GROUP_PRODUCT_DOMAIN}
+      stock: ${KAFKA_CONSUMER_GROUP_STOCK_DOMAIN}
+      company: ${KAFKA_CONSUMER_GROUP_COMPANY_DOMAIN}
 
 logging:
   level:
