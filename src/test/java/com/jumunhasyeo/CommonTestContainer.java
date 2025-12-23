@@ -13,6 +13,7 @@ public abstract class CommonTestContainer {
 
     private static final PostgreSQLContainer<?> POSTGRES_CONTAINER;
     private static final GenericContainer<?> REDIS_CONTAINER;
+    private static final GenericContainer<?> REDIS_BF_CONTAINER;
     private static final KafkaContainer KAFKA_CONTAINER;
 
     static {
@@ -27,6 +28,10 @@ public abstract class CommonTestContainer {
                 .withExposedPorts(6379)
                 .withReuse(true);
 
+        REDIS_BF_CONTAINER = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+                .withExposedPorts(6379)
+                .withReuse(true);
+
         KAFKA_CONTAINER = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.0"))
                 .withReuse(true);
 
@@ -36,6 +41,7 @@ public abstract class CommonTestContainer {
 
         System.out.println("Starting Redis container...");
         REDIS_CONTAINER.start();
+        REDIS_BF_CONTAINER.start();
         System.out.println("Redis container started at: " + REDIS_CONTAINER.getHost() + ":" + REDIS_CONTAINER.getMappedPort(6379));
 
         System.out.println("Starting Kafka container...");
@@ -57,8 +63,12 @@ public abstract class CommonTestContainer {
         registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.PostgreSQLDialect");
 
         // Redis 설정
-        registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
-        registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
+        registry.add("spring.data.redis.cache.host", REDIS_CONTAINER::getHost);
+        registry.add("spring.data.redis.cache.port", () -> REDIS_CONTAINER.getMappedPort(6379).toString());
+        registry.add("spring.data.redis.ssl.enabled", () -> "false");
+
+        registry.add("spring.data.redis.black-friday.host", REDIS_BF_CONTAINER::getHost);
+        registry.add("spring.data.redis.black-friday.port", () -> REDIS_BF_CONTAINER.getMappedPort(6379).toString());
         registry.add("spring.data.redis.ssl.enabled", () -> "false");
 
         // Kafka 설정

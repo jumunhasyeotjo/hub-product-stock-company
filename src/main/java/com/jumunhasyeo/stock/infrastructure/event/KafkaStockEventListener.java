@@ -22,7 +22,7 @@ public class KafkaStockEventListener {
 
     @KafkaListener(
             topics = "${spring.kafka.topics.order}",
-            groupId = "${spring.kafka.consumer.group-id}",
+            groupId = "${spring.kafka.consumer.stock}",
             containerFactory = "kafkaListenerContainerFactory"
     )
     public void listen(

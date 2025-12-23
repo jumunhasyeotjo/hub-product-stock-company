@@ -1,5 +1,6 @@
 package com.jumunhasyeo.common.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,17 +23,15 @@ import java.util.Map;
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host:localhost}")
-    private String redisHost;
-
-    @Value("${spring.data.redis.port:6379}")
-    private int redisPort;
-
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
+    @Primary
+    public RedisConnectionFactory cacheRedisConnectionFactory(
+            @Value("${spring.data.redis.cache.host}") String host,
+            @Value("${spring.data.redis.cache.port}") int port
+    ) {
         RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
-        redisConfig.setHostName(redisHost);
-        redisConfig.setPort(redisPort);
+        redisConfig.setHostName(host);
+        redisConfig.setPort(port);
 
         LettuceConnectionFactory factory = new LettuceConnectionFactory(redisConfig);
         factory.afterPropertiesSet();
@@ -40,14 +39,43 @@ public class RedisConfig {
     }
 
     @Bean
-    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
+    public RedisConnectionFactory bfRedisConnectionFactory(
+            @Value("${spring.data.redis.black-friday.host}") String host,
+            @Value("${spring.data.redis.black-friday.port}") int port
+    ) {
+        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
+        redisConfig.setHostName(host);
+        redisConfig.setPort(port);
+
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(redisConfig);
+        factory.afterPropertiesSet();
+        return factory;
+    }
+
+    @Bean
+    public StringRedisTemplate stringRedisTemplate(@Qualifier("cacheRedisConnectionFactory") RedisConnectionFactory connectionFactory) {
         return new StringRedisTemplate(connectionFactory);
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+    @Primary
+    public RedisTemplate<String, Object> redisTemplate(@Qualifier("cacheRedisConnectionFactory") RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
+
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> bfRedisTemplate(@Qualifier("bfRedisConnectionFactory") RedisConnectionFactory bfRedisConnectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(bfRedisConnectionFactory);
 
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());

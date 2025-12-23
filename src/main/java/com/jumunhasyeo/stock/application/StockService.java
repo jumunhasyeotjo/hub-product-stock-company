@@ -16,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +57,11 @@ public class StockService {
     @Transactional
     public List<StockRes> decrement(String idempotencyKey, List<DecreaseStockCommand> commandList){
         List<StockRes> result = new ArrayList<>();
+
+        commandList.sort(
+                Comparator.comparing(DecreaseStockCommand::productId)
+        );
+
         for (DecreaseStockCommand command : commandList) {
             result.add(stockVariationService.decrement(command));
         }
@@ -70,6 +73,11 @@ public class StockService {
     @Transactional
     public List<StockRes> increment(String idempotencyKey, List<IncreaseStockCommand> commandList){
         List<StockRes> result = new ArrayList<>();
+
+        commandList.sort(
+                Comparator.comparing(IncreaseStockCommand::productId)
+        );
+
         for (IncreaseStockCommand command : commandList) {
             result.add(stockVariationService.increment(command));
         }
@@ -78,7 +86,7 @@ public class StockService {
 
     private Stock getStock(UUID stockId){
         return stockRepository.findById(stockId)
-                .orElseThrow(()-> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(()-> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION, "stock(id="+ stockId +") 조회에 실패 했습니다."));
     }
 
     private boolean isExistHubAndProduct(CreateStockCommand command) {
@@ -97,7 +105,7 @@ public class StockService {
                 .toList();
 
         List<StockHistory> savedHistories = stockHistoryRepository.saveAll(histories);
-        
+
         return savedHistories.stream()
                 .map(StockHistoryRes::from)
                 .toList();
@@ -115,7 +123,7 @@ public class StockService {
                 .toList();
 
         List<StockHistory> savedHistories = stockHistoryRepository.saveAll(histories);
-        
+
         return savedHistories.stream()
                 .map(StockHistoryRes::from)
                 .toList();
