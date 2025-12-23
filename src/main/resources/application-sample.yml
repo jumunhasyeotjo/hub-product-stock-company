@@ -70,7 +70,7 @@ logging:
 
 cache:
   config:
-    hubService: ${HUB_SERVICE_CACHEABLE:true}  # true면 캐시주입, false면 원본 Service 주입
+    hubService: ${HUB_SERVICE_CACHEABLE:CAFFEINE}
 
 kakao:
   mobility:

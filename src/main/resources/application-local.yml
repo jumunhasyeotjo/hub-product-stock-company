@@ -70,9 +70,15 @@ logging:
     org.hibernate.internal: warn
 
 
+# 동적 구현체 전환 설정
+dynamic:
+  enabled: true           # true: 런타임 전환 모드
+  hubCache: CAFFEINE      # CAFFEINE | REDIS | NONE
+  stockLock: DEFAULT      # DEFAULT | PESSIMISTIC_LOCK
+
 cache:
   config:
-    hubService: ${HUB_SERVICE_CACHEABLE:true}  # true면 캐시주입, false면 원본 Service 주입
+    hubService: ${HUB_SERVICE_CACHEABLE:REDIS}  # dynamic.enabled=false 일 때 사용
 
 kakao:
   mobility:
@@ -134,12 +140,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
-  metrics:
-    enabled: false
-    export:
-      prometheus:
-        enabled: false
+        include: "*"
   tracing:
     enabled: false
     sampling:
