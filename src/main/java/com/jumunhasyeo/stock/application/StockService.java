@@ -105,7 +105,7 @@ public class StockService {
                 .toList();
 
         List<StockHistory> savedHistories = stockHistoryRepository.saveAll(histories);
-        
+
         return savedHistories.stream()
                 .map(StockHistoryRes::from)
                 .toList();
@@ -123,7 +123,7 @@ public class StockService {
                 .toList();
 
         List<StockHistory> savedHistories = stockHistoryRepository.saveAll(histories);
-        
+
         return savedHistories.stream()
                 .map(StockHistoryRes::from)
                 .toList();
