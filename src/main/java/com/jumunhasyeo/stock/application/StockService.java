@@ -58,11 +58,10 @@ public class StockService {
     public List<StockRes> decrement(String idempotencyKey, List<DecreaseStockCommand> commandList){
         List<StockRes> result = new ArrayList<>();
 
-        commandList.sort(
-                Comparator.comparing(DecreaseStockCommand::productId)
-        );
+        List<DecreaseStockCommand> sortedList = new ArrayList<>(commandList);
+        sortedList.sort(Comparator.comparing(DecreaseStockCommand::productId));
 
-        for (DecreaseStockCommand command : commandList) {
+        for (DecreaseStockCommand command : sortedList) {
             result.add(stockVariationService.decrement(command));
         }
         return result;
@@ -74,11 +73,10 @@ public class StockService {
     public List<StockRes> increment(String idempotencyKey, List<IncreaseStockCommand> commandList){
         List<StockRes> result = new ArrayList<>();
 
-        commandList.sort(
-                Comparator.comparing(IncreaseStockCommand::productId)
-        );
+        List<IncreaseStockCommand> sortedList = new ArrayList<>(commandList);
+        sortedList.sort(Comparator.comparing(IncreaseStockCommand::productId));
 
-        for (IncreaseStockCommand command : commandList) {
+        for (IncreaseStockCommand command : sortedList) {
             result.add(stockVariationService.increment(command));
         }
         return result;
