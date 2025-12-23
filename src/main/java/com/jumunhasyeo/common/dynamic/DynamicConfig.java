@@ -19,7 +19,7 @@ public class DynamicConfig {
      * CAFFEINE | REDIS | NONE
      */
     private String hubCache = HubServiceCacheType.CAFFEINE.name();
-    
+
     /**
      * StockVariationService 구현체 타입
      * DEFAULT | PESSIMISTIC_LOCK
