@@ -40,11 +40,11 @@
                 </providers>
             </encoder>
         </appender>
-
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-        </root>
     </springProfile>
+
+    <root level="ERROR">
+        <appender-ref ref="CONSOLE"/>
+    </root>
 
     <!-- test Profile -->
     <springProfile name="test">
