@@ -7,6 +7,7 @@ import com.jumunhasyeo.common.exception.ErrorCode;
 import com.jumunhasyeo.hub.hub.domain.event.HubCreatedEvent;
 import com.jumunhasyeo.hub.hub.domain.event.HubDeletedEvent;
 import com.jumunhasyeo.hub.hub.domain.event.HubNameUpdatedEvent;
+import com.jumunhasyeo.hub.hub.domain.event.HubUpdatedEvent;
 import com.jumunhasyeo.hub.hubRoute.domain.event.HubRouteCreatedEvent;
 import com.jumunhasyeo.hub.hubRoute.domain.event.HubRouteDeletedEvent;
 import lombok.RequiredArgsConstructor;
@@ -74,6 +75,16 @@ public class OutboxService {
 
     @Transactional
     public void save(HubRouteDeletedEvent event) {
+        try {
+            OutboxEvent outboxEvent = OutboxEvent.of(HUB_ROUTE_DELETED_EVENT.getEventName(), objectMapper.writeValueAsString(event), event.getEventKey(), hubTopic);
+            outboxRepository.save(outboxEvent);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to serialize event payload");
+        }
+    }
+
+    @Transactional
+    public void save(HubUpdatedEvent event) {
         try {
             OutboxEvent outboxEvent = OutboxEvent.of(HUB_ROUTE_DELETED_EVENT.getEventName(), objectMapper.writeValueAsString(event), event.getEventKey(), hubTopic);
             outboxRepository.save(outboxEvent);

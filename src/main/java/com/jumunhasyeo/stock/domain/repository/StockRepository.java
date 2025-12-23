@@ -1,7 +1,10 @@
 package com.jumunhasyeo.stock.domain.repository;
 
 import com.jumunhasyeo.stock.domain.entity.Stock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,4 +21,6 @@ public interface StockRepository {
     Optional<Stock> findById(UUID stockId);
 
     Stock save(Stock stock);
+
+    Page<Stock> findAll(Pageable pageable);
 }

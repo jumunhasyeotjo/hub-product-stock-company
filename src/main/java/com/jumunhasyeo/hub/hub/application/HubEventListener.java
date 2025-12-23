@@ -4,6 +4,7 @@ import com.jumunhasyeo.common.outbox.OutboxService;
 import com.jumunhasyeo.hub.hub.domain.event.HubCreatedEvent;
 import com.jumunhasyeo.hub.hub.domain.event.HubDeletedEvent;
 import com.jumunhasyeo.hub.hub.domain.event.HubNameUpdatedEvent;
+import com.jumunhasyeo.hub.hub.domain.event.HubUpdatedEvent;
 import com.jumunhasyeo.hub.hub.infrastructure.event.KafkaHubEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +58,38 @@ public class HubEventListener {
                 event.getHubId());
 
         outboxService.save(event);
+    }
+
+    /**
+     * Hub 이름 갱신 outbox 저장
+     * 트랜잭션 커밋 전 실행
+     */
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    public void handleHubUpdated(HubUpdatedEvent event) {
+        log.info("HubUpdatedEvent sync event received: (ID: {})",
+                event.getHubId());
+
+        outboxService.save(event);
+    }
+
+    /**
+     * Hub 생성 kafka 발송
+     * 트랜잭션 커밋 후 비동기 실행
+     */
+    @Async("eventExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void asyncHandleHubUpdated(HubUpdatedEvent event) {
+        log.info("HubUpdatedEvent async event received: (ID: {})",
+                event.getHubId());
+
+        var result = kafkaHubEventPublisher.publishEvent(event);
+        result.whenComplete((sendResult, exception) -> {
+            if (exception != null) {
+                log.error("Failed to publish HubCreatedEvent to Kafka for Hub ID: {}", event.getHubId(), exception);
+            } else {
+                outboxService.markAsProcessed(event.getEventKey());
+            }
+        });
     }
 
     /**

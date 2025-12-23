@@ -6,7 +6,6 @@ import com.jumunhasyeo.hub.hub.application.command.UpdateHubCommand;
 import com.jumunhasyeo.hub.hub.application.dto.response.HubRes;
 import com.jumunhasyeo.hub.hub.presentation.dto.HubSearchCondition;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,14 +18,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-public class HubCachedDecoratorService implements HubService {
+public class HubCaffeineCachedDecoratorService implements HubService {
 
     private static final String CACHE_NAME = "hub";
     private static final String CACHE_MANAGER_NAME = "caffeineCacheManager";
 
     private final HubService hubService;
 
-    public HubCachedDecoratorService(@Qualifier("hubServiceImpl") HubService hubService) {
+    public HubCaffeineCachedDecoratorService(HubService hubService) {
         this.hubService = hubService;
     }
 
@@ -96,5 +95,4 @@ public class HubCachedDecoratorService implements HubService {
     public List<HubRes> getAll() {
         return hubService.getAll();
     }
-
 }

@@ -73,11 +73,10 @@ class StockInternalWebControllerTest {
         // given
         UUID productId = UUID.randomUUID();
         UUID stockId = UUID.randomUUID();
-        ArrayList<IncrementStockReq> reqs = new ArrayList<>();
+        ArrayList<IncrementStockReq> request = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            reqs.add(new IncrementStockReq(stockId, 100));
+            request.add(new IncrementStockReq(stockId, 100));
         }
-        IncrementStockReqList request = new IncrementStockReqList(reqs);
         StockRes stockRes = StockRes.builder()
                 .stockId(stockId)
                 .hubId(UUID.randomUUID())

@@ -21,6 +21,14 @@ services:
     volumes:
       - redis_data:/data
 
+  redis-stock:
+    image: redis:latest
+    container_name: stock-redis
+    ports:
+      - "63799:6379"
+    volumes:
+      - redis_data:/data
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     ports:
@@ -58,6 +66,27 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
     depends_on:
       - kafka
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: delivery-redis-insight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "4000:3000"
+
+  k6:
+    image: grafana/k6
 
 volumes:
   postgres_data:

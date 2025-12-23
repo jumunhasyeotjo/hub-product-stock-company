@@ -37,6 +37,6 @@ public class StockVariationServicePessimisticLock implements StockVariationServi
 
     private Stock getStockByPessimisticLock(UUID productId) {
         return stockRepository.findByProductIdWithLock(productId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_EXCEPTION,"productId = "+productId));
     }
 }

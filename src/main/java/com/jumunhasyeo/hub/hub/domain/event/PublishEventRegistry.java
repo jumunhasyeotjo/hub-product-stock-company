@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum PublishEventRegistry {
     HUB_CREATED_EVENT(HubCreatedEvent.class.getSimpleName()),
     HUB_DELETED_EVENT(HubDeletedEvent.class.getSimpleName()),
-    HUB_NAME_UPDATED_EVENT(HubNameUpdatedEvent.class.getSimpleName());
+    HUB_NAME_UPDATED_EVENT(HubNameUpdatedEvent.class.getSimpleName()),
+    HUB_UPDATED_EVENT(HubUpdatedEvent.class.getSimpleName());
 
     private final String eventName;
 
