@@ -35,6 +35,7 @@ spring:
       connection-timeout: ${DB_CONNECTION_TIMEOUT}
   jpa:
     hibernate:
+      ddl-auto: update
     show-sql: false
     defer-datasource-initialization: true
     properties:
@@ -57,6 +58,11 @@ spring:
       retries: 3
     consumer:
       # 컨슈머 그룹
+      hub: ${KAFKA_CONSUMER_GROUP_HUB_DOMAIN}
+      hub-route: ${KAFKA_CONSUMER_GROUP_HUB-ROUTE_DOMAIN}
+      product: ${KAFKA_CONSUMER_GROUP_PRODUCT_DOMAIN}
+      stock: ${KAFKA_CONSUMER_GROUP_STOCK_DOMAIN}
+      company: ${KAFKA_CONSUMER_GROUP_COMPANY_DOMAIN}
 
 logging:
   level:
@@ -76,8 +82,15 @@ logging:
     org.hibernate.internal: warn
 
 
+# 동적 구현체 전환 설정
+dynamic:
+  enabled: true           # true: 런타임 전환 모드
+  hubCache: CAFFEINE      # CAFFEINE | REDIS | NONE
+  stockLock: DEFAULT      # DEFAULT | PESSIMISTIC_LOCK
+
 cache:
   config:
+    hubService: ${HUB_SERVICE_CACHEABLE:REDIS}  # dynamic.enabled=false 일 때 사용
 
 kakao:
   mobility:
@@ -139,6 +152,7 @@ management:
   endpoints:
     web:
       exposure:
+        include: "*"
   tracing:
     enabled: false
     sampling:
