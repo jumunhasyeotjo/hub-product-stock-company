@@ -8,10 +8,7 @@ import com.jumunhasyeo.hub.hub.application.command.CreateHubCommand;
 import com.jumunhasyeo.hub.hub.application.command.DeleteHubCommand;
 import com.jumunhasyeo.hub.hub.application.command.UpdateHubCommand;
 import com.jumunhasyeo.hub.hub.application.dto.response.HubRes;
-import com.jumunhasyeo.hub.hub.presentation.docs.ApiDocCreateHub;
-import com.jumunhasyeo.hub.hub.presentation.docs.ApiDocDeleteHub;
-import com.jumunhasyeo.hub.hub.presentation.docs.ApiDocSearchHub;
-import com.jumunhasyeo.hub.hub.presentation.docs.ApiDocUpdateHub;
+import com.jumunhasyeo.hub.hub.presentation.docs.*;
 import com.jumunhasyeo.hub.hub.presentation.dto.HubSearchCondition;
 import com.jumunhasyeo.hub.hub.presentation.dto.request.CreateHubReq;
 import com.jumunhasyeo.hub.hub.presentation.dto.request.DeleteHubReq;
@@ -27,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,6 +35,25 @@ import java.util.UUID;
 public class HubWebController {
 
     private final HubService hubService;
+
+    //TODO: 테스트용 삭제, 허브 단건 조회
+    @ApiDocGetHub
+    @GetMapping("/{hubId}")
+    public ResponseEntity<ApiRes<HubRes>> getById(
+            @Parameter(description = "조회할 허브의 ID", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable(name = "hubId") UUID hubId
+    ) {
+        HubRes hubRes = hubService.getById(hubId);
+        return ResponseEntity.ok(ApiRes.success(hubRes));
+    }
+
+    //TODO: 테스트용 삭제 허브 전체 조회
+    @ApiDocGetAllHubs
+    @GetMapping
+    public ResponseEntity<ApiRes<List<HubRes>>> getAll() {
+        List<HubRes> hubRes = hubService.getAll();
+        return ResponseEntity.ok(ApiRes.success(hubRes));
+    }
 
     //허브 검색 조회
     @ApiDocSearchHub

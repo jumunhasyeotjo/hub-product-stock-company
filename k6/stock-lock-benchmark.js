@@ -220,7 +220,7 @@ export function setup() {
     console.log(`========================================\n`);
     
     // 현재 설정 확인
-    const res = http.get(`${BASE_URL}/internal/api/v1/dynamic`);
+    const res = http.get(`${BASE_URL}/api/v1/dynamic`);
     if (res.status === 200) {
         console.log(`Current config: ${res.body}`);
     }
